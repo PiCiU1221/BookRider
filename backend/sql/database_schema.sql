@@ -1,3 +1,5 @@
+-- Database schema with create table statements
+
 BEGIN;
 
 -- Book related tables
@@ -28,11 +30,12 @@ CREATE TABLE languages
 CREATE TABLE books
 (
     id SERIAL PRIMARY KEY,
+    category_id INT REFERENCES categories(id),
     language_id INT NOT NULL REFERENCES languages(id),
     publisher_id INT REFERENCES publishers(id),
     title VARCHAR(255) NOT NULL,
     isbn VARCHAR(20) UNIQUE NOT NULL,
-    published_year INT
+    release_year INT
 );
 
 CREATE TABLE book_authors
@@ -49,9 +52,9 @@ CREATE TABLE addresses
     id SERIAL PRIMARY KEY,
     street VARCHAR(255) NOT NULL,
     city VARCHAR(100) NOT NULL,
-    postal_code VARCHAR(20),
-    latitude DECIMAL(9, 6),
-    longitude DECIMAL(9, 6)
+    postal_code VARCHAR(20) NOT NULL,
+    latitude DECIMAL(9, 6) NOT NULL,
+    longitude DECIMAL(9, 6) NOT NULL
 );
 
 -- Library related tables
@@ -59,7 +62,7 @@ CREATE TABLE addresses
 CREATE TABLE libraries
 (
     id SERIAL PRIMARY KEY,
-    address_id INT REFERENCES addresses(id),
+    address_id INT NOT NULL REFERENCES addresses(id),
     name VARCHAR(100) NOT NULL,
     phone_number VARCHAR(20),
     email VARCHAR(100),
@@ -144,15 +147,26 @@ CREATE TABLE orders
     user_id CHAR(10) NOT NULL REFERENCES users(id),
     driver_id CHAR(10) REFERENCES users(id),
     library_id INT NOT NULL REFERENCES libraries(id),
-    book_id INT NOT NULL REFERENCES books(id),
     target_address_id INT NOT NULL REFERENCES addresses(id),
     status VARCHAR(50) NOT NULL,
     payment_status VARCHAR(50) NOT NULL,
-    photo_url TEXT,
+    delivery_photo_url TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     accepted_at TIMESTAMP DEFAULT NULL,
     delivered_at TIMESTAMP DEFAULT NULL
+);
+
+CREATE TABLE order_items
+(
+    id SERIAL PRIMARY KEY,
+    order_id INT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    book_id INT NOT NULL REFERENCES books(id),
+    quantity INT NOT NULL CHECK (quantity > 0),
+    return_deadline TIMESTAMP DEFAULT NULL,
+    returned_quantity INT DEFAULT 0,
+    returned_at TIMESTAMP DEFAULT NULL,
+    status VARCHAR(50)
 );
 
 CREATE TABLE transactions
