@@ -88,8 +88,8 @@ CREATE TABLE users
     id CHAR(10) PRIMARY KEY,
     role_id INT NOT NULL REFERENCES roles(id),
     library_id INT REFERENCES libraries(id),
-    username VARCHAR(100),
     email VARCHAR(100) UNIQUE,
+    username VARCHAR(100),
     password VARCHAR(100) NOT NULL,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
@@ -146,14 +146,17 @@ CREATE TABLE orders
     id SERIAL PRIMARY KEY,
     user_id CHAR(10) NOT NULL REFERENCES users(id),
     driver_id CHAR(10) REFERENCES users(id),
+    librarian_id CHAR(10) REFERENCES users(id),
     library_id INT NOT NULL REFERENCES libraries(id),
     target_address_id INT NOT NULL REFERENCES addresses(id),
     status VARCHAR(50) NOT NULL,
     payment_status VARCHAR(50) NOT NULL,
     delivery_photo_url TEXT,
+    note_to_driver TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     accepted_at TIMESTAMP DEFAULT NULL,
+    picked_up_at TIMESTAMP DEFAULT NULL,
     delivered_at TIMESTAMP DEFAULT NULL
 );
 
