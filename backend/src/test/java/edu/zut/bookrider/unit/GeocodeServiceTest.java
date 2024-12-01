@@ -2,7 +2,6 @@ package edu.zut.bookrider.unit;
 
 import edu.zut.bookrider.dto.CoordinateDTO;
 import edu.zut.bookrider.exception.AddressNotFoundException;
-import edu.zut.bookrider.exception.InvalidCoordinatesException;
 import edu.zut.bookrider.service.GeocodeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
