@@ -1,4 +1,4 @@
-package edu.zut.bookrider.entity;
+package edu.zut.bookrider.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,15 +16,15 @@ import java.util.List;
 @Table(name = "books")
 public class Book extends BaseEntity<Integer> {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "language_id", nullable = false)
     private Language language;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "publisher_id")
     private Publisher publisher;
 
@@ -38,7 +38,7 @@ public class Book extends BaseEntity<Integer> {
     private Integer releaseYear;
 
     @Builder.Default
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "book_authors",
             joinColumns = @JoinColumn(name = "book_id"),
@@ -46,6 +46,9 @@ public class Book extends BaseEntity<Integer> {
     private List<Author> authors = new ArrayList<>();
 
     @Builder.Default
-    @ManyToMany(mappedBy = "books")
+    @ManyToMany(mappedBy = "books", fetch = FetchType.LAZY)
     private List<Library> libraries = new ArrayList<>();
+
+    @Column(name = "cover_image_url")
+    private String coverImageUrl;
 }

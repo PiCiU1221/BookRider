@@ -1,4 +1,4 @@
-package edu.zut.bookrider.entity;
+package edu.zut.bookrider.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Table(name = "users")
 public class User extends BaseEntity<Integer> {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 

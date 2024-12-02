@@ -1,4 +1,4 @@
-package edu.zut.bookrider.entity;
+package edu.zut.bookrider.model;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

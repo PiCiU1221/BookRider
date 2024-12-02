@@ -1,4 +1,4 @@
-package edu.zut.bookrider.entity;
+package edu.zut.bookrider.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,11 +20,6 @@ public class Category extends BaseEntity<Integer> {
     private String name;
 
     @Builder.Default
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Book> books = new ArrayList<>();
-
-    public void addBook(Book book){
-        books.add(book);
-        book.setCategory(this);
-    }
 }

@@ -1,18 +1,18 @@
-package edu.zut.bookrider.entity;
+package edu.zut.bookrider.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @Entity
 @Table(name = "orders")
@@ -47,7 +47,7 @@ public class Order extends BaseEntity<Integer> {
     @Column(name = "delivery_photo_url")
     private String deliveryPhotoUrl;
 
-    @Column(name = "none_to_driver")
+    @Column(name = "note_to_driver")
     private String noteToDriver;
 
     @CreationTimestamp
@@ -66,4 +66,7 @@ public class Order extends BaseEntity<Integer> {
 
     @Column(name = "delivered_at")
     private LocalDateTime deliveredAt;
+
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    private List<OrderItem> orderItems = new ArrayList<>();
 }

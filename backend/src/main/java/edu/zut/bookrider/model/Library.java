@@ -1,4 +1,4 @@
-package edu.zut.bookrider.entity;
+package edu.zut.bookrider.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,7 +35,7 @@ public class Library extends BaseEntity<Integer> {
     private LocalDateTime createdAt;
 
     @Builder.Default
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "library_books",
             joinColumns = @JoinColumn(name = "library_id"),
@@ -43,11 +43,6 @@ public class Library extends BaseEntity<Integer> {
     private List<Book> books = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<User> users = new ArrayList<>();
-
-    public void addUser(User user){
-        users.add(user);
-        user.setLibrary(this);
-    }
 }
