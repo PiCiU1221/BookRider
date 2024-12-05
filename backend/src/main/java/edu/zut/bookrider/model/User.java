@@ -11,12 +11,14 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @ToString(exclude = "library")
 @Builder
 @Entity
 @Table(name = "users")
-public class User extends BaseEntity<Integer> {
+public class User {
+
+    @Id
+    private String id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
@@ -33,12 +35,12 @@ public class User extends BaseEntity<Integer> {
 
     @Column(nullable = false)
     private String password;
-
+ 
     @Column(name = "first_name")
     private String firstName;
 
     @Column(name = "last_name")
-    private String last_name;
+    private String lastName;
 
     @Column(precision = 10, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
