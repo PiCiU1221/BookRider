@@ -3,7 +3,7 @@ package edu.zut.bookrider.unit;
 import edu.zut.bookrider.dto.CoordinateDTO;
 import edu.zut.bookrider.exception.AddressNotFoundException;
 import edu.zut.bookrider.service.GeocodeService;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +28,11 @@ public class GeocodeServiceTest {
     @Mock
     private RestTemplate restTemplate;
 
-    private String validLocationsJson;
-    private String noLocationsJson;
+    private static String validLocationsJson;
+    private static String noLocationsJson;
 
-    @BeforeEach
-    void setUp() throws IOException {
+    @BeforeAll
+    static void setUp() throws IOException {
         validLocationsJson = new String(Files.readAllBytes(Paths.get("src/test/resources/geocodeServiceTest/valid-locations-api-response.json")));
         noLocationsJson = new String(Files.readAllBytes(Paths.get("src/test/resources/geocodeServiceTest/no-locations-api-response.json")));
     }
