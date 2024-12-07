@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.zut.bookrider.dto.CoordinateDTO;
 import edu.zut.bookrider.exception.AddressNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+@RequiredArgsConstructor
 @Service
 public class GeocodeService {
 
@@ -18,7 +20,7 @@ public class GeocodeService {
 
     private final String baseUrl = "https://api.openrouteservice.org";
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     public CoordinateDTO getCoordinatesFromAddress (String street, String city, String postalCode) {
         String jsonResponse = callApiForGeocodeResponse(street, city, postalCode);

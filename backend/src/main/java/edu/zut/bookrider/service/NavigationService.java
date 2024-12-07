@@ -8,6 +8,7 @@ import edu.zut.bookrider.dto.NavigationResponseDTO;
 import edu.zut.bookrider.exception.ExternalApiException;
 import edu.zut.bookrider.exception.InvalidCoordinatesException;
 import edu.zut.bookrider.service.enums.TransportProfile;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -18,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class NavigationService {
 
@@ -26,7 +28,7 @@ public class NavigationService {
 
     private final String baseUrl = "https://api.openrouteservice.org";
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     public NavigationResponseDTO getDirectionsFromCoordinates(CoordinateDTO startCoordinates, CoordinateDTO endCoordinates, TransportProfile transportProfile) {
         String jsonResponse = callApiForDirections(startCoordinates, endCoordinates, transportProfile);
