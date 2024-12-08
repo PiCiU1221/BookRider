@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import RegistrationForm from './LibAdminRegisterForm.tsx';
+import LoginPage from './LibAdminLoginForm.tsx';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App: React.FC = () => {
+    return (
+        <Router>
+            <div>
+                <img
+                    src="/book-rider-high-resolution-logo.png"
+                    alt="Logo"
+                    style={{ width: '300px', display: 'block', margin: '0 auto' }}
+                />
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+                {/* Default Page */}
+                <Routes>
+                    <Route
+                        path="/"
+                        element={
+                            <div style={{ textAlign: 'center', margin: '20px 0' }}>
+                                <Link to="/login">
+                                    <button style={{ margin: '10px', padding: '10px 20px'}}>
+                                        Logowanie
+                                    </button>
+                                </Link>
+                                <Link to="/register">
+                                    <button style={{ margin: '10px', padding: '10px 20px'}}>
+                                        Rejestracja
+                                    </button>
+                                </Link>
+                            </div>
+                        }
+                    />
 
-export default App
+                    {/* Routes for Login and Register pages */}
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegistrationForm />} />
+                </Routes>
+            </div>
+        </Router>
+    );
+};
+
+export default App;
