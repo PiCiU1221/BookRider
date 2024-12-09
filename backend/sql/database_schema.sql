@@ -35,7 +35,8 @@ CREATE TABLE books
     publisher_id INT REFERENCES publishers(id),
     title VARCHAR(255) NOT NULL,
     isbn VARCHAR(20) UNIQUE NOT NULL,
-    release_year INT
+    release_year INT,
+    cover_image_url TEXT
 );
 
 CREATE TABLE book_authors

@@ -40,12 +40,12 @@ VALUES
     ('Niemiecki'),
     ('Francuski');
 
-INSERT INTO books (category_id, language_id, publisher_id, title, isbn, release_year)
+INSERT INTO books (category_id, language_id, publisher_id, title, isbn, release_year, cover_image_url)
 VALUES
-    (1, 1, 1, 'Quo Vadis', '9788373271890', 2020),
-    (2, 1, 2, 'Pan Tadeusz', '9788306014057', 2018),
-    (3, 1, 3, 'Faraon', '9788370200121', 2021),
-    (4, 1, 4, 'O krasnoludkach i sierotce Marysi', '9788373271906', 2019);
+    (1, 1, 1, 'Quo Vadis', '9788373271890', 2020, 'imgur.com/1'),
+    (2, 1, 2, 'Pan Tadeusz', '9788306014057', 2018, 'imgur.com/2'),
+    (3, 1, 3, 'Faraon', '9788370200121', 2021, 'imgur.com/3'),
+    (4, 1, 4, 'O krasnoludkach i sierotce Marysi', '9788373271906', 2019, 'imgur.com/4');
 
 INSERT INTO book_authors (book_id, author_id)
 VALUES
