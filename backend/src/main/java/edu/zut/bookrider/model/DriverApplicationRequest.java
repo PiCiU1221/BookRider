@@ -27,7 +27,7 @@ public class DriverApplicationRequest extends BaseEntity<Integer> {
     private User reviewedBy;
 
     @Enumerated(EnumType.STRING)
-    private DriverApplicationStatus driverApplicationStatus;
+    private DriverApplicationStatus status;
 
     @CreationTimestamp
     @Column(name = "submitted_at", updatable = false)

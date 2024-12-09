@@ -41,7 +41,7 @@ public class Order extends BaseEntity<Integer> {
     private Address targetAddress;
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
+    private OrderStatus status;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;

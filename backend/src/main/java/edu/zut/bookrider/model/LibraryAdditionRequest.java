@@ -37,7 +37,7 @@ public class LibraryAdditionRequest extends BaseEntity<Integer> {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private LibraryAdditionStatus libraryAdditionStatus;
+    private LibraryAdditionStatus status;
 
     @CreationTimestamp
     @Column(name = "submitted_at", updatable = false)
