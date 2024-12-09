@@ -1,5 +1,6 @@
 package edu.zut.bookrider.model;
 
+import edu.zut.bookrider.model.enums.DriverApplicationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -25,8 +26,8 @@ public class DriverApplicationRequest extends BaseEntity<Integer> {
     @JoinColumn(name = "reviewed_by")
     private User reviewedBy;
 
-    @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private DriverApplicationStatus driverApplicationStatus;
 
     @CreationTimestamp
     @Column(name = "submitted_at", updatable = false)

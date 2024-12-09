@@ -1,5 +1,7 @@
 package edu.zut.bookrider.model;
 
+import edu.zut.bookrider.model.enums.OrderStatus;
+import edu.zut.bookrider.model.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -38,11 +40,11 @@ public class Order extends BaseEntity<Integer> {
     @JoinColumn(name = "target_address_id", nullable = false)
     private Address targetAddress;
 
-    @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
 
-    @Column(name = "payment_status", nullable = false)
-    private String paymentStatus;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
 
     @Column(name = "delivery_photo_url")
     private String deliveryPhotoUrl;
