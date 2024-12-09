@@ -1,5 +1,6 @@
 package edu.zut.bookrider.model;
 
+import edu.zut.bookrider.model.enums.LibraryAdditionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -35,8 +36,8 @@ public class LibraryAdditionRequest extends BaseEntity<Integer> {
 
     private String email;
 
-    @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private LibraryAdditionStatus status;
 
     @CreationTimestamp
     @Column(name = "submitted_at", updatable = false)

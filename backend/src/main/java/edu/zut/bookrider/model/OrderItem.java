@@ -1,5 +1,6 @@
 package edu.zut.bookrider.model;
 
+import edu.zut.bookrider.model.enums.OrderItemStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,5 +35,6 @@ public class OrderItem extends BaseEntity<Integer> {
     @Column(name = "returned_at")
     private LocalDateTime returnedAt;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderItemStatus status;
 }
