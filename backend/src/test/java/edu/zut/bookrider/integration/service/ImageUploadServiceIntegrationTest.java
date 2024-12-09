@@ -1,4 +1,4 @@
-package edu.zut.bookrider.integration;
+package edu.zut.bookrider.integration.service;
 
 import edu.zut.bookrider.service.ImageUploadService;
 import org.junit.jupiter.api.Test;

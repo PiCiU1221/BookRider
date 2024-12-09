@@ -1,4 +1,4 @@
-package edu.zut.bookrider.integration;
+package edu.zut.bookrider.integration.service;
 
 import edu.zut.bookrider.dto.CoordinateDTO;
 import edu.zut.bookrider.exception.AddressNotFoundException;

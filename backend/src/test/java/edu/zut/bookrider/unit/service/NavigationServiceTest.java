@@ -1,24 +1,47 @@
-package edu.zut.bookrider.integration;
+package edu.zut.bookrider.unit.service;
 
 import edu.zut.bookrider.dto.CoordinateDTO;
 import edu.zut.bookrider.dto.NavigationResponseDTO;
 import edu.zut.bookrider.exception.InvalidCoordinatesException;
 import edu.zut.bookrider.service.NavigationService;
 import edu.zut.bookrider.service.enums.TransportProfile;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class NavigationServiceIntegrationTest {
+public class NavigationServiceTest {
 
     @Autowired
     private NavigationService navigationService;
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    private String validRouteJson;
+    private String noRouteJson;
+    private String invalidCoordinatesJson;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        validRouteJson = new String(Files.readAllBytes(Paths.get("src/test/resources/navigationServiceTest/valid-route-api-response.json")));
+        noRouteJson = new String(Files.readAllBytes(Paths.get("src/test/resources/navigationServiceTest/no-route-api-response.json")));
+        invalidCoordinatesJson = new String(Files.readAllBytes(Paths.get("src/test/resources/navigationServiceTest/invalid-coordinates-api-response.json")));
+    }
 
     @Test
     void whenPossibleRouteFromInput_thenNavigationStepsShouldBeCorrect() {
@@ -32,6 +55,8 @@ public class NavigationServiceIntegrationTest {
         CoordinateDTO endCoordinates = new CoordinateDTO(endLatitude, endLongitude);
 
         TransportProfile transportProfile = TransportProfile.CAR;
+
+        when(restTemplate.getForObject(anyString(), eq(String.class))).thenReturn(validRouteJson);
 
         NavigationResponseDTO navigationResponseDTO = navigationService.getDirectionsFromCoordinates(startCoordinates, endCoordinates, transportProfile);
 
@@ -74,6 +99,8 @@ public class NavigationServiceIntegrationTest {
         CoordinateDTO endCoordinates = new CoordinateDTO(14.504721, 53.434444);
         TransportProfile transportProfile = TransportProfile.CAR;
 
+        when(restTemplate.getForObject(anyString(), eq(String.class))).thenReturn(noRouteJson);
+
         InvalidCoordinatesException thrownException = assertThrows(
                 InvalidCoordinatesException.class,
                 () -> navigationService.getDirectionsFromCoordinates(startCoordinates, endCoordinates, transportProfile)
@@ -87,6 +114,8 @@ public class NavigationServiceIntegrationTest {
         CoordinateDTO startCoordinates = new CoordinateDTO(14.504721, 53.434444);
         CoordinateDTO endCoordinates = new CoordinateDTO(290.504721, 53.434444);
         TransportProfile transportProfile = TransportProfile.CAR;
+
+        when(restTemplate.getForObject(anyString(), eq(String.class))).thenReturn(invalidCoordinatesJson);
 
         InvalidCoordinatesException thrownException = assertThrows(
                 InvalidCoordinatesException.class,

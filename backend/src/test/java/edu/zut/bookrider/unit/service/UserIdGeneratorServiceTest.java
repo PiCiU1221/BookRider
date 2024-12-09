@@ -1,4 +1,4 @@
-package edu.zut.bookrider.unit;
+package edu.zut.bookrider.unit.service;
 
 import edu.zut.bookrider.repository.UserRepository;
 import edu.zut.bookrider.service.UserIdGeneratorService;
