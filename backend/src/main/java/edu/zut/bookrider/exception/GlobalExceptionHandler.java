@@ -1,6 +1,7 @@
 package edu.zut.bookrider.exception;
 
 import edu.zut.bookrider.dto.ErrorApiResponseDTO;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorApiResponseDTO> handleConstraintViolationExceptions(ConstraintViolationException ex) {
         List<String> errorMessages = ex.getConstraintViolations()
                 .stream()
-                .map(violation -> violation.getMessage())
+                .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList());
 
         ErrorApiResponseDTO errorResponse = new ErrorApiResponseDTO(400, String.join(", ", errorMessages));

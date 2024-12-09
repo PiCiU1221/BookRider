@@ -8,7 +8,6 @@ import edu.zut.bookrider.repository.AddressRepository;
 import edu.zut.bookrider.repository.LibraryRepository;
 import edu.zut.bookrider.repository.RoleRepository;
 import edu.zut.bookrider.repository.UserRepository;
-import edu.zut.bookrider.security.AuthService;
 import edu.zut.bookrider.service.UserIdGeneratorService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +34,6 @@ public class AuthControllerIntegrationTest {
     private WebApplicationContext context;
 
     private MockMvc mockMvc;
-
-    @Autowired
-    private AuthService authService;
 
     @Autowired
     private UserRepository userRepository;
