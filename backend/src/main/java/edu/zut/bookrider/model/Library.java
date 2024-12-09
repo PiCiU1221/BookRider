@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@ToString(exclude = {"users","books"})
+@ToString(exclude = {"books"})
 @Builder
 @Entity
 @Table(name = "libraries")
@@ -41,8 +41,4 @@ public class Library extends BaseEntity<Integer> {
             joinColumns = @JoinColumn(name = "library_id"),
             inverseJoinColumns = @JoinColumn(name = "book_id"))
     private List<Book> books = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<User> users = new ArrayList<>();
 }
