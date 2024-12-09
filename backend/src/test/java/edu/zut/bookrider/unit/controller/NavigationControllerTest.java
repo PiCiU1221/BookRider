@@ -1,4 +1,4 @@
-package edu.zut.bookrider.unit;
+package edu.zut.bookrider.unit.controller;
 
 import edu.zut.bookrider.controller.NavigationController;
 import edu.zut.bookrider.dto.CoordinateDTO;

@@ -1,4 +1,4 @@
-package edu.zut.bookrider.unit;
+package edu.zut.bookrider.unit.service;
 
 import edu.zut.bookrider.service.ImageUploadService;
 import org.junit.jupiter.api.BeforeAll;
