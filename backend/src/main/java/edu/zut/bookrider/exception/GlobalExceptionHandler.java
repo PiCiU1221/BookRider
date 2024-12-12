@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -63,17 +64,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorApiResponseDTO> handleGenericExceptions(BadCredentialsException ex) {
-        ErrorApiResponseDTO errorResponse = new ErrorApiResponseDTO(401,  ex.getMessage());
+        ErrorApiResponseDTO errorResponse = new ErrorApiResponseDTO(401, ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorApiResponseDTO> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage())
         );
-        return ResponseEntity.badRequest().body(errors);
+        ErrorApiResponseDTO errorResponse = new ErrorApiResponseDTO(400, errors.toString());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ErrorApiResponseDTO> handleMissingServletRequestPartException(MissingServletRequestPartException ex) {
+        String message = "Required part '" + ex.getRequestPartName() + "' is not present";
+        ErrorApiResponseDTO errorResponse = new ErrorApiResponseDTO(400,  message);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
