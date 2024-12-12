@@ -181,35 +181,6 @@ const RegistrationForm: React.FC = () => {
                         style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
                 </div>
-                <div style={{marginBottom: '10px'}}>
-                    <label htmlFor="line1" style={{display: 'block', marginBottom: '5px'}}>
-                        Adres biblioteki linia 1:
-                    </label>
-                    <input
-                        type="text"
-                        id="line1"
-                        name="line1"
-                        value={addressLines.line1}
-                        onChange={handleInputChange}
-                        maxLength={35}
-                        required
-                        style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
-                    />
-                </div>
-                <div style={{marginBottom: '10px'}}>
-                    <label htmlFor="line2" style={{display: 'block', marginBottom: '5px'}}>
-                        Adres biblioteki linia 2:
-                    </label>
-                    <input
-                        type="text"
-                        id="line2"
-                        name="line2"
-                        value={addressLines.line2}
-                        onChange={handleInputChange}
-                        maxLength={35}
-                        style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
-                    />
-                </div>
                 {error && (
                     <p style={{color: 'red', marginBottom: '10px'}}>{error}</p>
                 )}
