@@ -18,7 +18,7 @@ public class AuthController {
     @PostMapping("/login/{role}")
     public ResponseEntity<?> authenticateAccount(
             @PathVariable String role,
-            @Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+            @RequestBody @Valid LoginRequestDTO loginRequestDTO) {
 
         String token = authService.authenticateBasicAccount(loginRequestDTO, role);
 
@@ -30,7 +30,7 @@ public class AuthController {
 
     @PostMapping("/login/librarian")
     public ResponseEntity<?> authenticateLibrarian(
-            @RequestBody LibrarianLoginRequestDTO librarianLoginRequestDTO) {
+            @RequestBody @Valid LibrarianLoginRequestDTO librarianLoginRequestDTO) {
 
         String token = authService.authenticateLibrarian(librarianLoginRequestDTO);
 
@@ -51,7 +51,7 @@ public class AuthController {
     @PostMapping("/register/{role}")
     public ResponseEntity<?> registerAccount(
             @PathVariable String role,
-            @RequestBody CreateAdvancedAccountDTO createAdvancedAccountDTO) {
+            @RequestBody @Valid CreateAdvancedAccountDTO createAdvancedAccountDTO) {
 
         CreateAccountResponseDTO savedUserDTO = authService.createAdvancedAccount(createAdvancedAccountDTO, role);
 
