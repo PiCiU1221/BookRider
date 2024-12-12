@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface FormData {
     firstName: string;
@@ -28,8 +28,6 @@ const RegistrationForm: React.FC = () => {
     });
 
     const [error, setError] = useState<string | null>(null);
-
-    const navigate = useNavigate();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = e.target;
@@ -84,7 +82,7 @@ const RegistrationForm: React.FC = () => {
         const finalFormData = { ...formData, library_address: combinedAddress };
         console.log('Form Data:', finalFormData);
 
-        navigate('/processing');
+        // Add form submission logic (e.g., API call) here
     };
 
     return (
@@ -189,7 +187,7 @@ const RegistrationForm: React.FC = () => {
                     style={{
                         width: '100%',
                         padding: '10px',
-                        backgroundColor: '#007BFF',
+                        backgroundColor: '#3B576C',
                         color: '#fff',
                         border: 'none',
                         borderRadius: '4px',

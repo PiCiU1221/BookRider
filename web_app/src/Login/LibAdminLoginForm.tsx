@@ -40,6 +40,7 @@ const LoginPage: React.FC = () => {
                         name="username"
                         value={username}
                         onChange={handleInputChange}
+                        maxLength={25}
                         required
                         style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
                     />
@@ -54,6 +55,7 @@ const LoginPage: React.FC = () => {
                         name="password"
                         value={password}
                         onChange={handleInputChange}
+                        maxLength={25}
                         required
                         style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
                     />
