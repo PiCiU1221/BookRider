@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface FormData {
     firstName: string;
@@ -29,14 +29,14 @@ const RegistrationForm: React.FC = () => {
 
     const [error, setError] = useState<string | null>(null);
 
+    const navigate = useNavigate();
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = e.target;
 
         if (name === 'line1' || name === 'line2') {
-            // Update address lines
             setAddressLines((prev) => ({ ...prev, [name]: value }));
         } else {
-            // Update other form fields
             setFormData((prev) => ({ ...prev, [name]: value }));
         }
     };
@@ -46,10 +46,20 @@ const RegistrationForm: React.FC = () => {
         return passwordRegex.test(password);
     };
 
+    const isUsernameValid = (username: string): boolean => {
+        const usernameRegex = /^[a-zA-Z\d-]+$/;
+        return usernameRegex.test(username);
+    };
+
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
         e.preventDefault();
 
-        // Check if username is at least 10 characters long
+        if (!isUsernameValid(formData.username)) {
+            setError('Nazwa użytkownika może zawierać tylko litery, cyfry i myślniki.');
+            return;
+        }
+
         if (formData.username.length < 10) {
             setError('Nazwa użytkownika musi mieć co najmniej 10 znaków.');
             return;
@@ -73,7 +83,8 @@ const RegistrationForm: React.FC = () => {
 
         const finalFormData = { ...formData, library_address: combinedAddress };
         console.log('Form Data:', finalFormData);
-        // Add form submission logic (e.g., API call) here
+
+        navigate('/processing');
     };
 
     return (
@@ -90,6 +101,7 @@ const RegistrationForm: React.FC = () => {
                         name="firstName"
                         value={formData.firstName}
                         onChange={handleInputChange}
+                        maxLength={25}
                         required
                         style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
@@ -104,6 +116,7 @@ const RegistrationForm: React.FC = () => {
                         name="lastName"
                         value={formData.lastName}
                         onChange={handleInputChange}
+                        maxLength={25}
                         required
                         style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
@@ -118,6 +131,7 @@ const RegistrationForm: React.FC = () => {
                         name="username"
                         value={formData.username}
                         onChange={handleInputChange}
+                        maxLength={25}
                         required
                         style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
@@ -132,6 +146,7 @@ const RegistrationForm: React.FC = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
+                        maxLength={25}
                         required
                         style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
@@ -146,20 +161,22 @@ const RegistrationForm: React.FC = () => {
                         name="password"
                         value={formData.password}
                         onChange={handleInputChange}
+                        maxLength={25}
                         required
                         style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
                 </div>
                 <div style={{marginBottom: '10px'}}>
-                    <label htmlFor="confirmPassword" style={{display: 'block', marginBottom: '5px'}}>
+                    <label htmlFor="confirm_password" style={{display: 'block', marginBottom: '5px'}}>
                         Powtórz hasło:
                     </label>
                     <input
                         type="password"
-                        id="confirmPassword"
-                        name="confirmPassword"
+                        id="confirm_password"
+                        name="confirm_password"
                         value={formData.confirm_password}
                         onChange={handleInputChange}
+                        maxLength={25}
                         required
                         style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
@@ -174,6 +191,7 @@ const RegistrationForm: React.FC = () => {
                         name="line1"
                         value={addressLines.line1}
                         onChange={handleInputChange}
+                        maxLength={35}
                         required
                         style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
@@ -188,6 +206,7 @@ const RegistrationForm: React.FC = () => {
                         name="line2"
                         value={addressLines.line2}
                         onChange={handleInputChange}
+                        maxLength={35}
                         style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
                 </div>

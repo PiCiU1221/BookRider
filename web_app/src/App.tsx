@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import RegistrationForm from './LibAdminRegisterForm.tsx';
 import LoginPage from './LibAdminLoginForm.tsx';
+import ProcessingPage from './ProcessingInfo.tsx';
 
 const App: React.FC = () => {
     return (
@@ -36,6 +37,9 @@ const App: React.FC = () => {
                     {/* Routes for Login and Register pages */}
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegistrationForm />} />
+
+                    <Route path="/" element={<RegistrationForm />} />
+                    <Route path="/processing" element={<ProcessingPage />} />
                 </Routes>
             </div>
         </Router>
