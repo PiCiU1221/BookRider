@@ -1,42 +1,55 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+body {
+  background-color: #3B576C; /* Set the background color for the entire page */
+  margin: 0;                  /* Remove default margin */
+  font-family: Arial, sans-serif; /* Set your desired font */
+  display: flex;              /* Add Flexbox to the body */
+  justify-content: center;    /* Center children horizontally */
+  align-items: center;        /* Center children vertically */
+  height: 100vh;              /* Full viewport height to enable vertical centering */
 }
 
+.app-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centers content within the container vertically */
+  align-items: center;     /* Centers content within the container horizontally */
+  background-color: #3B576C; /* Dark background color */
+  color: #fff;             /* Default text color */
+}
+
+/* Logo container styling */
+.logo-container {
+  background-color: #3b576c;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  border-radius: 8px; /* Optional rounded corners */
+  margin-bottom: 20px; /* Space below the logo */
+}
+
+/* Logo styling */
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  width: 300px; /* Fixed logo width */
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Button container styling */
+.button-container {
+  text-align: center;
+  margin: 20px 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* Action button styling */
+.action-button {
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: #2d343a;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.action-button:hover {
+  background-color: #5c7b92; /* Slightly lighter on hover */
 }
