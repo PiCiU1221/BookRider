@@ -25,7 +25,7 @@ const SystemAdminDashboard: React.FC = () => {
     };
 
     return (
-        <div style={{ fontFamily: 'Arial, sans-serif' }}>
+        <div style={{ backgroundColor: "#3B576C", marginBottom: "-250px", fontFamily: 'Arial, sans-serif' }}>
             {/* Top Panel */}
             <div
                 style={{
@@ -38,6 +38,7 @@ const SystemAdminDashboard: React.FC = () => {
                     position: 'sticky',
                     top: 0,
                     zIndex: 1100,
+                    marginTop: "-40px"
                 }}
             >
                 <div>
