@@ -86,14 +86,8 @@ const RegistrationForm: React.FC = () => {
     };
 
     return (
-        <div style={{maxWidth: '400px', margin: 'auto', padding: '20px'}}>
-            <h2 style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: '-90px',
-                marginBottom: '-5px'
-            }}>Rejestracja</h2>
+        <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px' }}>
+            <h2>Rejestracja</h2>
             <form onSubmit={handleSubmit}>
                 <div style={{marginBottom: '10px'}}>
                     <label htmlFor="firstName" style={{display: 'block', marginBottom: '5px'}}>
@@ -107,7 +101,7 @@ const RegistrationForm: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
                 </div>
                 <div style={{marginBottom: '10px'}}>
@@ -122,7 +116,7 @@ const RegistrationForm: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
                 </div>
                 <div style={{marginBottom: '10px'}}>
@@ -137,7 +131,7 @@ const RegistrationForm: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
                 </div>
                 <div style={{marginBottom: '10px'}}>
@@ -152,7 +146,7 @@ const RegistrationForm: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
                 </div>
                 <div style={{marginBottom: '10px'}}>
@@ -167,7 +161,7 @@ const RegistrationForm: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
                 </div>
                 <div style={{marginBottom: '10px'}}>
@@ -182,7 +176,7 @@ const RegistrationForm: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={{width: '100%', padding: '8px', boxSizing: 'border-box'}}
                     />
                 </div>
                 {error && (
@@ -193,12 +187,11 @@ const RegistrationForm: React.FC = () => {
                     style={{
                         width: '100%',
                         padding: '10px',
-                        backgroundColor: '#2d343a',
+                        backgroundColor: '#3B576C',
                         color: '#fff',
                         border: 'none',
                         borderRadius: '4px',
                         cursor: 'pointer',
-                        marginTop: "15px"
                     }}
                 >
                     Rejestracja
@@ -208,14 +201,7 @@ const RegistrationForm: React.FC = () => {
             {/* Navigation */}
             <div style={{marginTop: '20px', textAlign: 'center'}}>
                 <Link to="/login">
-                    <button style={{
-                        backgroundColor: '#3B576C',
-                        color: '#f7ca65',
-                        margin: '10px',
-                        padding: '0px 30px',
-                        marginBottom: "0px"
-                    }}>Jesteś już zarejestrowany?
-                    </button>
+                    <button style={{margin: '10px', padding: '10px 20px'}}>Logowanie</button>
                 </Link>
             </div>
         </div>

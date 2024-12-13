@@ -27,11 +27,11 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div style={{maxWidth: '400px', margin: 'auto', padding: '20px'}}>
-            <h2 style={{display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '70px' }}>Logowanie</h2>
+        <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px' }}>
+            <h2>Logowanie</h2>
             <form onSubmit={handleSubmit}>
-                <div style={{marginBottom: '10px'}}>
-                    <label htmlFor="username" style={{display: 'block', marginBottom: '5px'}}>
+                <div style={{ marginBottom: '10px' }}>
+                    <label htmlFor="username" style={{ display: 'block', marginBottom: '5px' }}>
                         Nazwa użytkownika:
                     </label>
                     <input
@@ -42,11 +42,11 @@ const LoginPage: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
                     />
                 </div>
-                <div style={{marginBottom: '10px'}}>
-                    <label htmlFor="password" style={{display: 'block', marginBottom: '5px'}}>
+                <div style={{ marginBottom: '10px' }}>
+                    <label htmlFor="password" style={{ display: 'block', marginBottom: '5px' }}>
                         Hasło:
                     </label>
                     <input
@@ -57,17 +57,16 @@ const LoginPage: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
                     />
                 </div>
-                {error && <p style={{color: 'red', marginBottom: '10px'}}>{error}</p>}
+                {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
                 <button
                     type="submit"
                     style={{
                         width: '100%',
-                        marginTop: '60px',
                         padding: '10px',
-                        backgroundColor: '#2d343a',
+                        backgroundColor: '#007BFF',
                         color: '#fff',
                         border: 'none',
                         borderRadius: '4px',
@@ -79,12 +78,9 @@ const LoginPage: React.FC = () => {
             </form>
 
             {/* Navigation */}
-            <div style={{marginTop: '20px', textAlign: 'center'}}>
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
                 <Link to="/register">
-                    <button
-                        style={{backgroundColor: '#3B576C', color: '#f7ca65', margin: '10px', padding: '10px 20px'}}>Nie
-                        jesteś zarejestrowany?
-                    </button>
+                    <button style={{ margin: '10px', padding: '10px 20px' }}>Rejestracja</button>
                 </Link>
             </div>
         </div>
