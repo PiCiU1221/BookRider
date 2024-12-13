@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import './App.css'; // Import the CSS file
 import RegistrationForm from './Register/LibAdminRegisterForm.tsx';
 import LoginPage from './Login/LibAdminLoginForm.tsx';
 import ProcessingPage from './ProcessingInfo.tsx';
@@ -9,20 +10,13 @@ import SubmissionDetails from './SystemAdmin/SubmissionDetails.tsx';
 const App: React.FC = () => {
     return (
         <Router>
-            <div>
-                {/* Logo Container with background color */}
-                <div
-                    style={{
-                        backgroundColor: '#3B576C',  // Set the background color to #3B576C
-                        display: 'flex',
-                        justifyContent: 'center',    // Centers the logo horizontally
-                        alignItems: 'center',        // Centers the logo vertically
-                    }}
-                >
+            <div className="app-container">
+                {/* Logo Container */}
+                <div className="logo-container">
                     <img
                         src="/book-rider-high-resolution-logo.png"
                         alt="Logo"
-                        style={{width: '300px'}}  // Keeps the logo centered with fixed width
+                        className="logo"
                     />
                 </div>
 
@@ -31,39 +25,25 @@ const App: React.FC = () => {
                     <Route
                         path="/"
                         element={
-                            <div style={{textAlign: 'center', margin: '20px 0'}}>
+                            <div className="button-container">
                                 <Link to="/login">
-                                    <button style={{margin: '10px', padding: '10px 20px'}}>
-                                        Logowanie
-                                    </button>
+                                    <button className="action-button">Logowanie</button>
                                 </Link>
                                 <Link to="/register">
-                                    <button style={{margin: '10px', padding: '10px 20px'}}>
-                                        Rejestracja
-                                    </button>
+                                    <button className="action-button">Rejestracja</button>
                                 </Link>
                             </div>
                         }
                     />
-
-                    <Route path="/login" element={<LoginPage/>}/>
-                    <Route path="/register" element={<RegistrationForm/>}/>
-
-                    <Route path="/" element={<RegistrationForm/>}/>
-                    <Route path="/processing" element={<ProcessingPage/>}/>
-
-                    <Route path="/" element={<RegistrationForm/>}/>
-                    <Route path="/processing" element={<ProcessingPage/>}/>
-
-                    // PREVIEW ADMIN DASHBOARD
-                    // use the path to view the sys admin dashboard in preview version
-                    <Route path="/sys-admin-dashboard" element={<SystemAdminDashboard/>}/>
-                    <Route path="/" element={<SystemAdminDashboard />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegistrationForm />} />
+                    <Route path="/processing" element={<ProcessingPage />} />
+                    <Route path="/sys-admin-dashboard" element={<SystemAdminDashboard />} />
                     <Route path="/submission/:submissionType/:submissionId" element={<SubmissionDetails />} />
                 </Routes>
             </div>
         </Router>
-);
+    );
 };
 
 export default App;
