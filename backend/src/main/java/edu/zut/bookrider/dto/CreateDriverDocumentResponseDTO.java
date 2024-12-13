@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ErrorApiResponseDTO {
-    private int code;
-    private String message;
+public class CreateDriverDocumentResponseDTO {
+    String documentType;
+    String documentPhotoUrl;
+    LocalDate expiryDate;
 }

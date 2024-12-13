@@ -2,16 +2,15 @@ package edu.zut.bookrider.controller;
 
 import edu.zut.bookrider.dto.BookRequestDto;
 import edu.zut.bookrider.dto.BookResponseDto;
-import edu.zut.bookrider.exception.ApiErrorResponse;
 import edu.zut.bookrider.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -26,88 +25,66 @@ public class BookController {
             @RequestParam(required = false) Integer libraryId,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) String authorName,
-            @RequestParam(required = false) String releaseYear,
+            @RequestParam(required = false) int releaseYearFrom,
+            @RequestParam(required = false) int releaseYearTo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        try {
-            List<BookResponseDto> books = bookService.getFilteredBooks(libraryId, categoryId, authorName, releaseYear, page, size);
-            return ResponseEntity.ok(books);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiErrorResponse("GetFilteredBooksException", e.getMessage()));
-        }
+        List<BookResponseDto> books = bookService.getFilteredBooks(libraryId, categoryId, authorName, releaseYearFrom, releaseYearTo, page, size);
+        return ResponseEntity.ok(books);
     }
 
     @GetMapping
     public ResponseEntity<?> getAllBooks(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        try {
-            List<BookResponseDto> books = bookService.getAllBooks(page, size);
-            return ResponseEntity.ok(books);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiErrorResponse("GetAllBooksException", e.getMessage()));
-        }
+
+        List<BookResponseDto> books = bookService.getAllBooks(page, size);
+        return ResponseEntity.ok(books);
     }
 
-    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Secured("librarian")
+    @PostMapping
     public ResponseEntity<?> addNewBook(
-            @RequestPart("bookRequestDto") @Valid BookRequestDto bookRequestDto,
-            @RequestParam("image") MultipartFile image,
-            @RequestParam("id") Integer id) {
+            @RequestBody @Valid BookRequestDto bookRequestDto,
+            Authentication authentication) {
 
-        try {
-            BookResponseDto addedBook = bookService.addNewBook(bookRequestDto, image, id);
-            return ResponseEntity.ok(addedBook);
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().body(new ApiErrorResponse("ImageUploadException", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiErrorResponse("AddNewBookException", e.getMessage()));
-        }
+        BookResponseDto addedBook = bookService.addNewBook(bookRequestDto, authentication);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedBook);
     }
 
+    @Secured("librarian")
     @PostMapping("/add-existing/{bookId}")
     public ResponseEntity<?> addExistingBookToLibrary(
             @PathVariable Integer bookId,
             @RequestParam Integer libraryId) {
 
-        try {
-            bookService.addExistingBookToLibrary(bookId, libraryId);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiErrorResponse("AddExistingBookException", e.getMessage()));
-        }
+        bookService.addExistingBookToLibrary(bookId, libraryId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getBookById(@PathVariable Integer id) {
-        try {
-            BookResponseDto bookResponse = bookService.findBookById(id);
-            return ResponseEntity.ok(bookResponse);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiErrorResponse("GetBookByIdException", e.getMessage()));
-        }
+
+        BookResponseDto bookResponse = bookService.findBookById(id);
+        return ResponseEntity.ok(bookResponse);
     }
 
+    @Secured("librarian")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBook(
             @PathVariable Integer id,
             @RequestBody @Valid BookRequestDto bookRequestDto) {
-        try {
-            BookResponseDto updatedBook = bookService.updateBook(id, bookRequestDto);
-            return ResponseEntity.ok(updatedBook);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiErrorResponse("UpdateBookException", e.getMessage()));
-        }
+
+        BookResponseDto updatedBook = bookService.updateBook(id, bookRequestDto);
+        return ResponseEntity.ok(updatedBook);
     }
 
+    @Secured("librarian")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBook(@PathVariable Integer id) {
-        try {
-            bookService.deleteBook(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiErrorResponse("DeleteBookException", e.getMessage()));
-        }
+
+        bookService.deleteBook(id);
+        return ResponseEntity.noContent().build();
     }
 }

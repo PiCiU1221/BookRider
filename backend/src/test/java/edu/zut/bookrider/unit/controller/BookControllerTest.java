@@ -1,10 +1,13 @@
 package edu.zut.bookrider.unit.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.zut.bookrider.controller.BookController;
 import edu.zut.bookrider.dto.BookRequestDto;
 import edu.zut.bookrider.dto.BookResponseDto;
 import edu.zut.bookrider.model.Author;
 import edu.zut.bookrider.model.Category;
+import edu.zut.bookrider.model.Language;
+import edu.zut.bookrider.model.Publisher;
 import edu.zut.bookrider.service.BookService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,15 +15,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +37,9 @@ class BookControllerTest {
     @Mock
     private BookService bookService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @InjectMocks
     private BookController bookController;
 
@@ -44,6 +49,8 @@ class BookControllerTest {
     private BookResponseDto bookResponseDto;
     private Author author;
     private Category category;
+    private Publisher publisher;
+    private Language language;
 
     @BeforeEach
     void setUp() {
@@ -53,26 +60,43 @@ class BookControllerTest {
                 .name("Author Name")
                 .build();
         author.setId(1);
+
         category = Category.builder()
                 .name("Advantage")
                 .build();
         category.setId(1);
 
+        publisher = Publisher.builder()
+                .name("Publisher")
+                .build();
+        publisher.setId(1);
+
+        language = Language.builder()
+                .name("Language")
+                .build();
+        language.setId(1);
+
         bookRequestDto = new BookRequestDto(
-                "Book Title",
+                "Test Title",
+                category.getName(),
+                List.of(author.getId()),
                 2022,
-                category,
-                Collections.singletonList(author),
-                Collections.emptyList()
+                publisher.getId(),
+                "1234567891234",
+                language.getName(),
+                "imageByte64String"
         );
 
         bookResponseDto = new BookResponseDto(
                 1,
-                "Book Title",
+                "Test Title",
+                "Fiction",
+                List.of("Author Name"),
                 2022,
-                category.getName(),
-                "image_url",
-                Collections.singletonList(author.getName())
+                "Publisher",
+                "1234567891234",
+                "Language",
+                "http://image.url"
         );
     }
 
@@ -80,18 +104,19 @@ class BookControllerTest {
     void getFilteredBooks_shouldReturnFilteredBooks() throws Exception {
         List<BookResponseDto> books = Collections.singletonList(bookResponseDto);
 
-        when(bookService.getFilteredBooks(any(), any(), any(), any(), anyInt(), anyInt())).thenReturn(books);
+        when(bookService.getFilteredBooks(any(), any(), any(), any(), any(), anyInt(), anyInt())).thenReturn(books);
 
         mockMvc.perform(get("/api/books/filtered")
                         .param("authorName", "Author Name")
-                        .param("releaseYear", "2022")
+                        .param("releaseYearFrom", "2022")
+                        .param("releaseYearTo", "2022")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Book Title"))
+                .andExpect(jsonPath("$[0].title").value("Test Title"))
                 .andExpect(jsonPath("$[0].authorNames[0]").value("Author Name"));
 
-        verify(bookService).getFilteredBooks(any(), any(), any(), any(), anyInt(), anyInt());
+        verify(bookService).getFilteredBooks(any(), any(), any(), any(), any(), anyInt(), anyInt());
     }
 
     @Test
@@ -102,7 +127,7 @@ class BookControllerTest {
 
         mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Book Title"))
+                .andExpect(jsonPath("$[0].title").value("Test Title"))
                 .andExpect(jsonPath("$[0].authorNames[0]").value("Author Name"));
 
         verify(bookService).getAllBooks(Mockito.anyInt(), Mockito.anyInt());
@@ -110,30 +135,19 @@ class BookControllerTest {
 
     @Test
     void addNewBook_shouldReturnAddedBook() throws Exception {
-        MockMultipartFile image = new MockMultipartFile("image", "image.jpg", "image/jpeg", new byte[0]);
 
-        Path bookRequestFilePath = Path.of("src/test/resources/bookServiceTest/valid-book-response.json");
-        byte[] bookRequestBytes = Files.readAllBytes(bookRequestFilePath);
+        when(bookService.addNewBook(any(), any())).thenReturn(bookResponseDto);
 
-        MockMultipartFile bookRequestDtoPart = new MockMultipartFile(
-                "bookRequestDto",
-                "valid-book-response.json",
-                "application/json",
-                bookRequestBytes
-        );
+        String jsonBody = objectMapper.writeValueAsString(bookRequestDto);
 
-        when(bookService.addNewBook(any(), any(), anyInt())).thenReturn(bookResponseDto);
-
-        mockMvc.perform(multipart("/api/books/add")
-                        .file(image)
-                        .file(bookRequestDtoPart)
-                        .param("id", "1")
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Book Title"))
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/books")
+                        .content(jsonBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value("Test Title"))
                 .andExpect(jsonPath("$.authorNames[0]").value("Author Name"));
 
-        verify(bookService).addNewBook(any(), any(), anyInt());
+        verify(bookService).addNewBook(any(), any());
     }
 
     @Test
@@ -153,7 +167,7 @@ class BookControllerTest {
 
         mockMvc.perform(get("/api/books/{id}", 1))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Book Title"))
+                .andExpect(jsonPath("$.title").value("Test Title"))
                 .andExpect(jsonPath("$.authorNames[0]").value("Author Name"));
 
         verify(bookService).findBookById(1);
@@ -169,11 +183,42 @@ class BookControllerTest {
         when(bookResponseDto.getImage()).thenReturn("image_url");
         when(bookService.updateBook(eq(1), any(BookRequestDto.class))).thenReturn(bookResponseDto);
 
-        String bookRequestJson = "{\"title\":\"Updated Book Title\",\"year\":2023,\"category\":{\"name\":\"Updated Category\"},\"authors\":[{\"name\":\"Updated Author\"}],\"libraries\":[{\"name\":\"Library Name\"}],\"releaseYear\":2023}";
+        Author updatedAuthor = Author.builder()
+                .name("Updated Author")
+                .build();
+        updatedAuthor.setId(2);
+
+        Category updatedCategory = Category.builder()
+                .name("Updated Category")
+                .build();
+        updatedCategory.setId(2);
+
+        Publisher updatedPublisher = Publisher.builder()
+                .name("Updated Publisher")
+                .build();
+        updatedPublisher.setId(2);
+
+        Language updatedLanguage = Language.builder()
+                .name("Updated Language")
+                .build();
+        updatedPublisher.setId(2);
+
+        BookRequestDto bookPutRequestDto = new BookRequestDto(
+                "Updated Book Title",
+                updatedCategory.getName(),
+                List.of(author.getId()),
+                2023,
+                updatedPublisher.getId(),
+                "09871231231233",
+                updatedLanguage.getName(),
+                "updatedImageByte64"
+        );
+
+        String jsonBody = objectMapper.writeValueAsString(bookRequestDto);
 
         mockMvc.perform(put("/api/books/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(bookRequestJson))
+                        .content(jsonBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Updated Book Title"))
                 .andExpect(jsonPath("$.releaseYear").value(2023))

@@ -16,14 +16,23 @@ public class BookResponseDto {
     @NotNull(message = "Title cannot be null")
     String title;
 
-    @NotNull(message = "Release year cannot be null")
-    Integer releaseYear;
-
     @NotNull(message = "Category name cannot be null")
     String categoryName;
 
-    String image;
-
     @NotNull(message = "Author names list cannot be null")
     List<String> authorNames;
+
+    @NotNull(message = "Release year cannot be null")
+    Integer releaseYear;
+
+    @NotNull(message = "Publisher name cannot be null")
+    String publisherName;
+
+    @NotNull(message = "ISBN cannot be null")
+    String isbn;
+
+    @NotNull(message = "Language name cannot be null")
+    String languageName;
+
+    String image;
 }

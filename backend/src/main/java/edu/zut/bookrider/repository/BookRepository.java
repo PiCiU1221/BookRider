@@ -8,16 +8,21 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface BookRepository extends JpaRepository<Book, Integer> {
-    @Query("SELECT b FROM Book b " +
-           "LEFT JOIN FETCH b.libraries l " +
-           "LEFT JOIN FETCH b.authors a " +
-           "WHERE (:libraryId IS NULL OR l.id = :libraryId) " +
-           "AND (:categoryId IS NULL OR b.category.id = :categoryId) " +
-           "AND (:authorName IS NULL OR a.name LIKE %:authorName%) " +
-           "AND (:releaseYear IS NULL OR b.releaseYear = :releaseYear)")
+    @Query("SELECT DISTINCT b FROM Book b " +
+            "LEFT JOIN FETCH b.category " +
+            "LEFT JOIN FETCH b.language " +
+            "LEFT JOIN FETCH b.publisher " +
+            "LEFT JOIN FETCH b.authors a " +
+            "LEFT JOIN b.libraries l " +
+            "WHERE (:libraryId IS NULL OR l.id = :libraryId) " +
+            "AND (:categoryId IS NULL OR b.category.id = :categoryId) " +
+            "AND (:authorName IS NULL OR a.name LIKE %:authorName%) " +
+            "AND ((:releaseYearFrom IS NULL OR b.releaseYear >= :releaseYearFrom) " +
+            "AND (:releaseYearTo IS NULL OR b.releaseYear <= :releaseYearTo))")
     Page<Book> findAllByFilters(@Param("libraryId") Integer libraryId,
                                 @Param("categoryId") Integer categoryId,
                                 @Param("authorName") String authorName,
-                                @Param("releaseYear") String releaseYear,
+                                @Param("releaseYearFrom") Integer releaseYearFrom,
+                                @Param("releaseYearTo") Integer releaseYearTo,
                                 Pageable pageable);
 }

@@ -15,12 +15,16 @@ public class BookReadMapper implements Mapper<Book, BookResponseDto> {
         return new BookResponseDto(
                 object.getId(),
                 object.getTitle(),
-                object.getReleaseYear(),
                 object.getCategory() != null ? object.getCategory().getName() : null,
-                object.getCoverImageUrl(),
                 object.getAuthors().stream()
                         .map(Author::getName)
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                object.getReleaseYear(),
+                object.getPublisher() != null ? object.getPublisher().getName() : null,
+                object.getIsbn(),
+                object.getLanguage() != null ? object.getLanguage().getName() : null,
+                object.getCoverImageUrl()
+
         );
     }
 }
