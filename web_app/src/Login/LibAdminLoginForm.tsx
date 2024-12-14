@@ -23,7 +23,6 @@ const LoginPage: React.FC = () => {
         // Reset previous error messages
         setError(null);
 
-        // Add form submission logic (e.g., API call) here
     };
 
     return (
