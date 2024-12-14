@@ -7,7 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +43,7 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
-    @Secured("librarian")
+    @PreAuthorize("hasRole('librarian')")
     @PostMapping
     public ResponseEntity<?> addNewBook(
             @RequestBody @Valid BookRequestDto bookRequestDto,
@@ -53,7 +53,7 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.CREATED).body(addedBook);
     }
 
-    @Secured("librarian")
+    @PreAuthorize("hasRole('librarian')")
     @PostMapping("/add-existing/{bookId}")
     public ResponseEntity<?> addExistingBookToLibrary(
             @PathVariable Integer bookId,
@@ -70,7 +70,7 @@ public class BookController {
         return ResponseEntity.ok(bookResponse);
     }
 
-    @Secured("librarian")
+    @PreAuthorize("hasRole('librarian')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBook(
             @PathVariable Integer id,
@@ -80,7 +80,7 @@ public class BookController {
         return ResponseEntity.ok(updatedBook);
     }
 
-    @Secured("librarian")
+    @PreAuthorize("hasRole('librarian')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBook(@PathVariable Integer id) {
 

@@ -6,6 +6,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -93,7 +94,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiErrorResponseDTO> handleGenericExceptions(BadCredentialsException ex) {
+    public ResponseEntity<ApiErrorResponseDTO> handleBadCredentialsExceptions(BadCredentialsException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(401, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleAuthorizationDeniedExceptions(AuthorizationDeniedException ex) {
         ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(401, ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
