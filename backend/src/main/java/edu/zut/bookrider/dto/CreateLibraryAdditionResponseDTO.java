@@ -1,7 +1,6 @@
 package edu.zut.bookrider.dto;
 
 import edu.zut.bookrider.model.Address;
-import edu.zut.bookrider.model.LibraryAdditionRequest;
 import edu.zut.bookrider.model.enums.LibraryAdditionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;

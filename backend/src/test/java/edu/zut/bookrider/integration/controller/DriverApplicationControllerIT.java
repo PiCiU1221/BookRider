@@ -1,13 +1,10 @@
 package edu.zut.bookrider.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.zut.bookrider.dto.CreateDriverApplicationResponseDTO;
 import edu.zut.bookrider.dto.CreateDriverDocumentStringDTO;
 import edu.zut.bookrider.exception.DriverApplicationNotFoundException;
-import edu.zut.bookrider.exception.LibraryRequestNotFoundException;
 import edu.zut.bookrider.model.*;
 import edu.zut.bookrider.model.enums.DriverApplicationStatus;
-import edu.zut.bookrider.model.enums.LibraryAdditionStatus;
 import edu.zut.bookrider.repository.DriverApplicationRequestRepository;
 import edu.zut.bookrider.repository.RoleRepository;
 import edu.zut.bookrider.repository.UserRepository;
@@ -23,11 +20,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Base64;
 

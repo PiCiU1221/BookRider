@@ -1,7 +1,6 @@
 package edu.zut.bookrider.controller;
 
 import edu.zut.bookrider.dto.*;
-import edu.zut.bookrider.model.enums.DriverApplicationStatus;
 import edu.zut.bookrider.model.enums.LibraryAdditionStatus;
 import edu.zut.bookrider.service.LibraryAdditionRequestService;
 import jakarta.validation.Valid;

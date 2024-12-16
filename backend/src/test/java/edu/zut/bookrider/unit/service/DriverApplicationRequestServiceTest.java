@@ -1,7 +1,6 @@
 package edu.zut.bookrider.unit.service;
 
 import edu.zut.bookrider.dto.*;
-import edu.zut.bookrider.exception.UserNotFoundException;
 import edu.zut.bookrider.model.DriverApplicationRequest;
 import edu.zut.bookrider.model.Role;
 import edu.zut.bookrider.model.User;
@@ -15,9 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 
 import java.io.IOException;

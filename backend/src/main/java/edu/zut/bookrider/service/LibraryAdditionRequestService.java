@@ -1,12 +1,13 @@
 package edu.zut.bookrider.service;
 
 import edu.zut.bookrider.dto.*;
-import edu.zut.bookrider.exception.DriverApplicationNotFoundException;
 import edu.zut.bookrider.exception.LibraryRequestNotFoundException;
 import edu.zut.bookrider.exception.UserNotFoundException;
 import edu.zut.bookrider.mapper.libraryAddition.LibraryAdditionReadMapper;
-import edu.zut.bookrider.model.*;
-import edu.zut.bookrider.model.enums.DriverApplicationStatus;
+import edu.zut.bookrider.model.Address;
+import edu.zut.bookrider.model.Library;
+import edu.zut.bookrider.model.LibraryAdditionRequest;
+import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.model.enums.LibraryAdditionStatus;
 import edu.zut.bookrider.repository.LibraryAdditionRequestRepository;
 import edu.zut.bookrider.repository.LibraryRepository;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
