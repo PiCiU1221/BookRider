@@ -7,7 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class PublisherController {
         return ResponseEntity.ok(publisherResponse);
     }
 
-    @Secured("librarian")
+    @PreAuthorize("hasRole('librarian')")
     @PostMapping
     public ResponseEntity<?> addPublisher(
             @RequestBody @Valid PublisherRequestDto publisherRequestDto) {
@@ -40,7 +40,7 @@ public class PublisherController {
         return ResponseEntity.status(HttpStatus.CREATED).body(addedPublisher);
     }
 
-    @Secured("librarian")
+    @PreAuthorize("hasRole('librarian')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePublisher(
             @PathVariable Integer id,
@@ -50,7 +50,7 @@ public class PublisherController {
         return ResponseEntity.ok(updatedPublisher);
     }
 
-    @Secured("librarian")
+    @PreAuthorize("hasRole('librarian')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePublisher(@PathVariable Integer id) {
         publisherService.deletePublisher(id);
