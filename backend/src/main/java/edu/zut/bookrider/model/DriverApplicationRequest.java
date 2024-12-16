@@ -18,11 +18,11 @@ import java.util.List;
 @Table(name = "driver_application_requests")
 public class DriverApplicationRequest extends BaseEntity<Integer> {
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewed_by")
     private User reviewedBy;
 
@@ -40,6 +40,6 @@ public class DriverApplicationRequest extends BaseEntity<Integer> {
     private String rejectionReason;
 
     @Builder.Default
-    @OneToMany(mappedBy = "driverApplicationRequest", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "driverApplicationRequest", fetch = FetchType.LAZY)
     private List<DriverDocument> driverDocuments = new ArrayList<>();
 }

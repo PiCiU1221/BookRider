@@ -1,8 +1,7 @@
 package edu.zut.bookrider.unit.service;
 
-import edu.zut.bookrider.dto.CreateDriverApplicationResponseDTO;
-import edu.zut.bookrider.dto.CreateDriverDocumentDTO;
-import edu.zut.bookrider.dto.CreateDriverDocumentResponseDTO;
+import edu.zut.bookrider.dto.*;
+import edu.zut.bookrider.exception.UserNotFoundException;
 import edu.zut.bookrider.model.DriverApplicationRequest;
 import edu.zut.bookrider.model.Role;
 import edu.zut.bookrider.model.User;
@@ -16,15 +15,19 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -118,5 +121,61 @@ public class DriverApplicationRequestServiceTest {
         assertThrows(RuntimeException.class, () -> {
             driverApplicationRequestService.createDriverApplication(authentication, List.of(documentDto));
         });
+    }
+
+    @Test
+    void whenGetApplicationDetailsForAdmin_thenReturnDetails() {
+        when(driverApplicationRequestRepository.findById(applicationRequest.getId()))
+                .thenReturn(Optional.of(applicationRequest));
+        when(authentication.getName()).thenReturn("admin@example.com:system_administrator");
+
+        DriverApplicationDetailsDTO result = driverApplicationRequestService.getApplicationDetails(applicationRequest.getId(), authentication);
+
+        assertNotNull(result);
+        assertEquals(applicationRequest.getId(), result.getId());
+    }
+
+    @Test
+    void whenGetApplicationDetailsForUnauthorizedDriver_thenThrowException() {
+        when(driverApplicationRequestRepository.findById(applicationRequest.getId()))
+                .thenReturn(Optional.of(applicationRequest));
+        when(authentication.getName()).thenReturn("otherdriver@example.com:driver");
+        when(userRepository.findByEmailAndRoleName("otherdriver@example.com", "driver"))
+                .thenReturn(Optional.of(new User()));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            driverApplicationRequestService.getApplicationDetails(applicationRequest.getId(), authentication);
+        });
+        assertEquals("Application with ID " + applicationRequest.getId() + " doesn't belong to the user", exception.getMessage());
+    }
+
+    @Test
+    void whenChangeStatus_thenStatusChangedSuccessfully() {
+        User admin = new User();
+        admin.setId("RANDOM_SOMETHING");
+        when(authentication.getName()).thenReturn("admin@example.com:system_administrator");
+        when(userRepository.findByEmailAndRoleName("admin@example.com", "system_administrator"))
+                .thenReturn(Optional.of(admin));
+        when(driverApplicationRequestRepository.findById(applicationRequest.getId()))
+                .thenReturn(Optional.of(applicationRequest));
+
+        driverApplicationRequestService.changeStatus(applicationRequest.getId(), DriverApplicationStatus.UNDER_REVIEW, null, authentication);
+
+        assertEquals(DriverApplicationStatus.UNDER_REVIEW, applicationRequest.getStatus());
+        verify(driverApplicationRequestRepository).save(applicationRequest);
+    }
+
+    @Test
+    void whenChangeStatusWithoutReason_thenThrowException() {
+        when(authentication.getName()).thenReturn("admin@example.com:system_administrator");
+        when(userRepository.findByEmailAndRoleName("admin@example.com", "system_administrator"))
+                .thenReturn(Optional.of(new User()));
+        when(driverApplicationRequestRepository.findById(applicationRequest.getId()))
+                .thenReturn(Optional.of(applicationRequest));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            driverApplicationRequestService.changeStatus(applicationRequest.getId(), DriverApplicationStatus.REJECTED, null, authentication);
+        });
+        assertEquals("Rejection reason must be provided when rejecting an application", exception.getMessage());
     }
 }
