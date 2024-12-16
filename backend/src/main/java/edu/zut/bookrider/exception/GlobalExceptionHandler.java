@@ -122,6 +122,24 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(DriverApplicationNotFoundException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleDriverApplicationNotFoundException(DriverApplicationNotFoundException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleUserNotFoundException(UserNotFoundException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleIllegalArgumentException(IllegalArgumentException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponseDTO> handleGenericExceptions(Exception ex) {
         ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(500,  "An unexpected error occurred: " + ex.getMessage());
