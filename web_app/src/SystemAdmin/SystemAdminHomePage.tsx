@@ -4,19 +4,17 @@ import { useNavigate } from 'react-router-dom';
 const SystemAdminDashboard: React.FC = () => {
     const [activeSection, setActiveSection] = useState<string>('librarySubmissions');
     const navigate = useNavigate();
-    const sysAdminUsername = 'admin123'; // Replace with dynamic data if available
+    const sysAdminUsername = 'admin123';
 
     const handleSectionChange = (section: string) => {
         setActiveSection(section);
     };
 
     const handleSettings = () => {
-        // Replace with actual settings logic
         alert('Settings clicked');
     };
 
     const handleLogout = () => {
-        // Replace with actual logout logic
         alert('Logging out');
     };
 
@@ -25,7 +23,7 @@ const SystemAdminDashboard: React.FC = () => {
     };
 
     return (
-        <div style={{ backgroundColor: "#3B576C", marginBottom: "-250px", fontFamily: 'Arial, sans-serif' }}>
+        <div style={{ backgroundColor: "#3B576C", marginBottom: "-250px" }}>
             {/* Top Panel */}
             <div
                 style={{
@@ -33,7 +31,7 @@ const SystemAdminDashboard: React.FC = () => {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     padding: '10px 20px',
-                    backgroundColor: '#38424a',
+                    backgroundColor: '#314757',
                     color: '#fff',
                     position: 'sticky',
                     top: 0,
@@ -57,7 +55,7 @@ const SystemAdminDashboard: React.FC = () => {
                             cursor: 'pointer',
                         }}
                     >
-                        Settings
+                        Ustawienia
                     </button>
                     <button
                         onClick={handleLogout}
@@ -70,7 +68,7 @@ const SystemAdminDashboard: React.FC = () => {
                             cursor: 'pointer',
                         }}
                     >
-                        Log Out
+                        Wyloguj się
                     </button>
                 </div>
             </div>
@@ -81,7 +79,7 @@ const SystemAdminDashboard: React.FC = () => {
                     display: 'flex',
                     justifyContent: 'space-around',
                     padding: '10px',
-                    backgroundColor: '#38424a',
+                    backgroundColor: '#314757',
                     color: '#fff',
                     position: 'sticky',
                     top: 50,
@@ -117,7 +115,7 @@ const SystemAdminDashboard: React.FC = () => {
             </header>
 
             {/* Main Body */}
-            <main style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
+            <main style={{ padding: '20px', maxWidth: '800px', marginLeft: '-40px', width: '107%'}}>
                 {activeSection === 'librarySubmissions' && (
                     <section style={{ padding: '20px', borderRadius: '4px' }}>
                         <h2 style={{ color: '#fff' }}>Podania o zatwierdzenie bibliotek</h2>

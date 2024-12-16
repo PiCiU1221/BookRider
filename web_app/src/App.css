@@ -1,45 +1,41 @@
 body {
-  background-color: #3B576C; /* Set the background color for the entire page */
-  margin: 0;                  /* Remove default margin */
-  font-family: Arial, sans-serif; /* Set your desired font */
-  display: flex;              /* Add Flexbox to the body */
-  justify-content: center;    /* Center children horizontally */
-  align-items: center;        /* Center children vertically */
-  height: 100%;             /* Full viewport height to enable vertical centering */
+  background-color: #3B576C;
+  margin: 0;
+  font-family: Helvetica, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 
 .app-container {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centers content within the container vertically */
-  align-items: center;     /* Centers content within the container horizontally */
-  background-color: #3B576C; /* Dark background color */
-  color: #fff;             /* Default text color */
+  justify-content: center;
+  align-items: center;
+  background-color: #3B576C;
+  color: #fff;
 }
 
-/* Logo container styling */
 .logo-container {
   background-color: #3b576c;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
-  border-radius: 8px; /* Optional rounded corners */
-  margin-bottom: 20px; /* Space below the logo */
+  border-radius: 8px;
+  margin-bottom: 20px;
 }
 
-/* Logo styling */
 .logo {
-  width: 300px; /* Fixed logo width */
+  width: 300px;
 }
 
-/* Button container styling */
 .button-container {
   text-align: center;
   margin: 20px 0;
 }
 
-/* Action button styling */
 .action-button {
   margin: 10px;
   padding: 10px 20px;
@@ -51,5 +47,5 @@ body {
 }
 
 .action-button:hover {
-  background-color: #5c7b92; /* Slightly lighter on hover */
+  background-color: #5c7b92;
 }

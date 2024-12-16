@@ -81,8 +81,6 @@ const RegistrationForm: React.FC = () => {
 
         const finalFormData = { ...formData, library_address: combinedAddress };
         console.log('Form Data:', finalFormData);
-
-        // Add form submission logic (e.g., API call) here
     };
 
     return (
