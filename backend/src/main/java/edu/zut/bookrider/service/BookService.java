@@ -94,9 +94,12 @@ public class BookService {
         book.setCoverImageUrl(coverImageUrl);
         book.setLanguage(language);
         book.setIsbn(bookRequestDto.getIsbn());
-
         book.setCoverImageUrl(coverImageUrl);
+
         book = bookRepository.save(book);
+
+        publisher.getBooks().add(book);
+        publisherRepository.save(publisher);
 
         library.getBooks().add(book);
         libraryRepository.save(library);
