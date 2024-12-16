@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateDriverDocumentResponseDTO {
-    String documentType;
-    String documentPhotoUrl;
-    LocalDate expiryDate;
+    private String documentType;
+    private String documentPhotoUrl;
+    private LocalDate expiryDate;
 }

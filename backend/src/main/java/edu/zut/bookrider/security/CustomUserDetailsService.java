@@ -49,7 +49,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                         ? user.getEmail() + ":" + user.getRole().getName()
                         : user.getUsername() + ":" + user.getLibrary().getId())
                 .password(user.getPassword())
-                .authorities(Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getName())))
+                .roles(user.getRole().getName())
                 .build();
     }
 
