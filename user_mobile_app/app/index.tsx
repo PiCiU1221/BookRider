@@ -11,7 +11,7 @@ export default function Index() {
       }}
     >
       <Text>Book Rider</Text>
-        <Link href="/log_in">Log in!</Link>
+        <Link href="/log_in" style={{color:'blue'}}>Log in!</Link>
     </View>
   );
 }
