@@ -1,8 +1,17 @@
 import {StyleSheet, Text, View, TextInput, Button, Pressable} from "react-native";
 import {Link} from 'expo-router';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
+import {useState} from "react";
+
+const validateInput = (email:string,userName:string) => {
+    //TO DO:
+    //validate (or send it to back end to validate) Inputs!!!
+    console.warn("works");
+}
 
 export default function log_in() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     return (
         <SafeAreaProvider>
             <SafeAreaView
@@ -25,20 +34,19 @@ export default function log_in() {
                 }}
                 >
                     <Text>login?</Text>
-                    {/*<Text> Username/e-mail</Text>*/}
                     <TextInput
                     style={styles.input}
                     placeholder="Username/e-mail"
-                    >
-
-                    </TextInput>
+                    value={email}
+                    onChangeText={email => setEmail(email)}
+                    ></TextInput>
                     <TextInput
                         style={styles.input}
                         placeholder="Password"
-                    >
-
-                    </TextInput>
-                    <Button title="Log in!" color="#009933" />
+                        value={password}
+                        onChangeText={password => setPassword(email)}
+                    ></TextInput>
+                    <Button title="Log in!" color="#009933" onPress={()=>validateInput(email,password)} />
                         <Link href="/book_search" style={{color:'blue'}}>Temporary link to book search page </Link>
                     <Link href="/register" style={{color:'blue'}}>Register now!</Link>
                 </View>
