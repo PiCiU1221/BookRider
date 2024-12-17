@@ -7,8 +7,7 @@ export default function log_in() {
         <SafeAreaProvider>
             <SafeAreaView
                 style={{
-                    height: 700,
-                    width: 350,
+                    height: 650,
                     flexDirection: 'row',
                     alignItems: "center",
                     flex: 1,
@@ -20,7 +19,9 @@ export default function log_in() {
                     justifyContent: "center",
                     alignItems: "center",
                     borderWidth: 1,
-                    borderColor: "black"
+                    borderColor: "black",
+                    width: "80%",
+
                 }}
                 >
                     <Text>login?</Text>
@@ -39,7 +40,7 @@ export default function log_in() {
                     </TextInput>
                     <Button title="Log in!" color="#009933" />
                         <Link href="/book_search" style={{color:'blue'}}>Temporary link to book search page </Link>
-                    <Link href="/register" style={{color:'blue'}}>Resgister now!</Link>
+                    <Link href="/register" style={{color:'blue'}}>Register now!</Link>
                 </View>
             </SafeAreaView>
         </SafeAreaProvider>
@@ -51,7 +52,6 @@ const styles = StyleSheet.create({
         margin: 12,
         borderWidth: 1,
         padding: 10,
-
         backgroundColor: '#ffffff',
         width: 195 ,
 
