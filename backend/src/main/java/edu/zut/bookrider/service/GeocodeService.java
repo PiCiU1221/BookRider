@@ -15,7 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 public class GeocodeService {
 
-    @Value("${openrouteservice.api.key}")
+    @Value("${OPENROUTESERVICE_API_KEY}")
     private String apiKey;
 
     private final String baseUrl = "https://api.openrouteservice.org";
