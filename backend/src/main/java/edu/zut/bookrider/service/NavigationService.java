@@ -23,7 +23,7 @@ import java.util.List;
 @Service
 public class NavigationService {
 
-    @Value("${openrouteservice.api.key}")
+    @Value("${OPENROUTESERVICE_API_KEY}")
     private String apiKey;
 
     private final String baseUrl = "https://api.openrouteservice.org";
