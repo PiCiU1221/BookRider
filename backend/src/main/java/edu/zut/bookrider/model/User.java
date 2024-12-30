@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = "library")
 @Builder
 @Entity
 @Table(name = "users")
@@ -24,6 +23,7 @@ public class User {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "library_id")
     private Library library;
@@ -42,9 +42,11 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
+    @Builder.Default
     @Column(precision = 10, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
 
+    @Builder.Default
     @Column(name = "is_verified")
     private Boolean isVerified = false;
 
@@ -58,4 +60,8 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @ToString.Exclude
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ShoppingCart shoppingCart;
 }
