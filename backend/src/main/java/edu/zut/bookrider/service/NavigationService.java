@@ -26,8 +26,6 @@ public class NavigationService {
     @Value("${OPENROUTESERVICE_API_KEY}")
     private String apiKey;
 
-    private final String baseUrl = "https://api.openrouteservice.org";
-
     private final RestTemplate restTemplate;
 
     public NavigationResponseDTO getDirectionsFromCoordinates(CoordinateDTO startCoordinates, CoordinateDTO endCoordinates, TransportProfile transportProfile) {
@@ -40,6 +38,8 @@ public class NavigationService {
         String end = endCoordinates.getLongitude() + "," + endCoordinates.getLatitude();
 
         String transportProfileString = transportProfileEnumToString(transportProfile);
+
+        String baseUrl = "https://api.openrouteservice.org";
 
         String url = UriComponentsBuilder
                 .fromHttpUrl(baseUrl + "/v2/directions/" + transportProfileString)
