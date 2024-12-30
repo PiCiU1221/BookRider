@@ -63,9 +63,8 @@ public class GeocodeService {
             JsonNode geometry = firstFeature.path("geometry");
             JsonNode coordinates = geometry.path("coordinates");
 
-            coordinateDTO.setLatitude(coordinates.get(0).asDouble());
-            coordinateDTO.setLongitude(coordinates.get(1).asDouble());
-
+            coordinateDTO.setLatitude(coordinates.get(1).asDouble());
+            coordinateDTO.setLongitude(coordinates.get(0).asDouble());
         }
         return coordinateDTO;
     }
