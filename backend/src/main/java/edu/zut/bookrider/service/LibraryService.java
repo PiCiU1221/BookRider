@@ -6,6 +6,9 @@ import edu.zut.bookrider.repository.LibraryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class LibraryService {
@@ -22,5 +25,9 @@ public class LibraryService {
         library.setEmail(libraryAdditionRequest.getEmail());
 
         return libraryRepository.save(library);
+    }
+
+    public List<Library> getNearestLibrariesWithBookLimit5(Integer bookId, BigDecimal latitude, BigDecimal longitude) {
+        return libraryRepository.findNearestLibrariesWithBook(bookId, latitude, longitude);
     }
 }
