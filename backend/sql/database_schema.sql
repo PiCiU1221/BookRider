@@ -140,6 +140,69 @@ CREATE TABLE driver_documents
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Shopping cart related tables
+
+CREATE TABLE distance_cache
+(
+    id SERIAL PRIMARY KEY,
+    start_latitude NUMERIC(9, 6) NOT NULL,
+    start_longitude NUMERIC(9, 6) NOT NULL,
+    end_latitude NUMERIC(9, 6) NOT NULL,
+    end_longitude NUMERIC(9, 6) NOT NULL,
+    distance NUMERIC(10, 1) NOT NULL
+);
+
+CREATE TABLE quotes
+(
+    id SERIAL PRIMARY KEY,
+    valid_until TIMESTAMP NOT NULL,
+    book_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE CASCADE
+);
+
+CREATE TABLE quote_options
+(
+    id SERIAL PRIMARY KEY,
+    quote_id INTEGER NOT NULL,
+    library_id INTEGER NOT NULL,
+    distance_km NUMERIC(10, 1) NOT NULL,
+    total_delivery_cost NUMERIC(10, 2) NOT NULL,
+    library_name VARCHAR NOT NULL,
+    FOREIGN KEY (quote_id) REFERENCES quotes (id) ON DELETE CASCADE,
+    FOREIGN KEY (library_id) REFERENCES libraries (id) ON DELETE CASCADE
+);
+
+CREATE TABLE shopping_carts
+(
+    id SERIAL PRIMARY KEY,
+    user_id CHAR(10) NOT NULL UNIQUE,
+    total_delivery_cost NUMERIC(10, 2) NOT NULL,
+    delivery_address_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (delivery_address_id) REFERENCES addresses (id) ON DELETE CASCADE
+);
+
+CREATE TABLE shopping_cart_items
+(
+    id SERIAL PRIMARY KEY,
+    shopping_cart_id INTEGER NOT NULL,
+    library_id INTEGER NOT NULL,
+    delivery_cost NUMERIC(10, 2) NOT NULL,
+    FOREIGN KEY (shopping_cart_id) REFERENCES shopping_carts (id) ON DELETE CASCADE,
+    FOREIGN KEY (library_id) REFERENCES libraries (id) ON DELETE CASCADE
+);
+
+CREATE TABLE shopping_cart_sub_items
+(
+    id SERIAL PRIMARY KEY,
+    shopping_cart_item_id INTEGER NOT NULL,
+    book_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    FOREIGN KEY (shopping_cart_item_id) REFERENCES shopping_cart_items (id) ON DELETE CASCADE,
+    FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE CASCADE
+);
+
 -- Order related tables
 
 CREATE TABLE orders

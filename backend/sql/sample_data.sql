@@ -71,7 +71,7 @@ VALUES
 -- Creating new library
 INSERT INTO addresses (street, city, postal_code, latitude, longitude)
 VALUES
-    ('Aleja Papieża Jana Pawła II 50', 'Szczecin', '70-453', 53.4291, 14.5535);
+    ('Aleja Papieża Jana Pawła II 50', 'Szczecin', '70-453', 53.429155, 14.551630);
 
 INSERT INTO library_addition_requests (created_by, address_id, library_name, phone_number, email, status)
 VALUES
@@ -113,7 +113,7 @@ VALUES
 -- Creating new library
 INSERT INTO addresses (street, city, postal_code, latitude, longitude)
 VALUES
-    ('Plac Lotników 7', 'Szczecin', '70-414', 53.4299, 14.5507);
+    ('Plac Lotników 7', 'Szczecin', '70-414', 53.429556, 14.550914);
 
 INSERT INTO library_addition_requests (created_by, address_id, library_name, phone_number, email, status)
 VALUES

@@ -18,8 +18,6 @@ public class GeocodeService {
     @Value("${OPENROUTESERVICE_API_KEY}")
     private String apiKey;
 
-    private final String baseUrl = "https://api.openrouteservice.org";
-
     private final RestTemplate restTemplate;
 
     public CoordinateDTO getCoordinatesFromAddress (String street, String city, String postalCode) {
@@ -29,6 +27,8 @@ public class GeocodeService {
 
     private String callApiForGeocodeResponse(String street, String city, String postalCode) {
         String text = street + " " + city + " " + postalCode;
+
+        String baseUrl = "https://api.openrouteservice.org";
 
         String url = UriComponentsBuilder
                 .fromHttpUrl(baseUrl + "/geocode/search")
@@ -63,9 +63,8 @@ public class GeocodeService {
             JsonNode geometry = firstFeature.path("geometry");
             JsonNode coordinates = geometry.path("coordinates");
 
-            coordinateDTO.setLatitude(coordinates.get(0).asDouble());
-            coordinateDTO.setLongitude(coordinates.get(1).asDouble());
-
+            coordinateDTO.setLatitude(coordinates.get(1).asDouble());
+            coordinateDTO.setLongitude(coordinates.get(0).asDouble());
         }
         return coordinateDTO;
     }

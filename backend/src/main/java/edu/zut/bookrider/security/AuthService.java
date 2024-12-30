@@ -3,6 +3,7 @@ package edu.zut.bookrider.security;
 import edu.zut.bookrider.dto.*;
 import edu.zut.bookrider.model.Library;
 import edu.zut.bookrider.model.Role;
+import edu.zut.bookrider.model.ShoppingCart;
 import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.repository.RoleRepository;
 import edu.zut.bookrider.repository.UserRepository;
@@ -16,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -58,6 +60,7 @@ public class AuthService {
         }
     }
 
+    @Transactional
     public CreateAccountResponseDTO createUser(@Valid CreateUserDTO createUserDTO) {
 
         if (userRepository.existsByEmailAndRoleName(createUserDTO.getEmail(), "user")) {
@@ -72,8 +75,11 @@ public class AuthService {
 
         Role userRole = roleRepository.findByName("user")
                 .orElseThrow(() -> new IllegalArgumentException("Role not found: user"));
-
         user.setRole(userRole);
+
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setUser(user);
+        user.setShoppingCart(shoppingCart);
 
         User savedUser = userRepository.save(user);
 

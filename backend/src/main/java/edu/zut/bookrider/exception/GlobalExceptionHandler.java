@@ -134,6 +134,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(MissingAddressException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleMissingAddressException(MissingAddressException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(422,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleIllegalArgumentException(IllegalArgumentException ex) {
         ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());

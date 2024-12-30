@@ -24,8 +24,8 @@ public class GeocodeServiceIntegrationTest {
         CoordinateDTO coordinateDTO = geocodeService.getCoordinatesFromAddress(street, city, postalCode);
 
         assertNotNull(coordinateDTO);
-        assertEquals(15.03, Math.floor(coordinateDTO.getLatitude() * 100) / 100);
-        assertEquals(53.33, Math.floor(coordinateDTO.getLongitude() * 100) / 100);
+        assertEquals(53.33, Math.floor(coordinateDTO.getLatitude() * 100) / 100);
+        assertEquals(15.03, Math.floor(coordinateDTO.getLongitude() * 100) / 100);
     }
 
     @Test

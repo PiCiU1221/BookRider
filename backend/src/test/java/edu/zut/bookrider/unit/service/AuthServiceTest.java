@@ -3,6 +3,7 @@ package edu.zut.bookrider.unit.service;
 import edu.zut.bookrider.dto.*;
 import edu.zut.bookrider.model.Library;
 import edu.zut.bookrider.model.Role;
+import edu.zut.bookrider.model.ShoppingCart;
 import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.repository.RoleRepository;
 import edu.zut.bookrider.repository.UserRepository;
@@ -60,13 +61,17 @@ public class AuthServiceTest {
 
         when(roleRepository.findByName("user")).thenReturn(Optional.of(userRole));
 
+        ShoppingCart shoppingCart = new ShoppingCart();
+
         User createdUser = new User();
         createdUser.setId("testId");
         createdUser.setRole(userRole);
         createdUser.setEmail("user@example.com");
         createdUser.setPassword("encodedPassword");
+        createdUser.setShoppingCart(shoppingCart);
+        shoppingCart.setUser(createdUser);
 
-        when(userRepository.save(createdUser)).thenReturn(createdUser);
+        when(userRepository.save(any())).thenReturn(createdUser);
 
         CreateAccountResponseDTO response = authService.createUser(createUserDTO);
 

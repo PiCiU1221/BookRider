@@ -69,6 +69,7 @@ public class Order extends BaseEntity<Integer> {
     @Column(name = "delivered_at")
     private LocalDateTime deliveredAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
     private List<OrderItem> orderItems = new ArrayList<>();
 }

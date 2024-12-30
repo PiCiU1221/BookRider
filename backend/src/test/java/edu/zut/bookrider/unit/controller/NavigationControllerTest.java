@@ -27,8 +27,8 @@ public class NavigationControllerTest {
 
     @Test
     public void whenCorrectData_thenReturnCorrectResponse() throws Exception {
-        CoordinateDTO startCoordinates = new CoordinateDTO(14.504721, 53.434444);
-        CoordinateDTO endCoordinates = new CoordinateDTO(14.506454, 53.433332);
+        CoordinateDTO startCoordinates = new CoordinateDTO(53.434444, 14.504721);
+        CoordinateDTO endCoordinates = new CoordinateDTO(53.433332, 14.506454);
         TransportProfile transportProfile = TransportProfile.CAR;
 
         NavigationResponseDTO navigationResponseDTO = new NavigationResponseDTO();
@@ -38,8 +38,8 @@ public class NavigationControllerTest {
                 .thenReturn(navigationResponseDTO);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/navigation/directions")
-                        .param("start", "14.504721,53.434444")
-                        .param("end", "14.506454,53.433332")
+                        .param("start", startCoordinates.getLongitude() + "," + startCoordinates.getLatitude())
+                        .param("end", endCoordinates.getLongitude() + "," + endCoordinates.getLatitude())
                         .param("transportProfile", "car"))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.totalDistance").value(1));

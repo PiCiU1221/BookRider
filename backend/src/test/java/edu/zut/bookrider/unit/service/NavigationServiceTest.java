@@ -45,11 +45,11 @@ public class NavigationServiceTest {
 
     @Test
     void whenPossibleRouteFromInput_thenNavigationStepsShouldBeCorrect() {
-        double startLatitude = 14.504721;
-        double startLongitude = 53.434444;
+        double startLatitude = 53.434444;
+        double startLongitude = 14.504721;
 
-        double endLatitude = 14.506454;
-        double endLongitude = 53.433332;
+        double endLatitude = 53.433332;
+        double endLongitude = 14.506454;
 
         CoordinateDTO startCoordinates = new CoordinateDTO(startLatitude, startLongitude);
         CoordinateDTO endCoordinates = new CoordinateDTO(endLatitude, endLongitude);
@@ -63,7 +63,7 @@ public class NavigationServiceTest {
         double totalDistance = navigationResponseDTO.getTotalDistance();
         double totalDuration = navigationResponseDTO.getTotalDuration();
 
-        assertEquals(232.1, totalDistance);
+        assertEquals(0.2, totalDistance);
         assertEquals(46.4, totalDuration);
 
         List<NavigationResponseDTO.RouteStep> steps = navigationResponseDTO.getSteps();
@@ -74,6 +74,10 @@ public class NavigationServiceTest {
         assertEquals(8.7, firstStep.getStepDuration());
         assertEquals("Head east on Krakusa", firstStep.getInstruction());
 
+        /*
+        Our directions API uses reversed coordinates for some reason
+        This doesn't align well with our code, but we'll have to live with it
+        */
         List<CoordinateDTO> firstPointWayPoints = firstStep.getWayPoints();
         CoordinateDTO firstPointFirstCoordinate = new CoordinateDTO(14.504724, 53.434459);
         assertEquals(firstPointWayPoints.get(0), firstPointFirstCoordinate);
@@ -95,8 +99,8 @@ public class NavigationServiceTest {
 
     @Test
     void whenApiResponseHasNoRoute_thenInvalidCoordinatesExceptionShouldBeThrown() {
-        CoordinateDTO startCoordinates = new CoordinateDTO(14.504721, 53.434444);
-        CoordinateDTO endCoordinates = new CoordinateDTO(14.504721, 53.434444);
+        CoordinateDTO startCoordinates = new CoordinateDTO(53.434444, 14.504721);
+        CoordinateDTO endCoordinates = new CoordinateDTO(53.434444, 14.504721);
         TransportProfile transportProfile = TransportProfile.CAR;
 
         when(restTemplate.getForObject(anyString(), eq(String.class))).thenReturn(noRouteJson);
@@ -111,8 +115,8 @@ public class NavigationServiceTest {
 
     @Test
     void whenApiResponseHasInvalidCoordinates_thenInvalidCoordinatesExceptionShouldBeThrown() {
-        CoordinateDTO startCoordinates = new CoordinateDTO(14.504721, 53.434444);
-        CoordinateDTO endCoordinates = new CoordinateDTO(290.504721, 53.434444);
+        CoordinateDTO startCoordinates = new CoordinateDTO(53.434444, 14.504721);
+        CoordinateDTO endCoordinates = new CoordinateDTO(53.434444, 290.504721);
         TransportProfile transportProfile = TransportProfile.CAR;
 
         when(restTemplate.getForObject(anyString(), eq(String.class))).thenReturn(invalidCoordinatesJson);

@@ -29,15 +29,13 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public String getUserId(Authentication authentication) {
+    public User getUser(Authentication authentication) {
 
         String userEmail = authentication.getName().split(":")[0];
         String role = SecurityUtils.getFirstAuthority();
         role = Objects.requireNonNull(role).substring(5);
 
-        User user = userRepository.findByEmailAndRoleName(userEmail, role)
+        return userRepository.findByEmailAndRoleName(userEmail, role)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        return user.getId();
     }
 }
