@@ -45,8 +45,8 @@ public class NavigationController {
             throw new InvalidTransportProfileException("Invalid transport profile: " + transportProfile);
         }
 
-        CoordinateDTO startCoordinates = new CoordinateDTO(startLongitude, startLatitude);
-        CoordinateDTO endCoordinates = new CoordinateDTO(endLongitude, endLatitude);
+        CoordinateDTO startCoordinates = new CoordinateDTO(startLatitude, startLongitude);
+        CoordinateDTO endCoordinates = new CoordinateDTO(endLatitude, endLongitude);
 
         NavigationResponseDTO response = navigationService.getDirectionsFromCoordinates(
                 startCoordinates,

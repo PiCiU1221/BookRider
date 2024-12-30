@@ -36,8 +36,8 @@ public class NavigationService {
     }
 
     private String callApiForDirections(CoordinateDTO startCoordinates, CoordinateDTO endCoordinates, TransportProfile transportProfile) {
-        String start = startCoordinates.getLatitude() + "," + startCoordinates.getLongitude();
-        String end = endCoordinates.getLatitude() + "," + endCoordinates.getLongitude();
+        String start = startCoordinates.getLongitude() + "," + startCoordinates.getLatitude();
+        String end = endCoordinates.getLongitude() + "," + endCoordinates.getLatitude();
 
         String transportProfileString = transportProfileEnumToString(transportProfile);
 
@@ -116,7 +116,9 @@ public class NavigationService {
         NavigationResponseDTO navigationResponseDTO = new NavigationResponseDTO();
 
         JsonNode summaryNode = rootNode.at("/features/0/properties/summary");
-        navigationResponseDTO.setTotalDistance(summaryNode.get("distance").asDouble());
+        double distanceInMeters = summaryNode.get("distance").asDouble();
+        double distanceInKilometers = Math.round((distanceInMeters / 1000) * 10.0) / 10.0;
+        navigationResponseDTO.setTotalDistance(distanceInKilometers);
         navigationResponseDTO.setTotalDuration(summaryNode.get("duration").asDouble());
 
         List<NavigationResponseDTO.RouteStep> steps = new ArrayList<>();
