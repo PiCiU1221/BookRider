@@ -1,6 +1,7 @@
 package edu.zut.bookrider.controller;
 
 import edu.zut.bookrider.dto.UserIdResponseDto;
+import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class UserController {
     @GetMapping("/id")
     public ResponseEntity<?> getUserId(Authentication authentication) {
 
-        String userId = userService.getUserId(authentication);
-        return ResponseEntity.ok(new UserIdResponseDto(userId));
+        User user = userService.getUser(authentication);
+        return ResponseEntity.ok(new UserIdResponseDto(user.getId()));
     }
 }
