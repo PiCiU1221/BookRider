@@ -185,4 +185,9 @@ public class BookService {
         library.getBooks().add(book);
         libraryRepository.save(library);
     }
+
+    public Book getBookById(Integer bookId) {
+        return bookRepository.findById(bookId)
+                .orElseThrow(() -> new IllegalArgumentException("Book not found"));
+    }
 }
