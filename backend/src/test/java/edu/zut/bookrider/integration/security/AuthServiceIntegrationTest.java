@@ -15,10 +15,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -230,7 +235,10 @@ public class AuthServiceIntegrationTest {
         libraryAdmin.setLibrary(library);
         userRepository.save(libraryAdmin);
 
-        CreateLibrarianResponseDTO response = authService.createLibrarian(createLibrarianDTO, libraryAdminEmail);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(libraryAdmin.getEmail(), null, List.of(new SimpleGrantedAuthority("ROLE_library_administrator")));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        CreateLibrarianResponseDTO response = authService.createLibrarian(createLibrarianDTO, authentication);
 
         assertNotNull(response);
         assertNotNull(response.getId());
@@ -238,19 +246,6 @@ public class AuthServiceIntegrationTest {
         assertEquals("Adam", response.getFirstName());
         assertEquals("Smith", response.getLastName());
         assertNotNull(response.getTempPassword());
-    }
-
-    @Test
-    public void whenLibrarianAdminEmailIsWrong_thenThrowException() {
-        CreateLibrarianDTO createLibrarianDTO = new CreateLibrarianDTO("librarian1", "Adam", "Smith");
-        String libraryAdminEmail = "nonexistent_admin@example.com";
-
-        IllegalArgumentException thrownException = assertThrows(
-                IllegalArgumentException.class,
-                () -> authService.createLibrarian(createLibrarianDTO, libraryAdminEmail)
-        );
-
-        assertEquals("Library admin with the provided email doesn't exist", thrownException.getMessage());
     }
 
     @Test
@@ -288,9 +283,13 @@ public class AuthServiceIntegrationTest {
 
         CreateLibrarianDTO createLibrarianDTO = new CreateLibrarianDTO("librarian1", "Adam", "Smith");
 
+        String authenticationIdentifier = libraryAdmin.getEmail() + ":library_administrator";
+        Authentication authentication = new UsernamePasswordAuthenticationToken(authenticationIdentifier, null, List.of(new SimpleGrantedAuthority("ROLE_library_administrator")));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         IllegalArgumentException thrownException = assertThrows(
                 IllegalArgumentException.class,
-                () -> authService.createLibrarian(createLibrarianDTO, "library_admin@example.com")
+                () -> authService.createLibrarian(createLibrarianDTO, authentication)
         );
 
         assertEquals("A librarian with the username '" + createLibrarianDTO.getUsername() + "' already exists in this library", thrownException.getMessage());

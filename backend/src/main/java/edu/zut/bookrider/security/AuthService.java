@@ -8,6 +8,7 @@ import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.repository.RoleRepository;
 import edu.zut.bookrider.repository.UserRepository;
 import edu.zut.bookrider.service.UserIdGeneratorService;
+import edu.zut.bookrider.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +32,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final UserIdGeneratorService userIdGeneratorService;
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     public String authenticateBasicAccount(LoginRequestDTO loginRequestDTO, String role) throws AuthenticationException {
         Authentication authenticationRequest = new UsernamePasswordAuthenticationToken(
@@ -110,10 +112,9 @@ public class AuthService {
 
     public CreateLibrarianResponseDTO createLibrarian(
             @Valid CreateLibrarianDTO createLibrarianDTO,
-            String libraryAdminEmail) {
+            Authentication authentication) {
 
-        User libraryAdmin = userRepository.findByEmailAndRoleName(libraryAdminEmail, "library_administrator")
-                .orElseThrow(() -> new IllegalArgumentException("Library admin with the provided email doesn't exist"));
+        User libraryAdmin = userService.getUser(authentication);
 
         Library library = libraryAdmin.getLibrary();
 
