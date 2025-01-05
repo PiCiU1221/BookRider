@@ -1,5 +1,6 @@
 package edu.zut.bookrider.model;
 
+import edu.zut.bookrider.model.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -27,8 +28,9 @@ public class Transaction extends BaseEntity<Integer> {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false)
-    private String transactionType;
+    private TransactionType transactionType;
 
     @CreationTimestamp
     @Column(name = "transaction_date", updatable = false)
