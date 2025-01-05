@@ -30,7 +30,7 @@ public class OrderItem extends BaseEntity<Integer> {
     private LocalDateTime returnDeadline;
 
     @Column(name = "returned_quantity")
-    private int returnedQuantity;
+    private int returnedQuantity = 0;
 
     @Column(name = "returned_at")
     private LocalDateTime returnedAt;
