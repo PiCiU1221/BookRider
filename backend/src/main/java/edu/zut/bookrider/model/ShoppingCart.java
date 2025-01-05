@@ -17,6 +17,7 @@ import java.util.List;
 public class ShoppingCart extends BaseEntity<Integer> {
 
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;

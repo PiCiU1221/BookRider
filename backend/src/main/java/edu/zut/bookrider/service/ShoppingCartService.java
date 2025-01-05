@@ -174,4 +174,17 @@ public class ShoppingCartService {
 
         return shoppingCartMapper.map(shoppingCart);
     }
+
+    @Transactional
+    public void removeAllItemsFromCart(Authentication authentication) {
+
+        User user = userService.getUser(authentication);
+        ShoppingCart cart = user.getShoppingCart();
+
+        cart.getItems().clear();
+
+        cart.setTotalCartDeliveryCost(BigDecimal.ZERO);
+
+        shoppingCartRepository.save(cart);
+    }
 }
