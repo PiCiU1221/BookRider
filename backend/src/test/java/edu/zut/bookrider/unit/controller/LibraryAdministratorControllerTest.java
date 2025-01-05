@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.zut.bookrider.controller.LibraryAdministratorController;
 import edu.zut.bookrider.dto.CreateLibrarianDTO;
 import edu.zut.bookrider.dto.CreateLibrarianResponseDTO;
+import edu.zut.bookrider.dto.LibrarianDTO;
 import edu.zut.bookrider.security.AuthService;
 import edu.zut.bookrider.service.LibraryAdministratorService;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,8 @@ public class LibraryAdministratorControllerTest {
 
     private MockMvc mockMvc;
     private CreateLibrarianDTO createLibrarianDTO;
-    private CreateLibrarianResponseDTO librarianResponseDTO;
+    private CreateLibrarianResponseDTO createLibrarianResponseDTO;
+    private LibrarianDTO librarianDTO;
 
     @Mock
     private Authentication authentication;
@@ -57,7 +59,8 @@ public class LibraryAdministratorControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(libraryAdministratorController).build();
 
         createLibrarianDTO = new CreateLibrarianDTO("test_user", "TestName", "TestLastName");
-        librarianResponseDTO = new CreateLibrarianResponseDTO("1", "test_user", "TestName", "TestLastName", "tempPassword");
+        createLibrarianResponseDTO = new CreateLibrarianResponseDTO("1", "test_user", "TestName", "TestLastName", "tempPassword");
+        librarianDTO = new LibrarianDTO("1", "test_user", "TestName", "TestLastName");
 
         authentication = mock(Authentication.class);
         when(authentication.getName()).thenReturn("admin@test.com");
@@ -67,7 +70,7 @@ public class LibraryAdministratorControllerTest {
     @WithMockUser(username = "admin@test.com", roles = "library_administrator")
     void getAllLibrarians_shouldReturnAllLibrarians() throws Exception {
         when(libraryAdministratorService.getAllLibrarians(authentication))
-                .thenReturn(List.of(librarianResponseDTO));
+                .thenReturn(List.of(librarianDTO));
 
         mockMvc.perform(get("/api/library-admins/librarians")
                 .principal(authentication))
@@ -81,7 +84,7 @@ public class LibraryAdministratorControllerTest {
 
     @Test
     void addLibrarian_shouldReturnCreatedLibrarian() throws Exception {
-        when(authService.createLibrarian(any(CreateLibrarianDTO.class), eq(authentication))).thenReturn(librarianResponseDTO);
+        when(authService.createLibrarian(any(CreateLibrarianDTO.class), eq(authentication))).thenReturn(createLibrarianResponseDTO);
 
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -117,7 +120,7 @@ public class LibraryAdministratorControllerTest {
     @Test
     void resetLibrarianPassword_shouldReturnUpdatedLibrarian() throws Exception {
         when(libraryAdministratorService.resetLibrarianPassword(eq("test_user"), eq("newPassword"), eq(authentication)))
-                .thenReturn(librarianResponseDTO);
+                .thenReturn(librarianDTO);
 
         mockMvc.perform(patch("/api/library-admins/librarians/reset-password/{username}", "test_user")
                         .principal(authentication)

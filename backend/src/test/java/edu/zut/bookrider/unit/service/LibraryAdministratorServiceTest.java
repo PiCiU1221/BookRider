@@ -39,7 +39,6 @@ public class LibraryAdministratorServiceTest {
 
     private User libraryAdmin;
     private User librarian;
-    private CreateLibrarianResponseDTO librarianResponseDTO;
     private LibrarianDTO librarianDTO;
     private Authentication authentication;
 
@@ -62,7 +61,6 @@ public class LibraryAdministratorServiceTest {
         librarian.setRole(new Role("librarian"));
         librarian.setLibrary(library);
 
-        librarianResponseDTO = new CreateLibrarianResponseDTO(librarian.getId(), librarian.getUsername(), librarian.getFirstName(), librarian.getLastName(), "tempPassword");
         librarianDTO = new LibrarianDTO("123", "Test username", "Test FirstName", "Test LastName");
 
 
