@@ -2,11 +2,11 @@ package edu.zut.bookrider.service;
 
 import edu.zut.bookrider.dto.CreateLibrarianResponseDTO;
 import edu.zut.bookrider.exception.PasswordNotValidException;
-import edu.zut.bookrider.exception.UserNotFoundException;
 import edu.zut.bookrider.mapper.user.LibrarianReadMapper;
 import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,23 +22,24 @@ public class LibraryAdministratorService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final LibrarianReadMapper librarianReadMapper;
+    private final UserService userService;
 
     @Transactional
-    public void deleteLibrarian(String username, String libraryAdminEmail) {
-        User libraryAdmin = findLibraryAdminByEmail(libraryAdminEmail);
+    public void deleteLibrarian(String username, Authentication authentication) {
+        User libraryAdmin = userService.getUser(authentication);
         Integer libraryId = libraryAdmin.getLibrary().getId();
 
-        User librarian = findLibrarianByUsernameAndLibraryId(username, libraryId);
+        User librarian = userService.findLibrarianByUsernameAndLibraryId(username, libraryId);
 
         userRepository.delete(librarian);
     }
 
     @Transactional
-    public CreateLibrarianResponseDTO resetLibrarianPassword(String username, String newPassword, String libraryAdminEmail) {
-        User libraryAdmin = findLibraryAdminByEmail(libraryAdminEmail);
+    public CreateLibrarianResponseDTO resetLibrarianPassword(String username, String newPassword, Authentication authentication) {
+        User libraryAdmin = userService.getUser(authentication);
         Integer libraryId = libraryAdmin.getLibrary().getId();
 
-        User librarian = findLibrarianByUsernameAndLibraryId(username, libraryId);
+        User librarian = userService.findLibrarianByUsernameAndLibraryId(username, libraryId);
 
         if (newPassword.matches(PASSWORD_PATTERN)) {
             librarian.setPassword(passwordEncoder.encode(newPassword));
@@ -55,31 +56,20 @@ public class LibraryAdministratorService {
         return librarianReadMapper.map(librarian);
     }
 
-    public List<CreateLibrarianResponseDTO> getAllLibrarians(String libraryAdminEmail) {
-        User libraryAdmin = findLibraryAdminByEmail(libraryAdminEmail);
-        Integer libraryId = libraryAdmin.getLibrary().getId();
+    public List<CreateLibrarianResponseDTO> getAllLibrarians(Authentication authentication) {
+        User libraryAdmin = userService.getUser(authentication);
+        List<User> librarians = userService.getAllLibrarians(libraryAdmin);
 
-        return userRepository.findAll().stream()
-                .filter(user -> "librarian".equals(user.getRole().getName()) && user.getLibrary().getId().equals(libraryId))
+        return librarians.stream()
                 .map(librarianReadMapper::map)
                 .toList();
     }
 
-    public CreateLibrarianResponseDTO findLibrarianByUsername(String username, String libraryAdminEmail) {
-        User libraryAdmin = findLibraryAdminByEmail(libraryAdminEmail);
+    public CreateLibrarianResponseDTO findLibrarianByUsername(String username, Authentication authentication) {
+        User libraryAdmin = userService.getUser(authentication);
         Integer libraryId = libraryAdmin.getLibrary().getId();
 
-        User librarian = findLibrarianByUsernameAndLibraryId(username, libraryId);
+        User librarian = userService.findLibrarianByUsernameAndLibraryId(username, libraryId);
         return librarianReadMapper.map(librarian);
-    }
-
-    private User findLibraryAdminByEmail(String libraryAdminEmail) {
-        return userRepository.findByEmailAndRoleName(libraryAdminEmail, "library_administrator")
-                .orElseThrow(() -> new UserNotFoundException("Library admin with the provided email doesn't exist"));
-    }
-
-    private User findLibrarianByUsernameAndLibraryId(String username, Integer libraryId) {
-        return userRepository.findByUsernameAndLibraryId(username, libraryId)
-                .orElseThrow(() -> new UserNotFoundException("Librarian with the provided username " + username + " not found"));
     }
 }

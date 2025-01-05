@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,26 +24,26 @@ public class LibraryAdministratorController {
     @GetMapping("/librarians")
     public ResponseEntity<?> getLibrarians(
             @RequestParam(required = false) String username,
-            @RequestParam String libraryAdminEmail) {
+            Authentication authentication) {
         if (username != null) {
-            return ResponseEntity.ok(libraryAdministratorService.findLibrarianByUsername(username, libraryAdminEmail));
+            return ResponseEntity.ok(libraryAdministratorService.findLibrarianByUsername(username, authentication));
         }
-        return ResponseEntity.ok(libraryAdministratorService.getAllLibrarians(libraryAdminEmail));
+        return ResponseEntity.ok(libraryAdministratorService.getAllLibrarians(authentication));
     }
 
     @PostMapping("/librarians")
     public ResponseEntity<?> addLibrarian(
             @RequestBody @Valid CreateLibrarianDTO createLibrarianDTO,
-            @RequestParam String libraryAdminEmail) {
-        CreateLibrarianResponseDTO addedLibrarian = authService.createLibrarian(createLibrarianDTO, libraryAdminEmail);
+            Authentication authentication) {
+        CreateLibrarianResponseDTO addedLibrarian = authService.createLibrarian(createLibrarianDTO, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedLibrarian);
     }
 
     @DeleteMapping("/librarians/{username}")
     public ResponseEntity<?> removeLibrarian(
             @PathVariable String username,
-            @RequestParam String libraryAdminEmail) {
-        libraryAdministratorService.deleteLibrarian(username, libraryAdminEmail);
+            Authentication authentication) {
+        libraryAdministratorService.deleteLibrarian(username, authentication);
         return ResponseEntity.noContent().build();
     }
 
@@ -50,8 +51,8 @@ public class LibraryAdministratorController {
     public ResponseEntity<?> resetLibrarianPassword(
             @PathVariable String username,
             @RequestParam String newPassword,
-            @RequestParam String libraryAdminEmail) {
-        CreateLibrarianResponseDTO updatedLibrarian = libraryAdministratorService.resetLibrarianPassword(username, newPassword, libraryAdminEmail);
+            Authentication authentication) {
+        CreateLibrarianResponseDTO updatedLibrarian = libraryAdministratorService.resetLibrarianPassword(username, newPassword, authentication);
         return ResponseEntity.ok(updatedLibrarian);
     }
 }
