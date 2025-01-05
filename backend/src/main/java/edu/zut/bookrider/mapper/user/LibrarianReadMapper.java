@@ -1,21 +1,20 @@
 package edu.zut.bookrider.mapper.user;
 
-import edu.zut.bookrider.dto.CreateLibrarianResponseDTO;
+import edu.zut.bookrider.dto.LibrarianDTO;
 import edu.zut.bookrider.mapper.Mapper;
 import edu.zut.bookrider.model.User;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LibrarianReadMapper implements Mapper<User, CreateLibrarianResponseDTO> {
+public class LibrarianReadMapper implements Mapper<User, LibrarianDTO> {
 
     @Override
-    public CreateLibrarianResponseDTO map(User user) {
-        return new CreateLibrarianResponseDTO(
+    public LibrarianDTO map(User user) {
+        return new LibrarianDTO(
                 user.getId(),
                 user.getUsername(),
                 user.getFirstName(),
-                user.getLastName(),
-                user.getPassword()
+                user.getLastName()
         );
     }
 }

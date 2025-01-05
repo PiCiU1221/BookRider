@@ -1,6 +1,7 @@
 package edu.zut.bookrider.unit.service;
 
 import edu.zut.bookrider.dto.CreateLibrarianResponseDTO;
+import edu.zut.bookrider.dto.LibrarianDTO;
 import edu.zut.bookrider.exception.PasswordNotValidException;
 import edu.zut.bookrider.exception.UserNotFoundException;
 import edu.zut.bookrider.mapper.user.LibrarianReadMapper;
@@ -39,6 +40,7 @@ public class LibraryAdministratorServiceTest {
     private User libraryAdmin;
     private User librarian;
     private CreateLibrarianResponseDTO librarianResponseDTO;
+    private LibrarianDTO librarianDTO;
     private Authentication authentication;
 
     @BeforeEach
@@ -61,6 +63,8 @@ public class LibraryAdministratorServiceTest {
         librarian.setLibrary(library);
 
         librarianResponseDTO = new CreateLibrarianResponseDTO(librarian.getId(), librarian.getUsername(), librarian.getFirstName(), librarian.getLastName(), "tempPassword");
+        librarianDTO = new LibrarianDTO("123", "Test username", "Test FirstName", "Test LastName");
+
 
         authentication = mock(Authentication.class);
         when(authentication.getName()).thenReturn("admin@test.com");
@@ -90,20 +94,17 @@ public class LibraryAdministratorServiceTest {
     void resetLibrarianPassword_shouldResetPasswordSuccessfully() {
         String newPassword = "NewP@ssw0rd";
 
-        CreateLibrarianResponseDTO librarianResponse = new CreateLibrarianResponseDTO(
-                "123", "Test username", "Test FirstName", "Test LastName", "newPassword"
-        );
+        LibrarianDTO librarianDTO = new LibrarianDTO("123", "Test username", "Test FirstName", "Test LastName");
 
         when(userService.getUser(authentication)).thenReturn(libraryAdmin);
         when(userService.findLibrarianByUsernameAndLibraryId("Test username", libraryAdmin.getLibrary().getId())).thenReturn(librarian);
         when(passwordEncoder.encode(newPassword)).thenReturn("newPassword");
         when(userRepository.save(librarian)).thenReturn(librarian);
-        when(librarianReadMapper.map(librarian)).thenReturn(librarianResponse);
+        when(librarianReadMapper.map(librarian)).thenReturn(librarianDTO);
 
-        CreateLibrarianResponseDTO result = libraryAdministratorService.resetLibrarianPassword("Test username", newPassword, authentication);
+        LibrarianDTO result = libraryAdministratorService.resetLibrarianPassword("Test username", newPassword, authentication);
 
         assertNotNull(result);
-        assertEquals("newPassword", result.getTempPassword());
         assertEquals("Test username", result.getUsername());
         assertEquals("Test FirstName", result.getFirstName());
         assertEquals("Test LastName", result.getLastName());
@@ -123,9 +124,9 @@ public class LibraryAdministratorServiceTest {
     void getAllLibrarians_shouldReturnAllLibrarians() {
         when(userService.getUser(authentication)).thenReturn(libraryAdmin);
         when(userService.getAllLibrarians(libraryAdmin)).thenReturn(List.of(librarian));
-        when(librarianReadMapper.map(librarian)).thenReturn(librarianResponseDTO);
+        when(librarianReadMapper.map(librarian)).thenReturn(librarianDTO);
 
-        List<CreateLibrarianResponseDTO> result = libraryAdministratorService.getAllLibrarians(authentication);
+        List<LibrarianDTO> result = libraryAdministratorService.getAllLibrarians(authentication);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -136,9 +137,9 @@ public class LibraryAdministratorServiceTest {
     void findLibrarianByUsername_shouldReturnLibrarianResponseDTO() {
         when(userService.getUser(authentication)).thenReturn(libraryAdmin);
         when(userService.findLibrarianByUsernameAndLibraryId("Test username", libraryAdmin.getLibrary().getId())).thenReturn(librarian);
-        when(librarianReadMapper.map(librarian)).thenReturn(librarianResponseDTO);
+        when(librarianReadMapper.map(librarian)).thenReturn(librarianDTO);
 
-        CreateLibrarianResponseDTO result = libraryAdministratorService.findLibrarianByUsername("Test username", authentication);
+        LibrarianDTO result = libraryAdministratorService.findLibrarianByUsername("Test username", authentication);
 
         assertNotNull(result);
         assertEquals("Test username", result.getUsername());

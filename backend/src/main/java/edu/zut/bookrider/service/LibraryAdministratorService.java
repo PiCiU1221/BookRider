@@ -1,6 +1,6 @@
 package edu.zut.bookrider.service;
 
-import edu.zut.bookrider.dto.CreateLibrarianResponseDTO;
+import edu.zut.bookrider.dto.LibrarianDTO;
 import edu.zut.bookrider.exception.PasswordNotValidException;
 import edu.zut.bookrider.mapper.user.LibrarianReadMapper;
 import edu.zut.bookrider.model.User;
@@ -35,7 +35,7 @@ public class LibraryAdministratorService {
     }
 
     @Transactional
-    public CreateLibrarianResponseDTO resetLibrarianPassword(String username, String newPassword, Authentication authentication) {
+    public LibrarianDTO resetLibrarianPassword(String username, String newPassword, Authentication authentication) {
         User libraryAdmin = userService.getUser(authentication);
         Integer libraryId = libraryAdmin.getLibrary().getId();
 
@@ -56,7 +56,7 @@ public class LibraryAdministratorService {
         return librarianReadMapper.map(librarian);
     }
 
-    public List<CreateLibrarianResponseDTO> getAllLibrarians(Authentication authentication) {
+    public List<LibrarianDTO> getAllLibrarians(Authentication authentication) {
         User libraryAdmin = userService.getUser(authentication);
         List<User> librarians = userService.getAllLibrarians(libraryAdmin);
 
@@ -65,7 +65,7 @@ public class LibraryAdministratorService {
                 .toList();
     }
 
-    public CreateLibrarianResponseDTO findLibrarianByUsername(String username, Authentication authentication) {
+    public LibrarianDTO findLibrarianByUsername(String username, Authentication authentication) {
         User libraryAdmin = userService.getUser(authentication);
         Integer libraryId = libraryAdmin.getLibrary().getId();
 
