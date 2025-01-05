@@ -214,6 +214,7 @@ CREATE TABLE orders
     library_id INT NOT NULL REFERENCES libraries(id),
     target_address_id INT NOT NULL REFERENCES addresses(id),
     status VARCHAR(50) NOT NULL,
+    amount NUMERIC(10, 2) NOT NULL,
     payment_status VARCHAR(50) NOT NULL,
     delivery_photo_url TEXT,
     note_to_driver TEXT,

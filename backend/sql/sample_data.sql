@@ -228,9 +228,9 @@ INSERT INTO addresses (street, city, postal_code, latitude, longitude)
 VALUES
     ('ul. Gdańska 12', 'Szczecin', '70-743', 53.4485, 14.5525);
 
-INSERT INTO orders (user_id, library_id, target_address_id, status, payment_status)
+INSERT INTO orders (user_id, library_id, target_address_id, status, amount, payment_status)
 VALUES
-    ('GWVF51WKGG', 1, 3, 'pending', 'pending');
+    ('GWVF51WKGG', 1, 3, 'pending', 10.00, 'pending');
 
 INSERT INTO order_items (order_id, book_id, quantity, status)
 VALUES
