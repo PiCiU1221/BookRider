@@ -1,15 +1,18 @@
 package edu.zut.bookrider.service;
 
+import edu.zut.bookrider.exception.InsufficientBalanceException;
 import edu.zut.bookrider.exception.UserNotFoundException;
 import edu.zut.bookrider.model.Library;
 import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.repository.UserRepository;
 import edu.zut.bookrider.security.SecurityUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -40,6 +43,31 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
+    public void validateSufficientBalance(User user, BigDecimal requiredAmount) {
+
+        if (user.getBalance().compareTo(requiredAmount) < 0) {
+            throw new InsufficientBalanceException("User has insufficient funds for this purchase");
+        }
+    }
+
+    @Transactional
+    public void adjustBalance(String userId, BigDecimal amount, boolean isDeposit) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (isDeposit) {
+            user.setBalance(user.getBalance().add(amount));
+        } else {
+            if (user.getBalance().compareTo(amount) < 0) {
+                throw new InsufficientBalanceException("Insufficient balance");
+            }
+            user.setBalance(user.getBalance().subtract(amount));
+        }
+
+        userRepository.save(user);
+    }
+  
     public User findLibrarianByUsernameAndLibraryId(String username, Integer libraryId) {
         return userRepository.findByUsernameAndLibraryId(username, libraryId)
                 .orElseThrow(() -> new UserNotFoundException("Librarian with the provided username " + username + " not found"));

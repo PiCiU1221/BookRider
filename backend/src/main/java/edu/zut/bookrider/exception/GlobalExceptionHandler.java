@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -108,9 +109,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-        );
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
         ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, errors.toString());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
@@ -119,6 +122,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponseDTO> handleMissingServletRequestPartException(MissingServletRequestPartException ex) {
         String message = "Required part '" + ex.getRequestPartName() + "' is not present";
         ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  message);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleInsufficientBalanceException(InsufficientBalanceException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleOrderNotFoundException(OrderNotFoundException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -152,9 +167,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(EmptyCartException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleEmptyCartException(EmptyCartException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponseDTO> handleGenericExceptions(Exception ex) {
-        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(500,  "An unexpected error occurred: " + ex.getMessage());
+        // for testing only, remove in prod
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(500,  "An unexpected error occurred: " + ex + " " + ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
