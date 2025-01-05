@@ -149,6 +149,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(PasswordNotValidException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handlePasswordNotValidException(PasswordNotValidException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MissingAddressException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleMissingAddressException(MissingAddressException ex) {
         ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(422,  ex.getMessage());

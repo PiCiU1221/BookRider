@@ -10,12 +10,14 @@ import edu.zut.bookrider.repository.UserRepository;
 import edu.zut.bookrider.security.AuthService;
 import edu.zut.bookrider.security.JwtService;
 import edu.zut.bookrider.service.UserIdGeneratorService;
+import edu.zut.bookrider.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -36,17 +38,24 @@ public class AuthServiceTest {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private UserIdGeneratorService userIdGeneratorService;
+    private UserService userService;
 
     @MockBean
     private PasswordEncoder passwordEncoder;
+
+    private Authentication authentication;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
         roleRepository = mock(RoleRepository.class);
         userIdGeneratorService = mock(UserIdGeneratorService.class);
+        userService = mock(UserService.class);
 
-        authService = new AuthService(authenticationManager, jwtService, userRepository, roleRepository, userIdGeneratorService, passwordEncoder);
+        authService = new AuthService(authenticationManager, jwtService, userRepository, roleRepository, userIdGeneratorService, passwordEncoder, userService);
+
+        authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn("admin@test.com");
     }
 
     @Test
@@ -100,13 +109,12 @@ public class AuthServiceTest {
     @Test
     public void whenValidLibrarianInput_thenReturnCreatedLibrarianDTO() {
         CreateLibrarianDTO createLibrarianDTO = new CreateLibrarianDTO("librarian1", "Adam", "Smith");
-        String libraryAdminEmail = "library_admin@example.com";
 
         Library library = new Library();
         User libraryAdmin = new User();
         libraryAdmin.setLibrary(library);
 
-        when(userRepository.findByEmailAndRoleName(libraryAdminEmail, "library_administrator")).thenReturn(Optional.of(libraryAdmin));
+        when(userService.getUser(authentication)).thenReturn(libraryAdmin);
         when(userRepository.existsByUsernameAndLibrary(createLibrarianDTO.getUsername(), library)).thenReturn(false);
 
         when(userIdGeneratorService.generateUniqueId()).thenReturn("testId");
@@ -128,7 +136,7 @@ public class AuthServiceTest {
         // reason, even when they have exactly the same data
         when(userRepository.save(any())).thenReturn(createdLibrarian);
 
-        CreateLibrarianResponseDTO response = authService.createLibrarian(createLibrarianDTO, libraryAdminEmail);
+        CreateLibrarianResponseDTO response = authService.createLibrarian(createLibrarianDTO, authentication);
 
         assertNotNull(response);
         assertEquals("testId", response.getId());
@@ -139,35 +147,19 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void whenLibrarianAdminEmailIsWrong_thenThrowException() {
-        CreateLibrarianDTO createLibrarianDTO = new CreateLibrarianDTO("librarian1", "adam", "smith");
-        String libraryAdminEmail = "library_admin@example.com";
-
-        when(userRepository.findByEmailAndRoleName(libraryAdminEmail, "library_administrator")).thenReturn(Optional.empty());
-
-        IllegalArgumentException thrownException = assertThrows(
-                IllegalArgumentException.class,
-                () -> authService.createLibrarian(createLibrarianDTO, libraryAdminEmail)
-        );
-
-        assertEquals("Library admin with the provided email doesn't exist", thrownException.getMessage());
-    }
-
-    @Test
     public void whenLibrarianUsernameTakenWithinLibrary_thenThrowException() {
         CreateLibrarianDTO createLibrarianDTO = new CreateLibrarianDTO("librarian1", "Adam", "Smith");
-        String libraryAdminEmail = "library_admin@example.com";
 
         Library library = new Library();
         User libraryAdmin = new User();
         libraryAdmin.setLibrary(library);
 
-        when(userRepository.findByEmailAndRoleName(libraryAdminEmail, "library_administrator")).thenReturn(Optional.of(libraryAdmin));
+        when(userService.getUser(authentication)).thenReturn(libraryAdmin);
         when(userRepository.existsByUsernameAndLibrary(createLibrarianDTO.getUsername(), library)).thenReturn(true);
 
         IllegalArgumentException thrownException = assertThrows(
                 IllegalArgumentException.class,
-                () -> authService.createLibrarian(createLibrarianDTO, libraryAdminEmail)
+                () -> authService.createLibrarian(createLibrarianDTO, authentication)
         );
 
         assertEquals("A librarian with the username '" + createLibrarianDTO.getUsername() + "' already exists in this library", thrownException.getMessage());

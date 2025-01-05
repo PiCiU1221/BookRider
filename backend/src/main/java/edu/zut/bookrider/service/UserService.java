@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -65,5 +66,18 @@ public class UserService {
         }
 
         userRepository.save(user);
+    }
+  
+    public User findLibrarianByUsernameAndLibraryId(String username, Integer libraryId) {
+        return userRepository.findByUsernameAndLibraryId(username, libraryId)
+                .orElseThrow(() -> new UserNotFoundException("Librarian with the provided username " + username + " not found"));
+    }
+
+    public List<User> getAllLibrarians(User libraryAdmin) {
+        Integer libraryId = libraryAdmin.getLibrary().getId();
+
+        return userRepository.findAll().stream()
+                .filter(user -> "librarian".equals(user.getRole().getName()) && user.getLibrary().getId().equals(libraryId))
+                .toList();
     }
 }
