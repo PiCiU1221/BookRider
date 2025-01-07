@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "user_mobile_app",
-    "slug": "user_mobile_app",
+    "name": "Book Rider",
+    "slug": "book_rider",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "bookrider",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

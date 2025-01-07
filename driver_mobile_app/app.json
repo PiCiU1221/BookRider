@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "driver_mobile_app",
-    "slug": "driver_mobile_app",
+    "name": "Book Driver",
+    "slug": "book_driver",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "bookdriver",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

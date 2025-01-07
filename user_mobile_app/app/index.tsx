@@ -1,4 +1,5 @@
-import { Text, View } from "react-native";
+import { StyleSheet,Text, View } from "react-native";
+import {Link} from "expo-router";
 
 export default function Index() {
   return (
@@ -9,7 +10,17 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+      <Text>Book Rider</Text>
+        <Link href="/log_in" style={{color:'blue'}}>Log in!</Link>
     </View>
   );
+}
+const styles ={
+    container: {
+        flex:1,
+        backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: "center",
+
+    }
 }
