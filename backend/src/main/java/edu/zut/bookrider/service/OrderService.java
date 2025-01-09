@@ -1,6 +1,7 @@
 package edu.zut.bookrider.service;
 
 import edu.zut.bookrider.dto.CreateOrderResponseDTO;
+import edu.zut.bookrider.dto.DeclineOrderRequestDTO;
 import edu.zut.bookrider.dto.OrdersResponseDTO;
 import edu.zut.bookrider.exception.OrderNotFoundException;
 import edu.zut.bookrider.mapper.order.OrderMapper;
@@ -124,7 +125,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void declineOrder(Integer orderId) {
+    public void declineOrder(Integer orderId, DeclineOrderRequestDTO declineOrderRequestDTO) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
@@ -137,6 +138,7 @@ public class OrderService {
 
         order.setStatus(OrderStatus.DECLINED);
         order.setLibrarian(librarian);
+        order.setDeclineReason(declineOrderRequestDTO.getReason());
         orderRepository.save(order);
     }
 

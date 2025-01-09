@@ -1,7 +1,9 @@
 package edu.zut.bookrider.controller;
 
+import edu.zut.bookrider.dto.DeclineOrderRequestDTO;
 import edu.zut.bookrider.dto.OrdersResponseDTO;
 import edu.zut.bookrider.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,9 +43,11 @@ public class OrderController {
 
     @PreAuthorize("hasRole('librarian')")
     @PatchMapping("/{orderId}/decline")
-    public ResponseEntity<?> declineOrder(@PathVariable Integer orderId) {
+    public ResponseEntity<?> declineOrder(
+            @PathVariable Integer orderId,
+            @RequestBody @Valid DeclineOrderRequestDTO declineOrderRequestDTO) {
 
-        orderService.declineOrder(orderId);
+        orderService.declineOrder(orderId, declineOrderRequestDTO);
         return ResponseEntity.ok().build();
     }
 
