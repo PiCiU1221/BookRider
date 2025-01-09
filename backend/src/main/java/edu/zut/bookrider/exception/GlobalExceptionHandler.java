@@ -54,44 +54,44 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoRouteFoundException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleNoRouteFoundException(NoRouteFoundException ex) {
-        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ExternalApiException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleExternalApiException(ExternalApiException ex) {
-        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(503, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @ExceptionHandler(BookNotFoundException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleBookNotFoundException(BookNotFoundException ex) {
-        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(LibraryNotFoundException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleLibraryNotFoundException(LibraryNotFoundException ex) {
-        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleCategoryNotFoundException(CategoryNotFoundException ex) {
-        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(PublisherNotFoundException.class)
     public ResponseEntity<ApiErrorResponseDTO> handlePublisherNotFoundException(PublisherNotFoundException ex) {
-        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(LanguageNotFoundException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleLanguageNotFoundException(LanguageNotFoundException ex) {
-        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -133,20 +133,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleOrderNotFoundException(OrderNotFoundException ex) {
-        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(DriverApplicationNotFoundException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleDriverApplicationNotFoundException(DriverApplicationNotFoundException ex) {
-        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleUserNotFoundException(UserNotFoundException ex) {
-        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(PasswordNotValidException.class)
@@ -171,6 +171,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponseDTO> handleEmptyCartException(EmptyCartException ex) {
         ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleIllegalStateException(IllegalStateException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(409,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)
