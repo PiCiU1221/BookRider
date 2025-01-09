@@ -57,6 +57,9 @@ public class Order extends BaseEntity<Integer> {
     @Column(name = "note_to_driver")
     private String noteToDriver;
 
+    @Column(name = "decline_reason")
+    private String declineReason;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

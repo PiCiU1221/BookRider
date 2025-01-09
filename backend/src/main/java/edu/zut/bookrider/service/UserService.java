@@ -9,10 +9,11 @@ import edu.zut.bookrider.security.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -35,12 +36,31 @@ public class UserService {
 
     public User getUser(Authentication authentication) {
 
-        String userEmail = authentication.getName().split(":")[0];
+        String identifier = authentication.getName().split(":")[0];
         String role = SecurityUtils.getFirstAuthority();
         role = Objects.requireNonNull(role).substring(5);
 
-        return userRepository.findByEmailAndRoleName(userEmail, role)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        if (isEmail(identifier)) {
+            return userRepository.findByEmailAndRoleName(identifier, role)
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+        } else {
+            String[] librarianParts = authentication.getName().split(":");
+            String username = librarianParts[0];
+            Integer libraryId = Integer.valueOf(librarianParts[1]);
+            return userRepository.findByUsernameAndLibraryId(username, libraryId)
+                    .orElseThrow(() -> new UserNotFoundException(
+                            "User not found with username: " + username + " and library ID: " + libraryId));
+        }
+    }
+
+    public User getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return getUser(authentication);
+    }
+
+    private boolean isEmail(String identifier) {
+        return identifier.contains("@") && identifier.contains(".");
     }
 
     public void validateSufficientBalance(User user, BigDecimal requiredAmount) {

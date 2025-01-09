@@ -218,6 +218,7 @@ CREATE TABLE orders
     payment_status VARCHAR(50) NOT NULL,
     delivery_photo_url TEXT,
     note_to_driver TEXT,
+    decline_reason TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     accepted_at TIMESTAMP DEFAULT NULL,

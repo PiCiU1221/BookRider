@@ -165,7 +165,7 @@ VALUES
     (1, 'driving_licence', 'imgur.com/driver1-driving-licence', '2041-01-01');
 
 UPDATE driver_application_requests
-SET reviewed_by = 'YBWNYIBF1S', status = 'accepted', reviewed_at = CURRENT_TIMESTAMP
+SET reviewed_by = 'YBWNYIBF1S', status = 'APPROVED', reviewed_at = CURRENT_TIMESTAMP
 WHERE id = 1;
 
 UPDATE users
@@ -190,7 +190,7 @@ VALUES
     (2, 'driving_licence', 'imgur.com/driver2-driving_licence', '2035-02-01');
 
 UPDATE driver_application_requests
-SET reviewed_by = 'YBWNYIBF1S', status = 'accepted', reviewed_at = CURRENT_TIMESTAMP
+SET reviewed_by = 'YBWNYIBF1S', status = 'APPROVED', reviewed_at = CURRENT_TIMESTAMP
 WHERE id = 2;
 
 UPDATE users
