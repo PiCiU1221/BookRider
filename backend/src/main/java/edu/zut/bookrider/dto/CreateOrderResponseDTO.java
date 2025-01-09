@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateOrderResponseDTO {
+    private Integer orderId;
     private String userId;
     private String libraryName;
     private String deliveryAddress;

@@ -23,6 +23,7 @@ public class OrderMapper implements Mapper<Order, CreateOrderResponseDTO> {
                 .toList();
 
         return new CreateOrderResponseDTO(
+                order.getId(),
                 order.getUser().getId(),
                 order.getLibrary().getName(),
                 order.getTargetAddress().getStreet(),
