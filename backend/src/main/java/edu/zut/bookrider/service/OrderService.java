@@ -29,12 +29,16 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserService userService;
     private final OrderMapper orderMapper;
+    private final LibraryCardService libraryCardService;
 
     @Transactional
     public Order createOrderFromCartItem(ShoppingCartItem item) {
 
+        User user = item.getShoppingCart().getUser();
+        libraryCardService.validateLibraryCard(user.getId());
+
         Order order = new Order();
-        order.setUser(item.getShoppingCart().getUser());
+        order.setUser(user);
         order.setLibrary(item.getLibrary());
         order.setTargetAddress(item.getShoppingCart().getDeliveryAddress());
         order.setStatus(OrderStatus.PENDING);
