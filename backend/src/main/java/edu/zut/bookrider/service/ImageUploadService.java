@@ -73,6 +73,14 @@ public class ImageUploadService {
         // Convert the original image bytes to BufferedImage
         BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(originalImageBytes));
 
+        // Ensure the image is in a compatible RGB color space
+        BufferedImage rgbImage = new BufferedImage(
+                originalImage.getWidth(),
+                originalImage.getHeight(),
+                BufferedImage.TYPE_INT_RGB
+        );
+        rgbImage.createGraphics().drawImage(originalImage, 0, 0, null);
+
         // Set the compression quality based on the original image size
         float compressionQuality = calculateCompressionQuality(originalImageBytes.length);
 
@@ -92,7 +100,7 @@ public class ImageUploadService {
             // Write the compressed image bytes to the ByteArrayOutputStream
             try (ImageOutputStream ios = ImageIO.createImageOutputStream(compressedImageOutputStream)) {
                 writer.setOutput(ios);
-                writer.write(null, new IIOImage(originalImage, null, null), writeParam);
+                writer.write(null, new IIOImage(rgbImage, null, null), writeParam);
             } finally {
                 writer.dispose();
             }

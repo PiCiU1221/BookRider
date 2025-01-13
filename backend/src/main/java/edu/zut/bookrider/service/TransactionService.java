@@ -5,6 +5,7 @@ import edu.zut.bookrider.mapper.transaction.TransactionMapper;
 import edu.zut.bookrider.model.Order;
 import edu.zut.bookrider.model.Transaction;
 import edu.zut.bookrider.model.User;
+import edu.zut.bookrider.model.enums.OrderStatus;
 import edu.zut.bookrider.model.enums.TransactionType;
 import edu.zut.bookrider.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
@@ -17,6 +18,8 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 @Service
 public class TransactionService {
+
+    private static final BigDecimal SERVICE_FEE_PERCENTAGE = new BigDecimal("0.20");
 
     private final UserService userService;
     private final TransactionRepository transactionRepository;
@@ -38,7 +41,7 @@ public class TransactionService {
         Transaction savedTransaction = transactionRepository.save(transaction);
 
         userService.adjustBalance(
-                savedTransaction.getUser().getId(),
+                savedTransaction.getUser(),
                 savedTransaction.getAmount(),
                 true);
 
@@ -60,10 +63,38 @@ public class TransactionService {
         Transaction savedTransaction = transactionRepository.save(transaction);
 
         userService.adjustBalance(
-                savedTransaction.getUser().getId(),
+                savedTransaction.getUser(),
                 savedTransaction.getAmount(),
                 false);
 
         transactionMapper.map(savedTransaction);
+    }
+
+    @Transactional
+    public CreateTransactionResponseDTO createDriverPayoutTransaction(
+            User driver,
+            Order order) {
+        if (order == null || order.getStatus() != OrderStatus.DELIVERED) {
+            throw new IllegalArgumentException("The order must be delivered to process the payout.");
+        }
+
+        BigDecimal totalAmount = order.getAmount();
+        BigDecimal serviceFee = totalAmount.multiply(SERVICE_FEE_PERCENTAGE);
+        BigDecimal driverPayout = totalAmount.subtract(serviceFee);
+
+        Transaction transaction = new Transaction();
+        transaction.setUser(driver);
+        transaction.setOrder(order);
+        transaction.setAmount(driverPayout);
+        transaction.setTransactionType(TransactionType.DRIVER_PAYOUT);
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        userService.adjustBalance(
+                driver,
+                savedTransaction.getAmount(),
+                true);
+
+        return transactionMapper.map(savedTransaction);
     }
 }
