@@ -1,6 +1,7 @@
 package edu.zut.bookrider.service;
 
 import edu.zut.bookrider.dto.LibraryCardDTO;
+import edu.zut.bookrider.exception.InvalidLibraryCardException;
 import edu.zut.bookrider.exception.LibraryCardNotFoundException;
 import edu.zut.bookrider.exception.UserNotFoundException;
 import edu.zut.bookrider.mapper.libraryCard.LibraryCardMapper;
@@ -19,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -83,4 +85,19 @@ public class LibraryCardService {
 
         libraryCardRepository.delete(libraryCard);
     }
+
+    public void validateLibraryCard(String userId) {
+        List<LibraryCard> libraryCards = libraryCardRepository.findByUserId(userId, Pageable.unpaged())
+                .getContent();
+
+        LibraryCard validCard = libraryCards.stream()
+                .filter(card -> card.getExpirationDate().isAfter(LocalDate.now()))
+                .findFirst()
+                .orElse(null);
+
+        if (validCard == null) {
+            throw new InvalidLibraryCardException("The user's library card is missing or has expired");
+        }
+    }
+
 }

@@ -42,12 +42,16 @@ public class OrderService {
     private final ImageUploadService imageUploadService;
     private final CoordinateMapper coordinateMapper;
     private final TransactionService transactionService;
+    private final LibraryCardService libraryCardService;
 
     @Transactional
     public Order createOrderFromCartItem(ShoppingCartItem item) {
 
+        User user = item.getShoppingCart().getUser();
+        libraryCardService.validateLibraryCard(user.getId());
+
         Order order = new Order();
-        order.setUser(item.getShoppingCart().getUser());
+        order.setUser(user);
         order.setLibrary(item.getLibrary());
         order.setTargetAddress(item.getShoppingCart().getDeliveryAddress());
         order.setStatus(OrderStatus.PENDING);
