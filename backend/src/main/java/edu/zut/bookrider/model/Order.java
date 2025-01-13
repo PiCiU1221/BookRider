@@ -71,6 +71,9 @@ public class Order extends BaseEntity<Integer> {
     @Column(name = "accepted_at")
     private LocalDateTime acceptedAt;
 
+    @Column(name = "driver_assigned_at")
+    private LocalDateTime driverAssignedAt;
+
     @Column(name = "picked_up_at")
     private LocalDateTime pickedUpAt;
 

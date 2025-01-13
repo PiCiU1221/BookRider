@@ -1,5 +1,8 @@
 package edu.zut.bookrider.integration.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.zut.bookrider.dto.CoordinateDTO;
+import edu.zut.bookrider.dto.DeliverOrderRequestDTO;
 import edu.zut.bookrider.model.*;
 import edu.zut.bookrider.model.enums.OrderStatus;
 import edu.zut.bookrider.model.enums.PaymentStatus;
@@ -18,13 +21,22 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/*
+    This test uses a real instance of the first library (libraryId = 1).
+    Can't use @WithMockUser with variables, and our system requires
+    library ID in the username for this annotation. This is just a
+    temporary solution until we will use some more sophisticated methods
+    to do it. For development purposes, it's fine for now.
+ */
 @Transactional
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -56,6 +68,7 @@ public class OrderControllerIT {
 
     private User user;
     private User librarian;
+    private User driver;
     private Library library;
     private Address address;
 
@@ -90,11 +103,19 @@ public class OrderControllerIT {
         librarian.setLibrary(library);
         librarian.setPassword(passwordEncoder.encode("password"));
         librarian = userRepository.save(librarian);
+
+        Role driverRole = roleRepository.findByName("driver").orElseThrow();
+        driver = new User();
+        driver.setId(userIdGeneratorService.generateUniqueId());
+        driver.setEmail("testdriver@ocit.com");
+        driver.setRole(driverRole);
+        driver.setPassword(passwordEncoder.encode("password"));
+        driver = userRepository.save(driver);
     }
 
     @Test
     @WithMockUser(username = "testuser@ocit.com:user", roles = {"user"})
-    void whenUserRequestsOrders_thenReturnUserOrders() throws Exception {
+    void whenUserRequestsPendingOrders_thenReturnUserPendingOrders() throws Exception {
 
         Order order = new Order();
         order.setUser(user);
@@ -108,23 +129,95 @@ public class OrderControllerIT {
         Order order2 = new Order();
         order2.setUser(user);
         order2.setLibrary(library);
-        order2.setStatus(OrderStatus.DELIVERED);
+        order2.setStatus(OrderStatus.PENDING);
         order2.setTargetAddress(address);
         order2.setAmount(BigDecimal.valueOf(10));
         order2.setPaymentStatus(PaymentStatus.COMPLETED);
         orderRepository.save(order2);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/user"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/user/pending"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.activeOrders").isArray())
-                .andExpect(jsonPath("$.activeOrders", hasSize(greaterThan(0))))
-                .andExpect(jsonPath("$.completedOrders").isArray())
-                .andExpect(jsonPath("$.completedOrders", hasSize(greaterThan(0))));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.currentPage", is(0)))
+                .andExpect(jsonPath("$.pageSize", is(10)))
+                .andExpect(jsonPath("$.totalPages", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "testuser@ocit.com:user", roles = {"user"})
+    void whenUserRequestsInRealizationOrders_thenReturnUserInRealizationOrders() throws Exception {
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.ACCEPTED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order);
+
+        Order order2 = new Order();
+        order2.setUser(user);
+        order2.setLibrary(library);
+        order2.setStatus(OrderStatus.DRIVER_PICKED);
+        order2.setTargetAddress(address);
+        order2.setAmount(BigDecimal.valueOf(10));
+        order2.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order2);
+
+        Order order3 = new Order();
+        order3.setUser(user);
+        order3.setLibrary(library);
+        order3.setStatus(OrderStatus.IN_TRANSIT_TO_CUSTOMER);
+        order3.setTargetAddress(address);
+        order3.setAmount(BigDecimal.valueOf(10));
+        order3.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order3);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/user/in-realization"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(3)))
+                .andExpect(jsonPath("$.currentPage", is(0)))
+                .andExpect(jsonPath("$.pageSize", is(10)))
+                .andExpect(jsonPath("$.totalPages", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "testuser@ocit.com:user", roles = {"user"})
+    void whenUserRequestsCompletedOrders_thenReturnUserCompletedOrders() throws Exception {
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.DELIVERED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order);
+
+        Order order2 = new Order();
+        order2.setUser(user);
+        order2.setLibrary(library);
+        order2.setStatus(OrderStatus.DECLINED);
+        order2.setTargetAddress(address);
+        order2.setAmount(BigDecimal.valueOf(10));
+        order2.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/user/completed"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.currentPage", is(0)))
+                .andExpect(jsonPath("$.pageSize", is(10)))
+                .andExpect(jsonPath("$.totalPages", is(1)));
     }
 
     @Test
     @WithMockUser(username = "testlibrarian1:1", roles = {"librarian"})
-    void whenLibrarianRequestsOrders_thenReturnLibraryOrders() throws Exception {
+    void whenLibrarianRequestsPendingOrders_thenReturnLibraryPendingOrders() throws Exception {
 
         Order order = new Order();
         order.setUser(user);
@@ -138,18 +231,108 @@ public class OrderControllerIT {
         Order order2 = new Order();
         order2.setUser(user);
         order2.setLibrary(library);
-        order2.setStatus(OrderStatus.DELIVERED);
+        order2.setStatus(OrderStatus.PENDING);
         order2.setTargetAddress(address);
         order2.setAmount(BigDecimal.valueOf(10));
         order2.setPaymentStatus(PaymentStatus.COMPLETED);
         orderRepository.save(order2);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/librarian"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/librarian/pending"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.activeOrders").isArray())
-                .andExpect(jsonPath("$.activeOrders", hasSize(greaterThan(0))))
-                .andExpect(jsonPath("$.completedOrders").isArray())
-                .andExpect(jsonPath("$.completedOrders", hasSize(greaterThan(0))));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(greaterThan(2-1))))
+                .andExpect(jsonPath("$.currentPage", is(0)))
+                .andExpect(jsonPath("$.pageSize", is(10)))
+                .andExpect(jsonPath("$.totalPages", greaterThan(0)));
+    }
+
+    @Test
+    @WithMockUser(username = "testlibrarian1:1", roles = {"librarian"})
+    void whenLibrarianRequestsInRealizationOrders_thenReturnLibraryInRealizationOrders() throws Exception {
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.ACCEPTED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order);
+
+        Order order2 = new Order();
+        order2.setUser(user);
+        order2.setLibrary(library);
+        order2.setStatus(OrderStatus.ACCEPTED);
+        order2.setTargetAddress(address);
+        order2.setAmount(BigDecimal.valueOf(10));
+        order2.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/librarian/in-realization"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(greaterThan(2-1))))
+                .andExpect(jsonPath("$.currentPage", is(0)))
+                .andExpect(jsonPath("$.pageSize", is(10)))
+                .andExpect(jsonPath("$.totalPages", greaterThan(0)));
+    }
+
+    @Test
+    @WithMockUser(username = "testlibrarian1:1", roles = {"librarian"})
+    void whenLibrarianRequestsCompletedOrders_thenReturnLibraryCompletedOrders() throws Exception {
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.ACCEPTED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order);
+
+        Order order2 = new Order();
+        order2.setUser(user);
+        order2.setLibrary(library);
+        order2.setStatus(OrderStatus.DECLINED);
+        order2.setTargetAddress(address);
+        order2.setAmount(BigDecimal.valueOf(10));
+        order2.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order2);
+
+        Order order3 = new Order();
+        order3.setUser(user);
+        order3.setLibrary(library);
+        order3.setStatus(OrderStatus.DRIVER_PICKED);
+        order3.setTargetAddress(address);
+        order3.setAmount(BigDecimal.valueOf(10));
+        order3.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order3);
+
+        Order order4 = new Order();
+        order4.setUser(user);
+        order4.setLibrary(library);
+        order4.setStatus(OrderStatus.IN_TRANSIT_TO_CUSTOMER);
+        order4.setTargetAddress(address);
+        order4.setAmount(BigDecimal.valueOf(10));
+        order4.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order4);
+
+        Order order5 = new Order();
+        order5.setUser(user);
+        order5.setLibrary(library);
+        order5.setStatus(OrderStatus.DELIVERED);
+        order5.setTargetAddress(address);
+        order5.setAmount(BigDecimal.valueOf(10));
+        order5.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order5);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/librarian/completed"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(greaterThan(5-1))))
+                .andExpect(jsonPath("$.currentPage", is(0)))
+                .andExpect(jsonPath("$.pageSize", is(10)))
+                .andExpect(jsonPath("$.totalPages", greaterThan(0)));
     }
 
     @Test
@@ -228,47 +411,27 @@ public class OrderControllerIT {
     @WithMockUser(username = "testlibrarian1:1", roles = {"librarian"})
     void whenLibrarianHandoverOrderToDriver_thenStatusIsUpdated() throws Exception {
 
-        Role driverRole = roleRepository.findByName("driver").orElseThrow();
-        User driver = new User();
-        driver.setId(userIdGeneratorService.generateUniqueId());
-        driver.setRole(driverRole);
-        driver.setEmail("testdriver@ocit.com");
-        driver.setFirstName("Adam");
-        driver.setLastName("Driver");
-        driver.setPassword(passwordEncoder.encode("password"));
-        driver = userRepository.save(driver);
-
         Order order = new Order();
         order.setUser(user);
         order.setLibrary(library);
-        order.setStatus(OrderStatus.ACCEPTED);
+        order.setStatus(OrderStatus.DRIVER_PICKED);
         order.setTargetAddress(address);
         order.setAmount(BigDecimal.valueOf(10));
         order.setPaymentStatus(PaymentStatus.COMPLETED);
         order.setDriver(driver);
         order = orderRepository.save(order);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/orders/" + order.getId() + "/handover")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/orders/" + order.getId() + "/handover")
                         .param("driverId", driver.getId()))
                 .andExpect(status().isOk());
 
         Order updatedOrder = orderRepository.findById(order.getId()).orElseThrow();
-        assertEquals(OrderStatus.IN_TRANSIT, updatedOrder.getStatus());
+        assertEquals(OrderStatus.IN_TRANSIT_TO_CUSTOMER, updatedOrder.getStatus());
     }
 
     @Test
     @WithMockUser(username = "testlibrarian1:1", roles = {"librarian"})
     void whenOrderIsNotAccepted_thenIllegalStateExceptionIsThrown() throws Exception {
-
-        Role driverRole = roleRepository.findByName("driver").orElseThrow();
-        User driver = new User();
-        driver.setId(userIdGeneratorService.generateUniqueId());
-        driver.setRole(driverRole);
-        driver.setEmail("testdriver@ocit.com");
-        driver.setFirstName("Adam");
-        driver.setLastName("Driver");
-        driver.setPassword(passwordEncoder.encode("password"));
-        driver = userRepository.save(driver);
 
         Order order = new Order();
         order.setUser(user);
@@ -280,7 +443,7 @@ public class OrderControllerIT {
         order.setDriver(driver);
         order = orderRepository.save(order);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/orders/" + order.getId() + "/handover")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/orders/" + order.getId() + "/handover")
                         .param("driverId", driver.getId()))
                 .andExpect(status().isConflict());
     }
@@ -311,15 +474,297 @@ public class OrderControllerIT {
         Order order = new Order();
         order.setUser(user);
         order.setLibrary(library);
-        order.setStatus(OrderStatus.ACCEPTED);
+        order.setStatus(OrderStatus.DRIVER_PICKED);
         order.setTargetAddress(address);
         order.setAmount(BigDecimal.valueOf(10));
         order.setPaymentStatus(PaymentStatus.COMPLETED);
         order.setDriver(driver1);
         order = orderRepository.save(order);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/orders/" + order.getId() + "/handover")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/orders/" + order.getId() + "/handover")
                         .param("driverId", driver2.getId()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverRequestsPendingOrders_thenReturnDriverPendingOrders() throws Exception {
+
+        Order order = new Order();
+        order.setDriver(driver);
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.ACCEPTED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order);
+
+        Order order2 = new Order();
+        order2.setDriver(driver);
+        order2.setUser(user);
+        order2.setLibrary(library);
+        order2.setStatus(OrderStatus.ACCEPTED);
+        order2.setTargetAddress(address);
+        order2.setAmount(BigDecimal.valueOf(10));
+        order2.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/driver/pending")
+                        .param("locationString", "53.425383,14.543055")
+                        // since we're using real library this is very big to pass tests
+                        .param("maxDistanceInMeters", "99999999999")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(greaterThan(2-1))))
+                .andExpect(jsonPath("$.currentPage", is(0)))
+                .andExpect(jsonPath("$.pageSize", is(10)))
+                .andExpect(jsonPath("$.totalPages", greaterThan(0)));
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverRequestsInRealizationOrders_thenReturnDriverInRealizationOrders() throws Exception {
+
+        Order order = new Order();
+        order.setDriver(driver);
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.DRIVER_PICKED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order);
+
+        Order order2 = new Order();
+        order2.setDriver(driver);
+        order2.setUser(user);
+        order2.setLibrary(library);
+        order2.setStatus(OrderStatus.IN_TRANSIT_TO_CUSTOMER);
+        order2.setTargetAddress(address);
+        order2.setAmount(BigDecimal.valueOf(10));
+        order2.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/driver/in-realization"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.currentPage", is(0)))
+                .andExpect(jsonPath("$.pageSize", is(10)))
+                .andExpect(jsonPath("$.totalPages", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverCompletedRealizationOrders_thenReturnDriverCompletedOrders() throws Exception {
+
+        Order order = new Order();
+        order.setDriver(driver);
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.DELIVERED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order);
+
+        Order order2 = new Order();
+        order2.setDriver(driver);
+        order2.setUser(user);
+        order2.setLibrary(library);
+        order2.setStatus(OrderStatus.DELIVERED);
+        order2.setTargetAddress(address);
+        order2.setAmount(BigDecimal.valueOf(10));
+        order2.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/driver/completed"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.currentPage", is(0)))
+                .andExpect(jsonPath("$.pageSize", is(10)))
+                .andExpect(jsonPath("$.totalPages", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverAssignsOrder_thenReturnOkAndAssignIt() throws Exception {
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.ACCEPTED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        order = orderRepository.save(order);
+
+        assertNull(order.getDriverAssignedAt());
+        assertNull(order.getDriver());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/orders/" + order.getId() + "/assign"))
+                .andExpect(status().isOk());
+
+        Order orderAfterRequest = orderRepository.findById(order.getId()).orElseThrow();
+        assertNotNull(orderAfterRequest.getDriverAssignedAt());
+        assertEquals(driver, orderAfterRequest.getDriver());
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverAssignsOrderWithDifferentStatus_thenThrowException() throws Exception {
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.DRIVER_PICKED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        order = orderRepository.save(order);
+
+        assertNull(order.getDriverAssignedAt());
+        assertNull(order.getDriver());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/orders/" + order.getId() + "/assign"))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverDeliversOrder_thenReturnOkAndDriverPayoutTransactionDTO() throws Exception {
+
+        Order order = new Order();
+        order.setDriver(driver);
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.IN_TRANSIT_TO_CUSTOMER);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        order = orderRepository.save(order);
+
+        CoordinateDTO location = new CoordinateDTO(10.0, 10.0);
+
+        String imagePath = "src/test/resources/orderControllerTest/example_delivery_photo.png";
+        byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
+        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+        DeliverOrderRequestDTO requestDTO = new DeliverOrderRequestDTO(
+                location,
+                base64Image
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/orders/" + order.getId() + "/deliver")
+                        .content(new ObjectMapper().writeValueAsString(requestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.userId").value(driver.getId()))
+                .andExpect(jsonPath("$.orderId").value(order.getId()))
+                .andExpect(jsonPath("$.amount").value(8.00))
+                .andExpect(jsonPath("$.transactionType").value("DRIVER_PAYOUT"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverDeliversOrderWhenWrongStatus_thenThrowException() throws Exception {
+
+        Order order = new Order();
+        order.setDriver(driver);
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.DRIVER_PICKED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        order = orderRepository.save(order);
+
+        CoordinateDTO location = new CoordinateDTO(10.0, 10.0);
+
+        String imagePath = "src/test/resources/orderControllerTest/example_delivery_photo.png";
+        byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
+        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+        DeliverOrderRequestDTO requestDTO = new DeliverOrderRequestDTO(
+                location,
+                base64Image
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/orders/" + order.getId() + "/deliver")
+                        .content(new ObjectMapper().writeValueAsString(requestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverDeliversOrderWhenDifferentDriver_thenThrowException() throws Exception {
+
+        Role driverRole = roleRepository.findByName("driver").orElseThrow();
+        User driver2 = new User();
+        driver2.setId(userIdGeneratorService.generateUniqueId());
+        driver2.setEmail("testdriver2@ocit.com");
+        driver2.setRole(driverRole);
+        driver2.setPassword(passwordEncoder.encode("password"));
+        driver2 = userRepository.save(driver2);
+
+        Order order = new Order();
+        order.setDriver(driver2);
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.DRIVER_PICKED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        order = orderRepository.save(order);
+
+        CoordinateDTO location = new CoordinateDTO(10.0, 10.0);
+
+        String imagePath = "src/test/resources/orderControllerTest/example_delivery_photo.png";
+        byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
+        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+        DeliverOrderRequestDTO requestDTO = new DeliverOrderRequestDTO(
+                location,
+                base64Image
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/orders/" + order.getId() + "/deliver")
+                        .content(new ObjectMapper().writeValueAsString(requestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverDeliversOrderWhenTooFarAway_thenThrowException() throws Exception {
+
+        Order order = new Order();
+        order.setDriver(driver);
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.DRIVER_PICKED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        order = orderRepository.save(order);
+
+        CoordinateDTO location = new CoordinateDTO(15.0, 15.0);
+
+        String imagePath = "src/test/resources/orderControllerTest/example_delivery_photo.png";
+        byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
+        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+        DeliverOrderRequestDTO requestDTO = new DeliverOrderRequestDTO(
+                location,
+                base64Image
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/orders/" + order.getId() + "/deliver")
+                        .content(new ObjectMapper().writeValueAsString(requestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 }
