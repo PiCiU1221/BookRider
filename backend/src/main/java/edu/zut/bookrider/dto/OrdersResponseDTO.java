@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrdersResponseDTO {
-    private List<CreateOrderResponseDTO> activeOrders;
+    private List<CreateOrderResponseDTO> pendingOrders;
+    private List<CreateOrderResponseDTO> inRealizationOrders;
     private List<CreateOrderResponseDTO> completedOrders;
 }
