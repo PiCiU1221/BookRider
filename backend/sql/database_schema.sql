@@ -2,6 +2,8 @@
 
 BEGIN;
 
+CREATE EXTENSION postgis;
+
 -- Book related tables
 
 CREATE TABLE authors
@@ -222,6 +224,7 @@ CREATE TABLE orders
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     accepted_at TIMESTAMP DEFAULT NULL,
+    driver_assigned_at TIMESTAMP DEFAULT NULL,
     picked_up_at TIMESTAMP DEFAULT NULL,
     delivered_at TIMESTAMP DEFAULT NULL
 );
