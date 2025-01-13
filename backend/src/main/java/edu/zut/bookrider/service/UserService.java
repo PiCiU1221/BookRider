@@ -71,10 +71,7 @@ public class UserService {
     }
 
     @Transactional
-    public void adjustBalance(String userId, BigDecimal amount, boolean isDeposit) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    public void adjustBalance(User user, BigDecimal amount, boolean isDeposit) {
 
         if (isDeposit) {
             user.setBalance(user.getBalance().add(amount));
