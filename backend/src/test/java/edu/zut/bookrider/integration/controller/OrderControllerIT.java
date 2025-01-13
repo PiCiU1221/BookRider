@@ -7,7 +7,6 @@ import edu.zut.bookrider.model.*;
 import edu.zut.bookrider.model.enums.OrderStatus;
 import edu.zut.bookrider.model.enums.PaymentStatus;
 import edu.zut.bookrider.repository.*;
-import edu.zut.bookrider.service.ImageUploadService;
 import edu.zut.bookrider.service.UserIdGeneratorService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,9 +65,6 @@ public class OrderControllerIT {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private ImageUploadService imageUploadService;
 
     private User user;
     private User librarian;
