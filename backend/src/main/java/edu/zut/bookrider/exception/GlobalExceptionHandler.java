@@ -131,6 +131,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidLibraryCardException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleInvalidLibraryCardException(InvalidLibraryCardException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleOrderNotFoundException(OrderNotFoundException ex) {
         ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404,  ex.getMessage());
