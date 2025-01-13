@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +72,11 @@ public class CheckoutControllerIT {
     @Autowired
     private ShoppingCartRepository shoppingCartRepository;
 
+    @Autowired
+    private LibraryCardRepository libraryCardRepository;
+
     private User userReference;
+    private LibraryCard libraryCardReference;
 
     @BeforeEach
     void setUp() {
@@ -97,6 +102,14 @@ public class CheckoutControllerIT {
         user.setShoppingCart(shoppingCart);
 
         userReference = userRepository.save(user);
+
+        LibraryCard libraryCard = new LibraryCard();
+        libraryCard.setUser(userReference);
+        libraryCard.setCardId("123123123");
+        libraryCard.setFirstName("Adam");
+        libraryCard.setLastName("Smith");
+        libraryCard.setExpirationDate(LocalDate.of(9999, 12, 12));
+        libraryCardReference = libraryCardRepository.save(libraryCard);
 
         Category category = new Category();
         category.setName("Category");
@@ -323,6 +336,18 @@ public class CheckoutControllerIT {
     void whenNotEnoughBalance_thenReturnBadRequest() throws Exception {
 
         userReference.setBalance(BigDecimal.valueOf(0));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/checkout")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser@ccit.com", roles = {"user"})
+    void whenExpiredLibraryCard_thenReturnBadRequest() throws Exception {
+
+        libraryCardReference.setExpirationDate(LocalDate.of(2025, 1, 1));
+        libraryCardRepository.save(libraryCardReference);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/checkout")
                         .contentType(MediaType.APPLICATION_JSON))
