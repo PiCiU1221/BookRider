@@ -6,7 +6,6 @@ const LibrarianHomePage: React.FC = () => {
     const navigate = useNavigate();
     const librarianUsername = 'librarian123';
 
-    // Book search/add utils
     const [searchResults, setBookSearchResults] = useState<string[]>([
         'Book 1',
         'Book 2',
@@ -26,7 +25,6 @@ const LibrarianHomePage: React.FC = () => {
         setBookSearchResults(filteredResults);
     };
 
-    // Publisher search/add utils
     const [publisherResults, setPublisherResults] = useState<string[]>([
         'Publisher 1',
         'Publisher 2',
@@ -51,14 +49,13 @@ const LibrarianHomePage: React.FC = () => {
     };
 
     const handleSettings = () => {
-        alert('Settings clicked');
+        alert('Settings');
     };
 
     const handleLogout = () => {
         alert('Logging out');
     };
 
-    // Placeholder order details
     const { orderType, orderId } = useParams();
 
     const [showRejectionInput, setShowRejectionInput] = useState(false);
@@ -72,15 +69,15 @@ const LibrarianHomePage: React.FC = () => {
         setShowRejectionInput(true);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleRejectionReasonChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRejectionReason(e.target.value);
     };
 
     const handleConfirmRejection = () => {
-        if (rejectionReason.trim() === '') {
-            alert('Proszę podać przyczynę odmowy realizacji zamówienia.');
+        if (rejectionReason === '') {
+            alert('Proszę wybrać przyczynę odmowy realizacji zamówienia.');
         } else {
-            alert(`Order ${orderId} rejected for reason: ${rejectionReason}`);
+            alert(`Zamówienie ${orderId} odrzucone z powodu: ${rejectionReason}`);
             setShowRejectionInput(false);
             setRejectionReason('');
         }
@@ -362,7 +359,6 @@ const LibrarianHomePage: React.FC = () => {
 
                 {activeSection === 'orders' && (
                     <section style={{padding: '20px', borderRadius: '4px', marginBottom: '50px'}}>
-                        <h2 style={{textAlign: "center", color: '#fff'}}>Zamówienia</h2>
                             <div className="order-details-container">
                                 <h1 className="order-title">Szczegóły zamówienia nr: {orderId}</h1>
 
@@ -386,21 +382,38 @@ const LibrarianHomePage: React.FC = () => {
                                     </div>
 
                                     {showRejectionInput && (
-                                        <div className="rejection-input-container">
-                                            <input
-                                                type="text"
-                                                placeholder="Podaj przyczynę odmowy realizacji zamówienia"
-                                                value={rejectionReason}
-                                                onChange={handleInputChange}
-                                                className="rejection-input"
-                                                maxLength={100}
-                                            />
-                                            <button
-                                                onClick={handleConfirmRejection}
-                                                className="confirm-rejection-button"
-                                            >
-                                                Wyślij
-                                            </button>
+                                        <div>
+                                            <h3 style={{color: '#4b4b4b'}} >Wybierz przyczynę odmowy:</h3>
+                                            <form style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px' }}>
+                                                <label style={{ display: 'flex', alignItems: 'center', color: '#4b4b4b' }}>
+                                                    <input
+                                                        type="radio"
+                                                        value="Brak w zbiorach biblioteki"
+                                                        checked={rejectionReason === 'Brak w zbiorach biblioteki'}
+                                                        onChange={handleRejectionReasonChange}
+                                                    />
+                                                    <span style={{ marginLeft: '10px' }}>brak w zbiorach biblioteki</span>
+                                                </label>
+                                                <label style={{ display: 'flex', alignItems: 'center', color: '#4b4b4b' }}>
+                                                    <input
+                                                        type="radio"
+                                                        value="Wszystkie egzemplarze zostały wypożyczone"
+                                                        checked={rejectionReason === 'Wszystkie egzemplarze zostały wypożyczone'}
+                                                        onChange={handleRejectionReasonChange}
+                                                    />
+                                                    <span style={{ marginLeft: '10px' }}>wszystkie egzemplarze zostały wypożyczone</span>
+                                                </label>
+                                                <label style={{ display: 'flex', alignItems: 'center', color: '#4b4b4b' }}>
+                                                    <input
+                                                        type="radio"
+                                                        value="Inne"
+                                                        checked={rejectionReason === 'Inne'}
+                                                        onChange={handleRejectionReasonChange}
+                                                    />
+                                                    <span style={{ marginLeft: '10px' }}>inne</span>
+                                                </label>
+                                            </form>
+                                            <button className="confirm-rejection-button" onClick={handleConfirmRejection}>Potwierdź</button>
                                         </div>
                                     )}
                                 </div>

@@ -16,7 +16,6 @@ const LoginPage: React.FC = () => {
         }
     };
 
-    // Function to set the token as a cookie
     const setCookie = (name: string, value: string, days: number = 7): void => {
         const expires = new Date();
         expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000); // Set expiration date
@@ -41,29 +40,23 @@ const LoginPage: React.FC = () => {
                 }),
             });
 
-            // Prepare the entire response headers as a string
             let headersString = '';
             response.headers.forEach((value, key) => {
                 headersString += `${key}: ${value}\n`;
             });
 
-            // Log the entire response headers string
             console.log('Response Headers:\n', headersString);
 
             if (response.ok) {
-                // Extract the token from the Authorization header
                 const authHeader = response.headers.get('Authorization');
                 if (authHeader) {
-                    const token = authHeader.split(' ')[1]; // Get the token after 'Bearer '
+                    const token = authHeader.split(' ')[1];
 
-                    // Store the token as a cookie
-                    setCookie('access_token', `${token}`); // Store token in cookie
+                    setCookie('access_token', `${token}`);
 
-                    // Optionally, store role in localStorage for easy access
-                    const userRole = role; // You can still use the role here
+                    const userRole = role;
                     localStorage.setItem('role', userRole);
 
-                    // Navigate based on the role
                     if (userRole === 'library_administrator') {
                         navigate('/librarian-dashboard');
                     } else {
@@ -73,11 +66,11 @@ const LoginPage: React.FC = () => {
                     setError('Authorization header missing');
                 }
             } else {
-                const errorData = await response.text();  // Parse as text if no JSON
+                const errorData = await response.text();
                 setError(errorData || 'Login failed');
             }
         } catch (error) {
-            console.error('Login error: ', error);  // Log the error for debugging
+            console.error('Login error: ', error);
             setError('An error occurred while logging in');
         }
     };

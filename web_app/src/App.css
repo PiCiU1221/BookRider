@@ -178,13 +178,13 @@ button {
 }
 
 .back-button {
-  background-color: #282e33;
+  background-color: #3B576C;
   color: #fff;
   padding: 12px 20px;
   border-radius: 8px;
   font-size: 16px;
-  width: 100%;
-  max-width: 200px;
+  width: 50%;
+  max-width: 100%;
   margin: 0 auto;
   cursor: pointer;
   transition: background-color 0.3s ease;

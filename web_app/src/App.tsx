@@ -58,9 +58,9 @@ const App: React.FC = () => {
                                         const token = localStorage.getItem('access_token');
                                         if (token) {
                                             request.headers['Authorization'] = `Bearer ${token}`;
-                                            console.log("Interceptor added token:", token);  // Log token addition
+                                            console.log("Interceptor added token:", token);
                                         } else {
-                                            console.log("No token found");  // Log when no token is found
+                                            console.log("No token found");
                                         }
                                         return request;
                                     }}
