@@ -2,24 +2,21 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [role, setRole] = useState<string>('library_administrator'); // Role to be set correctly using radio button input
     const navigate = useNavigate();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        if (name === 'username') {
-            setUsername(value);
+        if (name === 'email') {
+            setEmail(value);
         } else if (name === 'password') {
             setPassword(value);
+        } else if (name === 'role') {
+            setRole(value);
         }
-    };
-
-    const setCookie = (name: string, value: string, days: number = 7): void => {
-        const expires = new Date();
-        expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000); // Set expiration date
-        document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;secure;HttpOnly;SameSite=Strict`;
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -27,51 +24,58 @@ const LoginPage: React.FC = () => {
         setError(null);
 
         try {
-            const role = "library_administrator";
-
             const response = await fetch(`https://bookrider.onrender.com/api/auth/login/${role}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    identifier: username,
+                    identifier: email,
                     password,
                 }),
             });
-
-            let headersString = '';
-            response.headers.forEach((value, key) => {
-                headersString += `${key}: ${value}\n`;
-            });
-
-            console.log('Response Headers:\n', headersString);
 
             if (response.ok) {
                 const authHeader = response.headers.get('Authorization');
                 if (authHeader) {
                     const token = authHeader.split(' ')[1];
 
-                    setCookie('access_token', `${token}`);
+                    localStorage.setItem('access_token', token);
+                    localStorage.setItem('role', role);
 
-                    const userRole = role;
-                    localStorage.setItem('role', userRole);
-
-                    if (userRole === 'library_administrator') {
+                    // Navigation on the basis of the user's role
+                    if (role === 'library_administrator') {
+                        navigate('/add-library');
+                    } else if (role === 'librarian') {
                         navigate('/librarian-dashboard');
+                    } else if (role === 'system_administrator') {
+                        navigate('/sys-admin-dashboard');
                     } else {
-                        navigate('/dashboard');
+                        navigate('/login');
                     }
                 } else {
                     setError('Authorization header missing');
                 }
             } else {
-                const errorData = await response.text();
-                setError(errorData || 'Login failed');
+                const errorData = await response.json();
+                switch (errorData.code) {
+                    case 401:
+                        setError('Nieprawidłowy email, hasło lub rola.');
+                        break;
+                    case 500:
+                        setError('Wewnętrzny błąd serwera. Spróbuj ponownie później.');
+                        break;
+                    case 400:
+                        setError('Należy podać adres email oraz hasło.');
+                        break;
+                    default:
+                        setError(errorData.message || 'Błąd logowania. Spróbuj ponownie.');
+                        break;
+                }
             }
         } catch (error) {
             console.error('Login error: ', error);
-            setError('An error occurred while logging in');
+            setError('Podczas logowania wystąpił błąd');
         }
     };
 
@@ -81,12 +85,12 @@ const LoginPage: React.FC = () => {
                 <h2 style={headerStyle}>Logowanie</h2>
                 <form onSubmit={handleSubmit} style={formStyle}>
                     <div style={formGroupStyle}>
-                        <label htmlFor="username" style={labelStyle}>Nazwa użytkownika:</label>
+                        <label htmlFor="email" style={labelStyle}>Adres email:</label>
                         <input
                             type="email"
-                            id="username"
-                            name="username"
-                            value={username}
+                            id="email"
+                            name="email"
+                            value={email}
                             onChange={handleInputChange}
                             required
                             style={inputStyle}
@@ -95,7 +99,7 @@ const LoginPage: React.FC = () => {
                     </div>
 
                     <div style={formGroupStyle}>
-                        <label htmlFor="password" style={labelStyle}>Hasło:</label>
+                        <label htmlFor="password" style={radioLabel}>Hasło:</label>
                         <input
                             type="password"
                             id="password"
@@ -107,9 +111,44 @@ const LoginPage: React.FC = () => {
                             maxLength={25}
                         />
                     </div>
-
-                    {error && <p style={errorStyle}>{error}</p>}
-
+                    <div style={radioGroupStyle}>
+                        <label style={labelStyle}>Jestem:</label>
+                        <div>
+                            <label style={radioStyle}>
+                                <input
+                                    type="radio"
+                                    name="role"
+                                    value="library_administrator"
+                                    checked={role === 'library_administrator'}
+                                    onChange={handleInputChange}
+                                />
+                                administratorem biblioteki
+                            </label>
+                            <label style={radioStyle}>
+                                <input
+                                    type="radio"
+                                    name="role"
+                                    value="librarian"
+                                    checked={role === 'librarian'}
+                                    onChange={handleInputChange}
+                                />
+                                bibliotekarzem
+                            </label>
+                            <label style={radioStyle}>
+                                <input
+                                    type="radio"
+                                    name="role"
+                                    value="system_administrator"
+                                    checked={role === 'system_administrator'}
+                                    onChange={handleInputChange}
+                                />
+                                administratorem systemów
+                            </label>
+                        </div>
+                    </div>
+                    <div style={errorStyle}>
+                    {error && <p>{error}</p>}
+                    </div>
                     <button
                         type="submit"
                         style={submitButtonStyle}
@@ -137,6 +176,7 @@ const formContainerStyle = {
     boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)',
     width: '100%',
     maxWidth: '400px',
+    alignItems: 'center',
 };
 
 const headerStyle: React.CSSProperties = {
@@ -175,7 +215,6 @@ const inputStyle: React.CSSProperties = {
 
 const errorStyle = {
     color: 'red',
-    marginBottom: '20px',
 };
 
 const submitButtonStyle: React.CSSProperties = {
@@ -203,6 +242,22 @@ const registerButtonStyle: React.CSSProperties = {
     cursor: 'pointer',
     fontSize: '16px',
     transition: 'background-color 0.3s',
+};
+
+const radioLabel: React.CSSProperties = {
+    color: '#3B576C',
+};
+
+const radioStyle: React.CSSProperties = {
+    color: '#3B576C',
+    display: 'flex',
+    gap: '10px',
+    marginBottom: '7px',
+};
+
+const radioGroupStyle: React.CSSProperties = {
+    marginBottom: '5%',
+    marginTop: '5%',
 };
 
 export default LoginPage;

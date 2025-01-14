@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 const LibraryAdminAddLibrary: React.FC = () => {
     const navigate = useNavigate();
-    const sysAdminUsername = 'admin123';
 
     const [formData, setFormData] = useState({
         libraryName: '',
@@ -20,14 +19,41 @@ const LibraryAdminAddLibrary: React.FC = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const fullAddress = `${formData.addressLine1} ${formData.addressLine2}`;
 
-        console.log('Form submitted:', { ...formData, address: fullAddress });
+        const requestBody = {
+            street: fullAddress,
+            city: formData.city,
+            postalCode: formData.postalCode,
+            libraryName: formData.libraryName,
+            phoneNumber: formData.phoneNumber,
+            libraryEmail: formData.emailAddress,
+        };
 
-        navigate('/processing-info');
+        const token = localStorage.getItem('token');
+
+        try {
+            const response = await fetch('https://bookrider.onrender.com/api/library-requests', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            if (response.ok) {
+                console.log('Library addition request submitted successfully');
+                navigate('/processing-info');
+            } else {
+                console.error('Error submitting request', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error during API call:', error);
+        }
     };
 
     const handleSettings = () => {
@@ -40,7 +66,6 @@ const LibraryAdminAddLibrary: React.FC = () => {
 
     return (
         <div style={{ backgroundColor: "#f4f6f9", minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
-            {/* Top Panel */}
             <div
                 style={{
                     display: 'flex',
@@ -57,7 +82,7 @@ const LibraryAdminAddLibrary: React.FC = () => {
                 }}
             >
                 <div style={{ fontWeight: 'bold', fontSize: '18px' }}>
-                    Witaj, {sysAdminUsername}
+                    Widok administratora biblioteki
                 </div>
                 <div>
                     <button
@@ -94,7 +119,6 @@ const LibraryAdminAddLibrary: React.FC = () => {
                 </div>
             </div>
 
-            {/* Main Body */}
             <main style={{ padding: '40px', maxWidth: '900px', margin: 'auto' }}>
                 <section style={{
                     padding: '30px',
