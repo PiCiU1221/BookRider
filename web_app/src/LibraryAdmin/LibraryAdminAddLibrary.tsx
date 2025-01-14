@@ -39,37 +39,39 @@ const LibraryAdminAddLibrary: React.FC = () => {
     };
 
     return (
-        <div style={{ backgroundColor: "#3B576C" }}>
+        <div style={{ backgroundColor: "#f4f6f9", minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
             {/* Top Panel */}
             <div
                 style={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    padding: '10px 20px',
-                    backgroundColor: '#314757',
+                    padding: '20px 20px',
+                    backgroundColor: '#34495e',
                     color: '#fff',
                     position: 'sticky',
                     top: 0,
                     zIndex: 1100,
-                    width: '90%',
-                    marginLeft: '20px',
+                    width: '97%',
+                    marginLeft: '-6px',
                 }}
             >
-                <div>
-                    <strong>Witaj, {sysAdminUsername}</strong>
+                <div style={{ fontWeight: 'bold', fontSize: '18px' }}>
+                    Witaj, {sysAdminUsername}
                 </div>
                 <div>
                     <button
                         onClick={handleSettings}
                         style={{
-                            marginRight: '10px',
-                            padding: '8px 16px',
+                            marginRight: '15px',
+                            padding: '12px 25px',
                             border: 'none',
-                            borderRadius: '4px',
+                            borderRadius: '6px',
                             backgroundColor: '#2d343a',
                             color: '#fff',
                             cursor: 'pointer',
+                            fontSize: '14px',
+                            transition: 'background-color 0.3s',
                         }}
                     >
                         Ustawienia
@@ -77,12 +79,14 @@ const LibraryAdminAddLibrary: React.FC = () => {
                     <button
                         onClick={handleLogout}
                         style={{
-                            padding: '8px 16px',
+                            padding: '12px 25px',
                             border: 'none',
-                            borderRadius: '4px',
+                            borderRadius: '6px',
                             backgroundColor: '#2d343a',
                             color: '#fff',
                             cursor: 'pointer',
+                            fontSize: '14px',
+                            transition: 'background-color 0.3s',
                         }}
                     >
                         Wyloguj się
@@ -91,12 +95,25 @@ const LibraryAdminAddLibrary: React.FC = () => {
             </div>
 
             {/* Main Body */}
-            <main style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
-                <section style={{ padding: '20px', borderRadius: '4px', backgroundColor: '#38424a' }}>
-                    <h2 style={{ color: '#fff', textAlign: "center" }}>Złóż podanie o dodanie Twojej biblioteki do systemu BookRider</h2>
-                    <form onSubmit={handleSubmit} style={{marginTop: '20px', color: '#fff'}}>
+            <main style={{ padding: '40px', maxWidth: '900px', margin: 'auto' }}>
+                <section style={{
+                    padding: '30px',
+                    backgroundColor: '#fff',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+                }}>
+                    <h2 style={{
+                        color: '#2c3e50',
+                        textAlign: 'center',
+                        marginBottom: '20px',
+                        fontSize: '28px',
+                        fontWeight: '600'
+                    }}>
+                        Złóż podanie o dodanie Twojej biblioteki do systemu BookRider
+                    </h2>
+                    <form onSubmit={handleSubmit}>
                         <div style={formGroupStyle}>
-                            <label htmlFor="libraryName">Nazwa biblioteki:</label>
+                            <label htmlFor="libraryName" style={labelStyle}>Nazwa biblioteki:</label>
                             <input
                                 type="text"
                                 id="libraryName"
@@ -109,7 +126,7 @@ const LibraryAdminAddLibrary: React.FC = () => {
                             />
                         </div>
                         <div style={formGroupStyle}>
-                            <label htmlFor="addressLine1">Adres biblioteki linia 1:</label>
+                            <label htmlFor="addressLine1" style={labelStyle}>Adres biblioteki linia 1:</label>
                             <input
                                 type="text"
                                 id="addressLine1"
@@ -122,7 +139,7 @@ const LibraryAdminAddLibrary: React.FC = () => {
                             />
                         </div>
                         <div style={formGroupStyle}>
-                            <label htmlFor="addressLine2">Adres biblioteki linia 2:</label>
+                            <label htmlFor="addressLine2" style={labelStyle}>Adres biblioteki linia 2:</label>
                             <input
                                 type="text"
                                 id="addressLine2"
@@ -134,7 +151,7 @@ const LibraryAdminAddLibrary: React.FC = () => {
                             />
                         </div>
                         <div style={formGroupStyle}>
-                            <label htmlFor="city">Miasto:</label>
+                            <label htmlFor="city" style={labelStyle}>Miasto:</label>
                             <input
                                 type="text"
                                 id="city"
@@ -147,7 +164,7 @@ const LibraryAdminAddLibrary: React.FC = () => {
                             />
                         </div>
                         <div style={formGroupStyle}>
-                            <label htmlFor="postalCode">Kod pocztowy:</label>
+                            <label htmlFor="postalCode" style={labelStyle}>Kod pocztowy:</label>
                             <input
                                 type="text"
                                 id="postalCode"
@@ -162,7 +179,7 @@ const LibraryAdminAddLibrary: React.FC = () => {
                             />
                         </div>
                         <div style={formGroupStyle}>
-                            <label htmlFor="phoneNumber">Numer telefonu:</label>
+                            <label htmlFor="phoneNumber" style={labelStyle}>Numer telefonu:</label>
                             <input
                                 type="tel"
                                 id="phoneNumber"
@@ -173,11 +190,11 @@ const LibraryAdminAddLibrary: React.FC = () => {
                                 maxLength={9}
                                 pattern="\d{9}"
                                 required
-                                title="Podaj prawidłowy number telefonu bez numeru kierunkowego"
+                                title="Podaj prawidłowy numer telefonu bez numeru kierunkowego"
                             />
                         </div>
                         <div style={formGroupStyle}>
-                            <label htmlFor="emailAddress">Adres e-mail:</label>
+                            <label htmlFor="emailAddress" style={labelStyle}>Adres e-mail:</label>
                             <input
                                 type="email"
                                 id="emailAddress"
@@ -189,17 +206,18 @@ const LibraryAdminAddLibrary: React.FC = () => {
                                 required
                             />
                         </div>
-                        <div style={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
                             <button
                                 type="submit"
                                 style={{
-                                    padding: '10px 20px',
+                                    padding: '12px 30px',
                                     border: 'none',
-                                    borderRadius: '4px',
-                                    backgroundColor: '#2d343a',
+                                    borderRadius: '6px',
+                                    backgroundColor: '#3B576C',
                                     color: '#fff',
                                     cursor: 'pointer',
-                                    marginTop: '10px',
+                                    fontSize: '16px',
+                                    transition: 'background-color 0.3s',
                                 }}
                             >
                                 Złóż podanie
@@ -213,18 +231,24 @@ const LibraryAdminAddLibrary: React.FC = () => {
 };
 
 const formGroupStyle = {
-    marginBottom: '15px',
+    marginBottom: '20px',
     display: 'flex',
     flexDirection: 'column' as const,
 };
 
 const inputStyle = {
-    marginTop: '5px',
-    padding: '10px',
-    borderRadius: '4px',
+    marginTop: '8px',
+    padding: '12px',
+    borderRadius: '6px',
     border: '1px solid #ccc',
-    fontSize: '14px',
-    backgroundColor: '#4f5d69',
+    fontSize: '16px',
+    backgroundColor: '#ecf0f1',
+    color: '#2c3e50',
+};
+
+const labelStyle = {
+    fontSize: '16px',
+    color: '#34495e',
 };
 
 export default LibraryAdminAddLibrary;

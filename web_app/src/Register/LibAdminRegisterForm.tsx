@@ -4,39 +4,25 @@ import { Link } from 'react-router-dom';
 interface FormData {
     firstName: string;
     lastName: string;
-    username: string;
     email: string;
     password: string;
     confirm_password: string;
-    library_address: string;
 }
 
 const RegistrationForm: React.FC = () => {
     const [formData, setFormData] = useState<FormData>({
         firstName: '',
         lastName: '',
-        username: '',
         email: '',
         password: '',
         confirm_password: '',
-        library_address: '',
-    });
-
-    const [addressLines, setAddressLines] = useState({
-        line1: '',
-        line2: '',
     });
 
     const [error, setError] = useState<string | null>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = e.target;
-
-        if (name === 'line1' || name === 'line2') {
-            setAddressLines((prev) => ({ ...prev, [name]: value }));
-        } else {
-            setFormData((prev) => ({ ...prev, [name]: value }));
-        }
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const isPasswordSafe = (password: string): boolean => {
@@ -44,24 +30,8 @@ const RegistrationForm: React.FC = () => {
         return passwordRegex.test(password);
     };
 
-    const isUsernameValid = (username: string): boolean => {
-        const usernameRegex = /^[a-zA-Z\d-]+$/;
-        return usernameRegex.test(username);
-    };
-
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
-
-        if (!isUsernameValid(formData.username)) {
-            setError('Nazwa użytkownika może zawierać tylko litery, cyfry i myślniki.');
-            return;
-        }
-
-        if (formData.username.length < 10) {
-            setError('Nazwa użytkownika musi mieć co najmniej 10 znaków.');
-            return;
-        }
 
         if (formData.password !== formData.confirm_password) {
             setError('Hasła nie pasują do siebie.');
@@ -77,26 +47,41 @@ const RegistrationForm: React.FC = () => {
 
         setError(null);
 
-        const combinedAddress = `${addressLines.line1}, ${addressLines.line2}`.trim();
+        const finalFormData = {
+            ...formData,
+            role: 'library_administrator'
+        };
 
-        const finalFormData = { ...formData, library_address: combinedAddress };
         console.log('Form Data:', finalFormData);
+
+        try {
+            const response = await fetch(`https://bookrider.onrender.com/api/auth/register/library_administrator`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(finalFormData),
+            });
+
+            console.log(response.status);
+
+            if (!response.ok) {
+                throw new Error('Registration failed');
+            }
+
+            console.log('Registration successful');
+        } catch (error) {
+            setError('An error occurred while registering the account.');
+            console.error('Registration Error:', error);
+        }
     };
 
     return (
-        <div style={{maxWidth: '400px', margin: 'auto', padding: '20px'}}>
-            <h2 style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: '-90px',
-                marginBottom: '-5px'
-            }}>Rejestracja</h2>
-            <form onSubmit={handleSubmit}>
-                <div style={{marginBottom: '10px'}}>
-                    <label htmlFor="firstName" style={{display: 'block', marginBottom: '5px'}}>
-                        Imię:
-                    </label>
+        <div style={containerStyle}>
+            <h2 style={headingStyle}>Rejestracja</h2>
+            <form onSubmit={handleSubmit} style={formStyle}>
+                <div style={inputContainerStyle}>
+                    <label htmlFor="firstName" style={labelStyle}>Imię:</label>
                     <input
                         type="text"
                         id="firstName"
@@ -105,13 +90,11 @@ const RegistrationForm: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={inputStyle}
                     />
                 </div>
-                <div style={{marginBottom: '10px'}}>
-                    <label htmlFor="lastName" style={{display: 'block', marginBottom: '5px'}}>
-                        Nazwisko:
-                    </label>
+                <div style={inputContainerStyle}>
+                    <label htmlFor="lastName" style={labelStyle}>Nazwisko:</label>
                     <input
                         type="text"
                         id="lastName"
@@ -120,28 +103,11 @@ const RegistrationForm: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={inputStyle}
                     />
                 </div>
-                <div style={{marginBottom: '10px'}}>
-                    <label htmlFor="username" style={{display: 'block', marginBottom: '5px'}}>
-                        Nazwa użytkownika:
-                    </label>
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleInputChange}
-                        maxLength={25}
-                        required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
-                    />
-                </div>
-                <div style={{marginBottom: '10px'}}>
-                    <label htmlFor="email" style={{display: 'block', marginBottom: '5px'}}>
-                        Adres email:
-                    </label>
+                <div style={inputContainerStyle}>
+                    <label htmlFor="email" style={labelStyle}>Adres email:</label>
                     <input
                         type="email"
                         id="email"
@@ -150,13 +116,11 @@ const RegistrationForm: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={inputStyle}
                     />
                 </div>
-                <div style={{marginBottom: '10px'}}>
-                    <label htmlFor="password" style={{display: 'block', marginBottom: '5px'}}>
-                        Hasło:
-                    </label>
+                <div style={inputContainerStyle}>
+                    <label htmlFor="password" style={labelStyle}>Hasło:</label>
                     <input
                         type="password"
                         id="password"
@@ -165,13 +129,11 @@ const RegistrationForm: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={inputStyle}
                     />
                 </div>
-                <div style={{marginBottom: '10px'}}>
-                    <label htmlFor="confirm_password" style={{display: 'block', marginBottom: '5px'}}>
-                        Powtórz hasło:
-                    </label>
+                <div style={inputContainerStyle}>
+                    <label htmlFor="confirm_password" style={labelStyle}>Powtórz hasło:</label>
                     <input
                         type="password"
                         id="confirm_password"
@@ -180,44 +142,105 @@ const RegistrationForm: React.FC = () => {
                         onChange={handleInputChange}
                         maxLength={25}
                         required
-                        style={{backgroundColor: '#314757', width: '100%', padding: '8px', boxSizing: 'border-box'}}
+                        style={inputStyle}
                     />
                 </div>
-                {error && (
-                    <p style={{color: 'red', marginBottom: '10px'}}>{error}</p>
-                )}
+
+                {error && <p style={errorStyle}>{error}</p>}
+
                 <button
                     type="submit"
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        backgroundColor: '#2d343a',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        marginTop: "15px"
-                    }}
+                    style={submitButtonStyle}
                 >
                     Rejestracja
                 </button>
             </form>
 
-            {/* Navigation */}
-            <div style={{marginTop: '20px', textAlign: 'center'}}>
+            <div style={navigationStyle}>
                 <Link to="/login">
-                    <button style={{
-                        backgroundColor: '#3B576C',
-                        color: '#f7ca65',
-                        margin: '10px',
-                        padding: '0px 30px',
-                        marginBottom: "0px"
-                    }}>Jesteś już zarejestrowany?
-                    </button>
+                    <button style={navButtonStyle}>Jesteś już zarejestrowany?</button>
                 </Link>
             </div>
         </div>
     );
+};
+
+const containerStyle: React.CSSProperties = {
+    maxWidth: '550px',
+    padding: '40px',
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+    width: "150%",
+    justifyContent: 'space-between',
+};
+
+const headingStyle: React.CSSProperties = {
+    textAlign: 'center',
+    color: '#2c3e50',
+    marginBottom: '20px',
+    fontSize: '28px',
+    fontWeight: 'bold',
+};
+
+const formStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+};
+
+const inputContainerStyle: React.CSSProperties = {
+    marginBottom: '15px',
+};
+
+const labelStyle: React.CSSProperties = {
+    display: 'block',
+    color: '#555',
+    marginBottom: '5px',
+    fontSize: '16px',
+};
+
+const inputStyle: React.CSSProperties = {
+    backgroundColor: '#f9f9f9',
+    width: '95%',
+    padding: '12px',
+    borderRadius: '4px',
+    color: '#333',
+    border: '1px solid #ccc',
+    fontSize: '14px',
+    transition: 'border 0.3s',
+};
+
+const errorStyle: React.CSSProperties = {
+    color: 'red',
+    marginBottom: '15px',
+    fontSize: '14px',
+};
+
+const submitButtonStyle: React.CSSProperties = {
+    width: '40%',
+    padding: '12px',
+    backgroundColor: '#3B576C',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    marginTop: '15px',
+    fontSize: '16px',
+    alignSelf: 'center',
+};
+
+const navigationStyle: React.CSSProperties = {
+    marginTop: '20px',
+    textAlign: 'center',
+};
+
+const navButtonStyle: React.CSSProperties = {
+    color: '#3B576C',
+    margin: '3px',
+    borderRadius: '4px',
+    fontSize: '16px',
+    cursor: 'pointer',
+    backgroundColor: '#fff',
 };
 
 export default RegistrationForm;
