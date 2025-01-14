@@ -6,12 +6,6 @@ const SystemAdminDashboard: React.FC = () => {
     const navigate = useNavigate();
     const sysAdminUsername = 'admin123';
 
-    // Function to get the cookie by name
-    // const getCookie = (name: string): string | null => {
-    //     const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-    //     return match ? match[2] : null;
-    // };
-
     const handleSectionChange = (section: string) => {
         setActiveSection(section);
     };
