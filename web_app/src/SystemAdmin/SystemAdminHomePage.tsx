@@ -6,16 +6,22 @@ const SystemAdminDashboard: React.FC = () => {
     const navigate = useNavigate();
     const sysAdminUsername = 'admin123';
 
+    // Function to get the cookie by name
+    // const getCookie = (name: string): string | null => {
+    //     const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+    //     return match ? match[2] : null;
+    // };
+
     const handleSectionChange = (section: string) => {
         setActiveSection(section);
     };
 
     const handleSettings = () => {
-        alert('Settings clicked');
+        alert('Ustawienia');
     };
 
     const handleLogout = () => {
-        alert('Logging out');
+        alert('Wylogowywanie');
     };
 
     const handleExpand = (submissionType: string, submissionId: number) => {
@@ -23,142 +29,66 @@ const SystemAdminDashboard: React.FC = () => {
     };
 
     return (
-        <div style={{ backgroundColor: "#3B576C", marginBottom: "-250px" }}>
-            {/* Top Panel */}
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '10px 20px',
-                    backgroundColor: '#314757',
-                    color: '#fff',
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 1100,
-                    marginTop: "-40px"
-                }}
-            >
-                <div>
+        <div style={pageStyle}>
+            <div style={headerStyle}>
+                <div style={greetingStyle}>
                     <strong>Witaj, {sysAdminUsername}</strong>
                 </div>
                 <div>
-                    <button
-                        onClick={handleSettings}
-                        style={{
-                            marginRight: '10px',
-                            padding: '8px 16px',
-                            border: 'none',
-                            borderRadius: '4px',
-                            backgroundColor: '#2d343a',
-                            color: '#fff',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        Ustawienia
-                    </button>
-                    <button
-                        onClick={handleLogout}
-                        style={{
-                            padding: '8px 16px',
-                            border: 'none',
-                            borderRadius: '4px',
-                            backgroundColor: '#2d343a',
-                            color: '#fff',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        Wyloguj się
-                    </button>
+                    <button onClick={handleSettings} style={buttonStyle}>Ustawienia</button>
+                    <button onClick={handleLogout} style={buttonStyle}>Wyloguj się</button>
                 </div>
             </div>
 
-            {/* Section Buttons */}
-            <header
-                style={{
-                    display: 'flex',
-                    justifyContent: 'space-around',
-                    padding: '10px',
-                    backgroundColor: '#314757',
-                    color: '#fff',
-                    position: 'sticky',
-                    top: 50,
-                    zIndex: 1000,
-                }}
-            >
+            <header style={navHeaderStyle}>
                 <button
                     onClick={() => handleSectionChange('librarySubmissions')}
-                    style={{
-                        padding: '10px 20px',
-                        border: 'none',
-                        borderRadius: '4px',
-                        backgroundColor: activeSection === 'librarySubmissions' ? '#3B576C' : '#2d343a',
-                        color: '#fff',
-                        cursor: 'pointer',
-                    }}
+                    style={getNavButtonStyle1('librarySubmissions', activeSection)}
                 >
                     Podania o zatwierdzenie bibliotek
                 </button>
                 <button
                     onClick={() => handleSectionChange('driverSubmissions')}
-                    style={{
-                        padding: '10px 20px',
-                        border: 'none',
-                        borderRadius: '4px',
-                        backgroundColor: activeSection === 'driverSubmissions' ? '#3B576C' : '#2d343a',
-                        color: '#fff',
-                        cursor: 'pointer',
-                    }}
+                    style={getNavButtonStyle2('driverSubmissions', activeSection)}
                 >
                     Podania o zatwierdzenie kierowców
                 </button>
             </header>
 
-            {/* Main Body */}
-            <main style={{ padding: '20px', maxWidth: '800px', marginLeft: '-40px', width: '107%'}}>
+            <main style={mainBodyStyle}>
                 {activeSection === 'librarySubmissions' && (
-                    <section style={{ padding: '20px', borderRadius: '4px' }}>
-                        <h2 style={{ color: '#fff' }}>Podania o zatwierdzenie bibliotek</h2>
-                        <div style={{ marginBottom: '20px' }}>
+                    <section style={sectionStyle}>
+                        <h2 style={sectionTitleStyle}>Podania o zatwierdzenie bibliotek</h2>
+                        <div style={submissionListStyle}>
                             {[1, 2, 3].map((id) => (
                                 <div key={id} style={submissionStyle}>
-                                    <h3 style={{ color: '#fff' }}>Library Submission {id}</h3>
-                                    <p style={{ color: '#fff' }}>Details of library submission {id} go here.</p>
-                                    <div>
-                                        <button
-                                            onClick={() => handleExpand('Library', id)}
-                                            style={{
-                                                ...actionButtonStyle,
-                                                backgroundColor: '#3B576C',
-                                            }}
-                                        >
-                                            Otwórz
-                                        </button>
-                                    </div>
+                                    <h3 style={submissionTitleStyle}>Library Submission {id}</h3>
+                                    <p style={submissionDetailStyle}>Details of library submission {id} go here.</p>
+                                    <button
+                                        onClick={() => handleExpand('Library', id)}
+                                        style={actionButtonStyle}
+                                    >
+                                        Otwórz
+                                    </button>
                                 </div>
                             ))}
                         </div>
                     </section>
                 )}
                 {activeSection === 'driverSubmissions' && (
-                    <section style={{ padding: '20px', borderRadius: '4px' }}>
-                        <h2 style={{ color: '#fff' }}>Podania o zatwierdzenie kierowców</h2>
-                        <div style={{ marginBottom: '20px' }}>
+                    <section style={sectionStyle}>
+                        <h2 style={sectionTitleStyle}>Podania o zatwierdzenie kierowców</h2>
+                        <div style={submissionListStyle}>
                             {[1, 2, 3].map((id) => (
                                 <div key={id} style={submissionStyle}>
-                                    <h3 style={{ color: '#fff' }}>Driver Submission {id}</h3>
-                                    <p style={{ color: '#fff' }}>Details of driver submission {id} go here.</p>
-                                    <div>
-                                        <button
-                                            onClick={() => handleExpand('Driver', id)}
-                                            style={{
-                                                ...actionButtonStyle,
-                                                backgroundColor: '#3B576C',
-                                            }}
-                                        >
-                                            Otwórz
-                                        </button>
-                                    </div>
+                                    <h3 style={submissionTitleStyle}>Driver Submission {id}</h3>
+                                    <p style={submissionDetailStyle}>Details of driver submission {id} go here.</p>
+                                    <button
+                                        onClick={() => handleExpand('Driver', id)}
+                                        style={actionButtonStyle}
+                                    >
+                                        Otwórz
+                                    </button>
                                 </div>
                             ))}
                         </div>
@@ -169,20 +99,125 @@ const SystemAdminDashboard: React.FC = () => {
     );
 };
 
+// Styles
+const pageStyle = {
+    backgroundColor: '#f4f4f4',
+    margin: '0',
+    padding: '0',
+};
+
+const headerStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '15px 30px',
+    backgroundColor: '#314757',
+    color: '#fff',
+    position: 'sticky',
+    top: 0,
+    zIndex: 1100,
+    marginTop: "-30px",
+    marginBottom: "-10px",
+};
+
+const greetingStyle = {
+    fontSize: '20px',
+};
+
+const buttonStyle = {
+    marginLeft: '18px',
+    marginRight: '-5px',
+    padding: '10px 20px',
+    backgroundColor: '#2d343a',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+};
+
+const navHeaderStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '10px 50px',
+    backgroundColor: '#314757',
+    color: '#fff',
+    position: 'sticky',
+    zIndex: 1000,
+};
+
+
+const getNavButtonStyle1 = (section: string, activeSection: string) => ({
+    padding: '12px 65px',
+    backgroundColor: section === activeSection ? '#3B576C' : '#2d343a',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    marginLeft: "-30px",
+});
+
+const getNavButtonStyle2 = (section: string, activeSection: string) => ({
+    padding: '12px 65px',
+    backgroundColor: section === activeSection ? '#3B576C' : '#2d343a',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    marginRight: "-30px",
+});
+
+const mainBodyStyle: React.CSSProperties = {
+    padding: '20px',
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    gap: '15px',
+    maxWidth: '1100px',
+    margin: '0 auto',
+};
+
+const sectionStyle = {
+    padding: '20px',
+};
+
+const sectionTitleStyle = {
+    color: '#314757',
+    fontSize: '22px',
+    marginBottom: '15px',
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: '10px',
+};
+
+const submissionListStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '15px',
+    textAlign: 'center',
+};
+
 const submissionStyle = {
-    backgroundColor: '#38424a',
+    backgroundColor: '#ffff',
     padding: '15px',
-    marginBottom: '10px',
-    borderRadius: '4px',
+    borderRadius: '6px',
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
+};
+
+const submissionTitleStyle = {
+    fontSize: '18px',
+    color: '#2d343a',
+};
+
+const submissionDetailStyle = {
+    color: '#2d343a',
 };
 
 const actionButtonStyle = {
-    padding: '8px 16px',
-    margin: '0 10px',
+    padding: '8px 20px',
     backgroundColor: '#3B576C',
     color: '#fff',
     border: 'none',
-    borderRadius: '4px',
+    borderRadius: '5px',
     cursor: 'pointer',
 };
 
