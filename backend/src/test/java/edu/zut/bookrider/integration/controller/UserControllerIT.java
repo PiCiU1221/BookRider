@@ -1,6 +1,7 @@
 package edu.zut.bookrider.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.zut.bookrider.dto.IsVerifiedResponseDto;
 import edu.zut.bookrider.dto.UserIdResponseDto;
 import edu.zut.bookrider.model.Role;
 import edu.zut.bookrider.model.User;
@@ -68,5 +69,19 @@ public class UserControllerIT {
         UserIdResponseDto responseDto = new ObjectMapper().readValue(responseBody, UserIdResponseDto.class);
 
         assertEquals(userReference.getId(), responseDto.getUserId());
+    }
+
+    @Test
+    @WithMockUser(username = "example@usit.com", roles = {"user"})
+    void whenUserIsValid_thenReturnUserIsVerifiedDto() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/users/is-verified")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseBody = mvcResult.getResponse().getContentAsString();
+        IsVerifiedResponseDto responseDto = new ObjectMapper().readValue(responseBody, IsVerifiedResponseDto.class);
+
+        assertEquals(userReference.getIsVerified(), responseDto.getIsVerified());
     }
 }
