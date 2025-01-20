@@ -31,12 +31,12 @@ public class NavigationController {
             @RequestParam @NotBlank String transportProfile) {
 
         String[] startParsed = start.split(",");
-        double startLongitude = Double.parseDouble(startParsed[0]);
-        double startLatitude = Double.parseDouble(startParsed[1]);
+        double startLatitude = Double.parseDouble(startParsed[0]);
+        double startLongitude = Double.parseDouble(startParsed[1]);
 
         String[] endParsed = end.split(",");
-        double endLongitude = Double.parseDouble(endParsed[0]);
-        double endLatitude = Double.parseDouble(endParsed[1]);
+        double endLatitude = Double.parseDouble(endParsed[0]);
+        double endLongitude = Double.parseDouble(endParsed[1]);
 
         TransportProfile profile;
         try {

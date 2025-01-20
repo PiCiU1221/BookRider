@@ -38,8 +38,8 @@ public class NavigationControllerTest {
                 .thenReturn(navigationResponseDTO);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/navigation/directions")
-                        .param("start", startCoordinates.getLongitude() + "," + startCoordinates.getLatitude())
-                        .param("end", endCoordinates.getLongitude() + "," + endCoordinates.getLatitude())
+                        .param("start", startCoordinates.getLatitude() + "," + startCoordinates.getLongitude())
+                        .param("end", endCoordinates.getLatitude() + "," + endCoordinates.getLongitude())
                         .param("transportProfile", "car"))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.totalDistance").value(1));
@@ -48,7 +48,7 @@ public class NavigationControllerTest {
     @Test
     public void whenStartParamIsMissing_thenReturnBadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/navigation/directions")
-                        .param("end", "14.506454,53.433332")
+                        .param("end", "53.433332,14.506454")
                         .param("transportProfile", "car"))
                 .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -58,7 +58,7 @@ public class NavigationControllerTest {
     @Test
     public void whenEndParamIsMissing_thenReturnBadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/navigation/directions")
-                        .param("start", "14.504721,53.434444")
+                        .param("start", "53.434444,14.504721")
                         .param("transportProfile", "car"))
                 .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -68,8 +68,8 @@ public class NavigationControllerTest {
     @Test
     public void whenTransportProfileParamIsMissing_thenReturnBadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/navigation/directions")
-                        .param("start", "14.504721,53.434444")
-                        .param("end", "14.506454,53.433332"))
+                        .param("start", "53.434444,14.504721")
+                        .param("end", "53.433332,14.506454"))
                 .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
                         .value("Required request parameter 'transportProfile' is missing."));
@@ -87,8 +87,8 @@ public class NavigationControllerTest {
     @Test
     public void whenStartParamIsInWrongFormat_thenReturnBadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/navigation/directions")
-                        .param("start", "14.504721,test")
-                        .param("end", "14.506454,53.433332")
+                        .param("start", "53.42,test")
+                        .param("end", "53.433332,14.506454")
                         .param("transportProfile", "car"))
                 .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
@@ -98,8 +98,8 @@ public class NavigationControllerTest {
     @Test
     public void whenTransportProfileParamIsWrong_thenReturnBadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/navigation/directions")
-                        .param("start", "14.504721,53.434444")
-                        .param("end", "14.506454,53.433332")
+                        .param("start", "53.434444,14.504721")
+                        .param("end", "53.433332,14.506454")
                         .param("transportProfile", "something"))
                 .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
