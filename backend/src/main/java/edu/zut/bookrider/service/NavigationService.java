@@ -133,13 +133,15 @@ public class NavigationService {
 
             List<CoordinateDTO> wayPoints = new ArrayList<>();
             JsonNode wayPointsNode = stepNode.get("way_points");
-            if (wayPointsNode != null && wayPointsNode.isArray()) {
-                for (JsonNode wayPointIndexNode : wayPointsNode) {
-                    int index = wayPointIndexNode.asInt();
-                    JsonNode coordinateNode = coordinatesNode.get(index);
+            if (wayPointsNode != null && wayPointsNode.size() == 2) {
+                int startIndex = wayPointsNode.get(0).asInt();
+                int endIndex = wayPointsNode.get(1).asInt();
+
+                for (int i = startIndex; i <= endIndex; i++) {
+                    JsonNode coordinateNode = coordinatesNode.get(i);
                     double longitude = coordinateNode.get(0).asDouble();
                     double latitude = coordinateNode.get(1).asDouble();
-                    wayPoints.add(new CoordinateDTO(longitude, latitude));
+                    wayPoints.add(new CoordinateDTO(latitude, longitude));
                 }
             }
 

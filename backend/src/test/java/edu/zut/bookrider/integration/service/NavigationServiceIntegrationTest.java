@@ -26,7 +26,7 @@ public class NavigationServiceIntegrationTest {
         double startLongitude = 14.504721;
 
         double endLatitude = 53.433332;
-        double endLongitude =  14.506454;
+        double endLongitude = 14.506454;
 
         CoordinateDTO startCoordinates = new CoordinateDTO(startLatitude, startLongitude);
         CoordinateDTO endCoordinates = new CoordinateDTO(endLatitude, endLongitude);
@@ -54,9 +54,9 @@ public class NavigationServiceIntegrationTest {
         This doesn't align well with our code, but we'll have to live with it
         */
         List<CoordinateDTO> firstPointWayPoints = firstStep.getWayPoints();
-        CoordinateDTO firstPointFirstCoordinate = new CoordinateDTO(14.504724, 53.434459);
+        CoordinateDTO firstPointFirstCoordinate = new CoordinateDTO(53.434459, 14.504724);
         assertEquals(firstPointWayPoints.get(0), firstPointFirstCoordinate);
-        CoordinateDTO firstPointSecondCoordinate = new CoordinateDTO(14.50563, 53.4344);
+        CoordinateDTO firstPointSecondCoordinate = new CoordinateDTO(53.4344, 14.50563);
         assertEquals(firstPointWayPoints.get(1), firstPointSecondCoordinate);
 
         NavigationResponseDTO.RouteStep thirdStep = steps.get(2);
@@ -66,9 +66,9 @@ public class NavigationServiceIntegrationTest {
         assertEquals("Turn left", thirdStep.getInstruction());
 
         List<CoordinateDTO> thirdPointWayPoints = thirdStep.getWayPoints();
-        CoordinateDTO thirdPointFirstCoordinate = new CoordinateDTO(14.505567, 53.433389);
+        CoordinateDTO thirdPointFirstCoordinate = new CoordinateDTO(53.433389, 14.505567);
         assertEquals(thirdPointWayPoints.get(0), thirdPointFirstCoordinate);
-        CoordinateDTO thirdPointSecondCoordinate = new CoordinateDTO(14.506455, 53.433336);
+        CoordinateDTO thirdPointSecondCoordinate = new CoordinateDTO(53.433336, 14.506455);
         assertEquals(thirdPointWayPoints.get(1), thirdPointSecondCoordinate);
     }
 
