@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/library-admins")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('library_administrator')")
-@CrossOrigin
 public class LibraryAdministratorController {
 
     private final LibraryAdministratorService libraryAdministratorService;
