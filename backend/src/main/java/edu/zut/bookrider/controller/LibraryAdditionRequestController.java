@@ -16,6 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/library-requests")
+@CrossOrigin
 public class LibraryAdditionRequestController {
 
     private final LibraryAdditionRequestService libraryAdditionRequestService;

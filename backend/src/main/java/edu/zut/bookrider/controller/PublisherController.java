@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/publishers")
 @RequiredArgsConstructor
+@CrossOrigin
 public class PublisherController {
 
     private final PublisherService publisherService;

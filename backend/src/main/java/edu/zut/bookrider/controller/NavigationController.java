@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Validated
 @RequestMapping("/api/navigation")
+@CrossOrigin
 public class NavigationController {
 
     private final NavigationService navigationService;
