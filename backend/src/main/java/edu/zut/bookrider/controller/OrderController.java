@@ -110,8 +110,8 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         String[] startParsed = locationString.split(",");
-        double locationLongitude = Double.parseDouble(startParsed[0]);
-        double locationLatitude = Double.parseDouble(startParsed[1]);
+        double locationLatitude = Double.parseDouble(startParsed[0]);
+        double locationLongitude = Double.parseDouble(startParsed[1]);
 
         CoordinateDTO location = new CoordinateDTO(locationLatitude, locationLongitude);
 
