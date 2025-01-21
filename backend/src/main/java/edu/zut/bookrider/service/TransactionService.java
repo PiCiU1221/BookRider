@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 @Service
 public class TransactionService {
 
-    private static final BigDecimal SERVICE_FEE_PERCENTAGE = new BigDecimal("0.20");
+    public static final BigDecimal SERVICE_FEE_PERCENTAGE = new BigDecimal("0.20");
 
     private final UserService userService;
     private final TransactionRepository transactionRepository;
@@ -96,5 +96,10 @@ public class TransactionService {
                 true);
 
         return transactionMapper.map(savedTransaction);
+    }
+
+    public BigDecimal getTransactionAmountByOrderIdAndType(Integer orderId, TransactionType transactionType) {
+        return transactionRepository.findAmountByOrderIdAndTransactionType(orderId, transactionType)
+                .orElse(BigDecimal.ZERO);
     }
 }

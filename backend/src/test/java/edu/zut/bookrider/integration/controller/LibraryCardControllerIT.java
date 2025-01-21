@@ -92,7 +92,7 @@ public class LibraryCardControllerIT {
 
         LibraryCard libraryCard = new LibraryCard();
         libraryCard.setUser(savedUser);
-        libraryCard.setCardId("12345");
+        libraryCard.setCardId("999999");
         libraryCard.setFirstName("FirstName");
         libraryCard.setLastName("LastName");
         libraryCard.setExpirationDate(LocalDate.of(2028, 6, 29));
