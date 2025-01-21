@@ -8,6 +8,7 @@ import edu.zut.bookrider.dto.NavigationResponseDTO;
 import edu.zut.bookrider.exception.ExternalApiException;
 import edu.zut.bookrider.exception.InvalidCoordinatesException;
 import edu.zut.bookrider.service.enums.TransportProfile;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,12 +29,12 @@ public class NavigationService {
 
     private final RestTemplate restTemplate;
 
-    public NavigationResponseDTO getDirectionsFromCoordinates(CoordinateDTO startCoordinates, CoordinateDTO endCoordinates, TransportProfile transportProfile) {
+    public NavigationResponseDTO getDirectionsFromCoordinates(@Valid CoordinateDTO startCoordinates, @Valid CoordinateDTO endCoordinates, TransportProfile transportProfile) {
         String jsonResponse = callApiForDirections(startCoordinates, endCoordinates, transportProfile);
         return parseApiResponseIntoNavigationDTO(jsonResponse);
     }
 
-    private String callApiForDirections(CoordinateDTO startCoordinates, CoordinateDTO endCoordinates, TransportProfile transportProfile) {
+    private String callApiForDirections(@Valid CoordinateDTO startCoordinates, @Valid CoordinateDTO endCoordinates, TransportProfile transportProfile) {
         String start = startCoordinates.getLongitude() + "," + startCoordinates.getLatitude();
         String end = endCoordinates.getLongitude() + "," + endCoordinates.getLatitude();
 

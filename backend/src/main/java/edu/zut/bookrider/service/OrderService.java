@@ -15,6 +15,7 @@ import edu.zut.bookrider.model.enums.TransactionType;
 import edu.zut.bookrider.repository.OrderRepository;
 import edu.zut.bookrider.util.BASE64DecodedMultipartFile;
 import edu.zut.bookrider.util.LocationUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -226,7 +227,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void declineOrder(Integer orderId, DeclineOrderRequestDTO declineOrderRequestDTO) {
+    public void declineOrder(Integer orderId, @Valid DeclineOrderRequestDTO declineOrderRequestDTO) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
@@ -263,7 +264,7 @@ public class OrderService {
     }
 
     public PageResponseDTO<CreateOrderResponseDTO> getDriverPendingOrdersWithDistance(
-            CoordinateDTO location, double maxDistanceInMeters, int page, int size) {
+            @Valid CoordinateDTO location, double maxDistanceInMeters, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Order> pendingOrders = orderRepository.findAcceptedOrdersForDriverWithDistance(
@@ -359,7 +360,7 @@ public class OrderService {
     }
 
     @Transactional
-    public CreateTransactionResponseDTO deliverOrder(Integer orderId, DeliverOrderRequestDTO requestDTO) {
+    public CreateTransactionResponseDTO deliverOrder(Integer orderId, @Valid DeliverOrderRequestDTO requestDTO) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
