@@ -57,6 +57,7 @@ public class TransactionService {
 
         Transaction transaction = new Transaction();
         transaction.setUser(user);
+        transaction.setOrder(order);
         transaction.setAmount(amount);
         transaction.setTransactionType(TransactionType.USER_PAYMENT);
 
