@@ -18,6 +18,7 @@ import java.util.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/driver-applications")
+@CrossOrigin
 public class DriverApplicationController {
 
     private final DriverApplicationRequestService driverApplicationRequestService;
