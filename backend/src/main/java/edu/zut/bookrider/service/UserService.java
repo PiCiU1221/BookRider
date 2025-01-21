@@ -1,6 +1,8 @@
 package edu.zut.bookrider.service;
 
+import edu.zut.bookrider.dto.ChangePasswordDto;
 import edu.zut.bookrider.exception.InsufficientBalanceException;
+import edu.zut.bookrider.exception.InvalidPasswordException;
 import edu.zut.bookrider.exception.UserNotFoundException;
 import edu.zut.bookrider.model.Library;
 import edu.zut.bookrider.model.User;
@@ -10,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,6 +24,7 @@ import java.util.Objects;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public void updateLibrary(User user, Library library) {
 
@@ -97,4 +101,24 @@ public class UserService {
                 .filter(user -> "librarian".equals(user.getRole().getName()) && user.getLibrary().getId().equals(libraryId))
                 .toList();
     }
+
+    @Transactional
+    public void changePassword(Authentication authentication, String username, ChangePasswordDto changePasswordDto) {
+        User libraryAdmin = getUser(authentication);
+        Integer libraryId = libraryAdmin.getLibrary().getId();
+
+        User librarian = findLibrarianByUsernameAndLibraryId(username, libraryId);
+
+        if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), librarian.getPassword())) {
+            throw new InvalidPasswordException("Old password is not correct");
+        }
+
+        if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
+            throw new InvalidPasswordException("The new password and its confirmation do not match");
+        }
+
+        librarian.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+        userRepository.save(librarian);
+    }
+
 }
