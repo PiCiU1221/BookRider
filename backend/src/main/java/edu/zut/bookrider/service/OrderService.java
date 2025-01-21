@@ -11,6 +11,7 @@ import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.model.enums.OrderItemStatus;
 import edu.zut.bookrider.model.enums.OrderStatus;
 import edu.zut.bookrider.model.enums.PaymentStatus;
+import edu.zut.bookrider.model.enums.TransactionType;
 import edu.zut.bookrider.repository.OrderRepository;
 import edu.zut.bookrider.util.BASE64DecodedMultipartFile;
 import edu.zut.bookrider.util.LocationUtils;
@@ -269,9 +270,14 @@ public class OrderService {
                 OrderStatus.ACCEPTED, BigDecimal.valueOf(location.getLatitude()),
                 BigDecimal.valueOf(location.getLongitude()), maxDistanceInMeters, pageable);
 
-        List<CreateOrderResponseDTO> pendingOrderDtos = pendingOrders.getContent().stream()
-                .map(orderMapper::map)
-                .toList();
+        List<CreateOrderResponseDTO> pendingOrderDtos = pendingOrders.getContent().stream().map(order -> {
+            CreateOrderResponseDTO dto = orderMapper.map(order);
+            BigDecimal userPayment = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.USER_PAYMENT);
+            BigDecimal netAmount = userPayment.subtract(userPayment.multiply(TransactionService.SERVICE_FEE_PERCENTAGE));
+            dto.setAmount(netAmount);
+
+            return dto;
+        }).toList();
 
         return new PageResponseDTO<>(
                 pendingOrderDtos,
@@ -289,9 +295,15 @@ public class OrderService {
         Page<Order> inRealizationOrders = orderRepository.findByDriverIdAndStatusIn(
                 driver.getId(), List.of(OrderStatus.DRIVER_PICKED, OrderStatus.IN_TRANSIT_TO_CUSTOMER), pageable);
 
-        List<CreateOrderResponseDTO> inRealizationOrderDtos = inRealizationOrders.getContent().stream()
-                .map(orderMapper::map)
-                .toList();
+        List<CreateOrderResponseDTO> inRealizationOrderDtos = inRealizationOrders.getContent().stream().map(order -> {
+            CreateOrderResponseDTO dto = orderMapper.map(order);
+            BigDecimal userPayment = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.USER_PAYMENT);
+            BigDecimal netAmount = userPayment.subtract(userPayment.multiply(TransactionService.SERVICE_FEE_PERCENTAGE));
+            dto.setAmount(netAmount);
+
+            return dto;
+        }).toList();
+
 
         return new PageResponseDTO<>(
                 inRealizationOrderDtos,
@@ -309,9 +321,13 @@ public class OrderService {
         Page<Order> completedOrders = orderRepository.findByDriverIdAndStatusIn(
                 driver.getId(), List.of(OrderStatus.DELIVERED), pageable);
 
-        List<CreateOrderResponseDTO> completedOrderDtos = completedOrders.getContent().stream()
-                .map(orderMapper::map)
-                .toList();
+        List<CreateOrderResponseDTO> completedOrderDtos = completedOrders.getContent().stream().map(order -> {
+            CreateOrderResponseDTO dto = orderMapper.map(order);
+            BigDecimal driverPayout = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.DRIVER_PAYOUT);
+            dto.setAmount(driverPayout);
+
+            return dto;
+        }).toList();
 
         return new PageResponseDTO<>(
                 completedOrderDtos,
