@@ -20,8 +20,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             "JOIN o.library l " +
             "JOIN l.address a " +
             "WHERE o.status = :status " +
-            "AND (ST_DistanceSphere(ST_MakePoint(a.longitude, a.latitude), " +
-            "ST_MakePoint(:driverLongitude, :driverLatitude)) <= :maxDistanceInMeters)")
+            "AND (ST_DistanceSphere(ST_MakePoint(a.latitude, a.longitude), " +
+            "ST_MakePoint(:driverLatitude, :driverLongitude)) <= :maxDistanceInMeters)")
     Page<Order> findAcceptedOrdersForDriverWithDistance(
             @Param("status") OrderStatus status,
             @Param("driverLatitude") BigDecimal driverLatitude,
