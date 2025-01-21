@@ -150,7 +150,7 @@ public class OrderController {
     @PostMapping("/{orderId}/deliver")
     public ResponseEntity<?> deliverOrder(
             @PathVariable Integer orderId,
-            @RequestBody DeliverOrderRequestDTO request) {
+            @Valid @RequestBody DeliverOrderRequestDTO request) {
 
         CreateTransactionResponseDTO response = orderService.deliverOrder(orderId, request);
 
