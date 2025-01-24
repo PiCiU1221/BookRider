@@ -3,6 +3,7 @@ package edu.zut.bookrider.controller;
 import edu.zut.bookrider.dto.CreateAddressDTO;
 import edu.zut.bookrider.dto.ShoppingCartResponseDTO;
 import edu.zut.bookrider.service.ShoppingCartService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,7 +20,7 @@ public class ShoppingCartController {
     @PreAuthorize("hasRole('user')")
     @PostMapping("/address")
     public ResponseEntity<?> setDeliveryAddress(
-            @RequestBody CreateAddressDTO createAddressDTO,
+            @Valid @RequestBody CreateAddressDTO createAddressDTO,
             Authentication authentication) {
 
         ShoppingCartResponseDTO updatedShoppingCart = shoppingCartService.setDeliveryAddress(createAddressDTO, authentication);

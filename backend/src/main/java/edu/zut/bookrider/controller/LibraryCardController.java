@@ -2,6 +2,7 @@ package edu.zut.bookrider.controller;
 
 import edu.zut.bookrider.dto.LibraryCardDTO;
 import edu.zut.bookrider.service.LibraryCardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class LibraryCardController {
     @PreAuthorize("hasRole('librarian')")
     @PostMapping
     public ResponseEntity<?> createLibraryCard(
-            @RequestBody LibraryCardDTO libraryCardDTO) {
+            @Valid @RequestBody LibraryCardDTO libraryCardDTO) {
 
         LibraryCardDTO responseDto = libraryCardService.addLibraryCard(libraryCardDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);

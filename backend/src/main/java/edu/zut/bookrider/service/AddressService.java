@@ -4,6 +4,7 @@ import edu.zut.bookrider.dto.CoordinateDTO;
 import edu.zut.bookrider.dto.CreateAddressDTO;
 import edu.zut.bookrider.model.Address;
 import edu.zut.bookrider.repository.AddressRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class AddressService {
     private final GeocodeService geocodeService;
     private final AddressRepository addressRepository;
 
-    public Address createAddress(CreateAddressDTO createAddressDTO) {
+    public Address createAddress(@Valid CreateAddressDTO createAddressDTO) {
         Address address = new Address();
 
         address.setStreet(createAddressDTO.getStreet());
@@ -36,7 +37,7 @@ public class AddressService {
         return addressRepository.save(address);
     }
 
-    public Optional<Address> findExistingAddress(CreateAddressDTO createAddressDTO) {
+    public Optional<Address> findExistingAddress(@Valid CreateAddressDTO createAddressDTO) {
         return addressRepository.findByStreetAndCityAndPostalCode(
                 createAddressDTO.getStreet(),
                 createAddressDTO.getCity(),

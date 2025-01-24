@@ -6,6 +6,7 @@ import edu.zut.bookrider.model.DriverApplicationRequest;
 import edu.zut.bookrider.model.DriverDocument;
 import edu.zut.bookrider.repository.DriverDocumentRepository;
 import edu.zut.bookrider.util.BASE64DecodedMultipartFile;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,7 @@ public class DriverDocumentService {
     private final DriverDocumentRepository driverDocumentRepository;
 
     public CreateDriverDocumentResponseDTO saveDriverDocument(
-            CreateDriverDocumentDTO documentDto,
+            @Valid CreateDriverDocumentDTO documentDto,
             DriverApplicationRequest applicationRequest
     ) throws IOException {
         MultipartFile multipartFile = new BASE64DecodedMultipartFile(documentDto.getImageInBytes());

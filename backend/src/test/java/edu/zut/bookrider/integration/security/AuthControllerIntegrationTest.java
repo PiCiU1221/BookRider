@@ -16,7 +16,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +67,7 @@ public class AuthControllerIntegrationTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/auth/login/{role}", role)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest)
@@ -76,9 +75,6 @@ public class AuthControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(header().exists(HttpHeaders.AUTHORIZATION))
                 .andReturn();
-
-        // To debug
-        //System.out.println(mvcResult.getResponse().getHeader(HttpHeaders.AUTHORIZATION));
     }
 
     @Test
@@ -88,7 +84,7 @@ public class AuthControllerIntegrationTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/auth/login/{role}", role)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest)
@@ -96,9 +92,6 @@ public class AuthControllerIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().json("{\"code\":401,\"message\":\"Invalid email or password.\"}"))
                 .andReturn();
-
-        // To debug
-        //System.out.println(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
@@ -116,7 +109,7 @@ public class AuthControllerIntegrationTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/auth/login/{role}", role)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest)
@@ -124,9 +117,6 @@ public class AuthControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(header().exists(HttpHeaders.AUTHORIZATION))
                 .andReturn();
-
-        // To debug
-        //System.out.println(mvcResult.getResponse().getHeader(HttpHeaders.AUTHORIZATION));
     }
 
     @Test
@@ -136,7 +126,7 @@ public class AuthControllerIntegrationTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/auth/login/{role}", role)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest)
@@ -144,9 +134,6 @@ public class AuthControllerIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().json("{\"code\":401,\"message\":\"Invalid email or password.\"}"))
                 .andReturn();
-
-        // To debug
-        //System.out.println(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
@@ -177,7 +164,7 @@ public class AuthControllerIntegrationTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/auth/login/librarian")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest)
@@ -185,9 +172,6 @@ public class AuthControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(header().exists(HttpHeaders.AUTHORIZATION))
                 .andReturn();
-
-        // To debug
-        //System.out.println(mvcResult.getResponse().getHeader(HttpHeaders.AUTHORIZATION));
     }
 
     @Test
@@ -196,7 +180,7 @@ public class AuthControllerIntegrationTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/auth/login/librarian")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest)
@@ -204,8 +188,22 @@ public class AuthControllerIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().json("{\"code\":401,\"message\":\"Invalid email or password.\"}"))
                 .andReturn();
+    }
 
-        // To debug
-        //System.out.println(mvcResult.getResponse().getContentAsString());
+    @Test
+    public void whenInvalidUserEmailDuringRegister_thenReturnError() throws Exception {
+        String role = "user";
+        String jsonRequest = "{\"email\":\"test\", \"password\":\"password\"}";
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/api/auth/register/user", role)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json("{\"code\":400,\"message\":\"{email=Email must be a valid email address}\"}"))
+                .andReturn();
     }
 }
