@@ -103,7 +103,7 @@ public class LibraryAdditionRequestControllerIT {
         CreateLibraryAdditionDTO createLibraryAdditionDTO = new CreateLibraryAdditionDTO();
         createLibraryAdditionDTO.setStreet("Wojska Polskiego 14");
         createLibraryAdditionDTO.setCity("Szczecin");
-        createLibraryAdditionDTO.setPostalCode("73123");
+        createLibraryAdditionDTO.setPostalCode("73-123");
         createLibraryAdditionDTO.setLibraryName("Filia nr. 5");
         createLibraryAdditionDTO.setPhoneNumber("123123123");
         createLibraryAdditionDTO.setLibraryEmail("filia5@szczecin.gov.pl");
