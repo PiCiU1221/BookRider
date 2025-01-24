@@ -208,4 +208,21 @@ public class AuthControllerIntegrationTest {
         // To debug
         //System.out.println(mvcResult.getResponse().getContentAsString());
     }
+
+    @Test
+    public void whenInvalidUserEmailDuringRegister_thenReturnError() throws Exception {
+        String role = "user";
+        String jsonRequest = "{\"email\":\"test\", \"password\":\"password\"}";
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/api/auth/register/user", role)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json("{\"code\":400,\"message\":\"{email=Email must be a valid email address}\"}"))
+                .andReturn();
+    }
 }
