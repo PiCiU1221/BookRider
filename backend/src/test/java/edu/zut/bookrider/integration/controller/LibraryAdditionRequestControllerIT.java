@@ -22,7 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,14 +109,11 @@ public class LibraryAdditionRequestControllerIT {
 
         String jsonBody = objectMapper.writeValueAsString(createLibraryAdditionDTO);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/library-requests")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/library-requests")
                         .content(jsonBody)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
-
-        String responseBody = mvcResult.getResponse().getContentAsString();
-        //System.out.println("Response Body: " + responseBody);
     }
 
     @Test
