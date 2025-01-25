@@ -155,10 +155,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(PasswordNotValidException.class)
-    public ResponseEntity<ApiErrorResponseDTO> handlePasswordNotValidException(PasswordNotValidException ex) {
-        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleInvalidPasswordException(InvalidPasswordException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(401,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(MissingAddressException.class)
