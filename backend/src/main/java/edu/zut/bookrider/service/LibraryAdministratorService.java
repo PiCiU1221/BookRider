@@ -1,7 +1,7 @@
 package edu.zut.bookrider.service;
 
+import edu.zut.bookrider.dto.CreateLibrarianResponseDTO;
 import edu.zut.bookrider.dto.LibrarianDTO;
-import edu.zut.bookrider.exception.PasswordNotValidException;
 import edu.zut.bookrider.mapper.user.LibrarianReadMapper;
 import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.repository.UserRepository;
@@ -12,12 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 public class LibraryAdministratorService {
-
-    private static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -35,25 +34,23 @@ public class LibraryAdministratorService {
     }
 
     @Transactional
-    public LibrarianDTO resetLibrarianPassword(String username, String newPassword, Authentication authentication) {
-        User libraryAdmin = userService.getUser(authentication);
+    public CreateLibrarianResponseDTO resetLibrarianPassword(String username) {
+        User libraryAdmin = userService.getUser();
         Integer libraryId = libraryAdmin.getLibrary().getId();
 
         User librarian = userService.findLibrarianByUsernameAndLibraryId(username, libraryId);
 
-        if (newPassword.matches(PASSWORD_PATTERN)) {
-            librarian.setPassword(passwordEncoder.encode(newPassword));
-        } else {
-            throw new PasswordNotValidException(
-                    "Password must contain at least one uppercase letter, " +
-                    "one lowercase letter, one digit, and one special character : @$!%*?&. " +
-                    "It must be at least 8 characters long."
-            );
-        }
+        String tempPassword = UUID.randomUUID().toString().substring(0, 8);
+        librarian.setPassword(passwordEncoder.encode(tempPassword));
+        User savedLibrarian = userRepository.save(librarian);
 
-        userRepository.save(librarian);
-
-        return librarianReadMapper.map(librarian);
+        return new CreateLibrarianResponseDTO(
+                savedLibrarian.getId(),
+                savedLibrarian.getUsername(),
+                savedLibrarian.getFirstName(),
+                savedLibrarian.getLastName(),
+                tempPassword
+        );
     }
 
     public List<LibrarianDTO> getAllLibrarians(Authentication authentication) {

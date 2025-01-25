@@ -2,7 +2,6 @@ package edu.zut.bookrider.unit.service;
 
 import edu.zut.bookrider.dto.CreateLibrarianResponseDTO;
 import edu.zut.bookrider.dto.LibrarianDTO;
-import edu.zut.bookrider.exception.PasswordNotValidException;
 import edu.zut.bookrider.exception.UserNotFoundException;
 import edu.zut.bookrider.mapper.user.LibrarianReadMapper;
 import edu.zut.bookrider.model.Library;
@@ -90,32 +89,28 @@ public class LibraryAdministratorServiceTest {
 
     @Test
     void resetLibrarianPassword_shouldResetPasswordSuccessfully() {
-        String newPassword = "NewP@ssw0rd";
+        String username = "Test username";
+        String generatedTempPassword = "tempPass";
+        String encodedPassword = "encodedTempPass";
 
-        LibrarianDTO librarianDTO = new LibrarianDTO("123", "Test username", "Test FirstName", "Test LastName");
-
-        when(userService.getUser(authentication)).thenReturn(libraryAdmin);
-        when(userService.findLibrarianByUsernameAndLibraryId("Test username", libraryAdmin.getLibrary().getId())).thenReturn(librarian);
-        when(passwordEncoder.encode(newPassword)).thenReturn("newPassword");
+        when(userService.getUser()).thenReturn(libraryAdmin);
+        when(userService.findLibrarianByUsernameAndLibraryId(username, libraryAdmin.getLibrary().getId()))
+                .thenReturn(librarian);
+        when(passwordEncoder.encode(generatedTempPassword)).thenReturn(encodedPassword);
         when(userRepository.save(librarian)).thenReturn(librarian);
-        when(librarianReadMapper.map(librarian)).thenReturn(librarianDTO);
-
-        LibrarianDTO result = libraryAdministratorService.resetLibrarianPassword("Test username", newPassword, authentication);
+        CreateLibrarianResponseDTO result = libraryAdministratorService.resetLibrarianPassword(username);
 
         assertNotNull(result);
-        assertEquals("Test username", result.getUsername());
-        assertEquals("Test FirstName", result.getFirstName());
-        assertEquals("Test LastName", result.getLastName());
-        assertEquals("123", result.getId());
-    }
+        assertEquals(librarian.getId(), result.getId());
+        assertEquals(username, result.getUsername());
+        assertEquals(librarian.getFirstName(), result.getFirstName());
+        assertEquals(librarian.getLastName(), result.getLastName());
+        assertNotNull(result.getTempPassword());
 
-    @Test
-    void resetLibrarianPassword_shouldThrowPasswordNotValidException_whenPasswordDoesNotMatchPattern() {
-        String newPassword = "invalidPassword";
-        when(userService.getUser(authentication)).thenReturn(libraryAdmin);
-        when(userService.findLibrarianByUsernameAndLibraryId("Test username", libraryAdmin.getLibrary().getId())).thenReturn(librarian);
-
-        assertThrows(PasswordNotValidException.class, () -> libraryAdministratorService.resetLibrarianPassword("Test username", newPassword, authentication));
+        verify(userService).getUser();
+        verify(userService).findLibrarianByUsernameAndLibraryId(username, libraryAdmin.getLibrary().getId());
+        verify(passwordEncoder).encode(anyString());
+        verify(userRepository).save(librarian);
     }
 
     @Test
