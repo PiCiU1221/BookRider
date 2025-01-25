@@ -156,4 +156,32 @@ public class OrderController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PreAuthorize("hasRole('driver')")
+    @PostMapping("/{orderId}/pickup-navigation")
+    public ResponseEntity<?> pickupNavigation(
+            @PathVariable Integer orderId,
+            @Valid @RequestBody DeliveryNavigationRequestDTO navigationRequestDTO) {
+
+        NavigationResponseDTO response = orderService.getNavigation(
+                orderId,
+                navigationRequestDTO,
+                true
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('driver')")
+    @PostMapping("/{orderId}/delivery-navigation")
+    public ResponseEntity<?> getDeliveryNavigation(
+            @PathVariable Integer orderId,
+            @Valid @RequestBody DeliveryNavigationRequestDTO navigationRequestDTO) {
+
+        NavigationResponseDTO response = orderService.getNavigation(
+                orderId,
+                navigationRequestDTO,
+                false
+        );
+        return ResponseEntity.ok(response);
+    }
 }

@@ -3,6 +3,7 @@ package edu.zut.bookrider.integration.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.zut.bookrider.dto.CoordinateDTO;
 import edu.zut.bookrider.dto.DeliverOrderRequestDTO;
+import edu.zut.bookrider.dto.DeliveryNavigationRequestDTO;
 import edu.zut.bookrider.model.*;
 import edu.zut.bookrider.model.enums.OrderStatus;
 import edu.zut.bookrider.model.enums.PaymentStatus;
@@ -79,8 +80,8 @@ public class OrderControllerIT {
         address.setPostalCode("12312");
         address.setCity("Szczecin");
         address.setStreet("Wyszynskiego 10");
-        address.setLatitude(BigDecimal.valueOf(10.0));
-        address.setLongitude(BigDecimal.valueOf(10.0));
+        address.setLatitude(BigDecimal.valueOf(53.424451));
+        address.setLongitude(BigDecimal.valueOf(14.552580));
         address = addressRepository.save(address);
 
         Role userRole = roleRepository.findByName("user").orElseThrow();
@@ -646,7 +647,7 @@ public class OrderControllerIT {
         order.setPaymentStatus(PaymentStatus.COMPLETED);
         order = orderRepository.save(order);
 
-        CoordinateDTO location = new CoordinateDTO(10.0, 10.0);
+        CoordinateDTO location = new CoordinateDTO(53.423, 14.553);
 
         String imagePath = "src/test/resources/orderControllerTest/example_delivery_photo.png";
         byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
@@ -764,6 +765,110 @@ public class OrderControllerIT {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/orders/" + order.getId() + "/deliver")
                         .content(new ObjectMapper().writeValueAsString(requestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverRequestsNavigationToPickup_thenReturnOkAndNavigationResponse() throws Exception {
+
+        Order order = new Order();
+        order.setDriver(driver);
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.DRIVER_PICKED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        order = orderRepository.save(order);
+
+        DeliveryNavigationRequestDTO navigationRequestDTO = new DeliveryNavigationRequestDTO(
+                "CAR",
+                53.432285,
+                14.543989
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/orders/" + order.getId() + "/pickup-navigation")
+                        .content(new ObjectMapper().writeValueAsString(navigationRequestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalDistance").value(0.7));
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverRequestsNavigationToDelivery_thenReturnOkAndNavigationResponse() throws Exception {
+
+        Order order = new Order();
+        order.setDriver(driver);
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.DRIVER_PICKED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        order = orderRepository.save(order);
+
+        DeliveryNavigationRequestDTO navigationRequestDTO = new DeliveryNavigationRequestDTO(
+                "CAR",
+                53.432285,
+                14.543989
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/orders/" + order.getId() + "/delivery-navigation")
+                        .content(new ObjectMapper().writeValueAsString(navigationRequestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalDistance").value(1.3));
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverRequestsNavigationToDeliveryOrderIdNotValid_thenReturnNotFound() throws Exception {
+
+        DeliveryNavigationRequestDTO navigationRequestDTO = new DeliveryNavigationRequestDTO(
+                "CAR",
+                53.432285,
+                14.543989
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/orders/" + 99999999 + "/delivery-navigation")
+                        .content(new ObjectMapper().writeValueAsString(navigationRequestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
+    void whenDriverRequestsNavigationToDeliveryOrderNotHis_thenReturnNotFound() throws Exception {
+
+        Role driverRole = roleRepository.findByName("driver").orElseThrow();
+        User driver2 = new User();
+        driver2.setId(userIdGeneratorService.generateUniqueId());
+        driver2.setEmail("testdriver2@ocit.com");
+        driver2.setRole(driverRole);
+        driver2.setPassword(passwordEncoder.encode("password"));
+        driver2 = userRepository.save(driver2);
+
+        Order order = new Order();
+        order.setDriver(driver2);
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setStatus(OrderStatus.DRIVER_PICKED);
+        order.setTargetAddress(address);
+        order.setAmount(BigDecimal.valueOf(10));
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        order = orderRepository.save(order);
+
+        DeliveryNavigationRequestDTO navigationRequestDTO = new DeliveryNavigationRequestDTO(
+                "CAR",
+                53.432285,
+                14.543989
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/orders/" + order.getId() + "/delivery-navigation")
+                        .content(new ObjectMapper().writeValueAsString(navigationRequestDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
