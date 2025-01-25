@@ -1,6 +1,8 @@
 package edu.zut.bookrider.integration.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import edu.zut.bookrider.dto.CreateLibrarianDTO;
 import edu.zut.bookrider.model.Address;
 import edu.zut.bookrider.model.Library;
 import edu.zut.bookrider.model.Role;

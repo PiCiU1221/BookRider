@@ -1,18 +1,17 @@
 package edu.zut.bookrider.service;
 
 import edu.zut.bookrider.dto.*;
+import edu.zut.bookrider.exception.InvalidTransportProfileException;
 import edu.zut.bookrider.exception.OrderNotFoundException;
 import edu.zut.bookrider.mapper.coordinate.CoordinateMapper;
 import edu.zut.bookrider.mapper.order.OrderMapper;
-import edu.zut.bookrider.model.Order;
-import edu.zut.bookrider.model.OrderItem;
-import edu.zut.bookrider.model.ShoppingCartItem;
-import edu.zut.bookrider.model.User;
+import edu.zut.bookrider.model.*;
 import edu.zut.bookrider.model.enums.OrderItemStatus;
 import edu.zut.bookrider.model.enums.OrderStatus;
 import edu.zut.bookrider.model.enums.PaymentStatus;
 import edu.zut.bookrider.model.enums.TransactionType;
 import edu.zut.bookrider.repository.OrderRepository;
+import edu.zut.bookrider.service.enums.TransportProfile;
 import edu.zut.bookrider.util.BASE64DecodedMultipartFile;
 import edu.zut.bookrider.util.LocationUtils;
 import jakarta.validation.Valid;
@@ -45,6 +44,7 @@ public class OrderService {
     private final CoordinateMapper coordinateMapper;
     private final TransactionService transactionService;
     private final LibraryCardService libraryCardService;
+    private final NavigationService navigationService;
 
     @Transactional
     public Order createOrderFromCartItem(ShoppingCartItem item) {
@@ -400,5 +400,49 @@ public class OrderService {
         orderRepository.save(order);
 
         return transactionService.createDriverPayoutTransaction(driver, order);
+    }
+
+    public NavigationResponseDTO getNavigation(
+            Integer orderId,
+            DeliveryNavigationRequestDTO navigationRequestDTO,
+            boolean isPickupNavigation) {
+
+        double startLatitude = navigationRequestDTO.getLatitude();
+        double startLongitude = navigationRequestDTO.getLongitude();
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+
+        User driver = userService.getUser();
+        if (!order.getDriver().getId().equals(driver.getId())) {
+            throw new IllegalArgumentException("You are not assigned to this order.");
+        }
+
+        Address targetAddress;
+        if (isPickupNavigation) {
+            targetAddress = order.getLibrary().getAddress();
+        } else {
+            targetAddress = order.getTargetAddress();
+        }
+
+        double endLatitude = targetAddress.getLatitude().doubleValue();
+        double endLongitude = targetAddress.getLongitude().doubleValue();
+
+        TransportProfile profile;
+        String transportProfile = navigationRequestDTO.getTransportProfile();
+        try {
+            profile = TransportProfile.valueOf(transportProfile.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidTransportProfileException("Invalid transport profile: " + transportProfile);
+        }
+
+        CoordinateDTO startCoordinates = new CoordinateDTO(startLatitude, startLongitude);
+        CoordinateDTO endCoordinates = new CoordinateDTO(endLatitude, endLongitude);
+
+        return navigationService.getDirectionsFromCoordinates(
+                startCoordinates,
+                endCoordinates,
+                profile
+        );
     }
 }
