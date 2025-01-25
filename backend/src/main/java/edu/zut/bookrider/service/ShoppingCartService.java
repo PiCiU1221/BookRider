@@ -7,6 +7,7 @@ import edu.zut.bookrider.mapper.shoppingCart.ShoppingCartMapper;
 import edu.zut.bookrider.model.*;
 import edu.zut.bookrider.repository.ShoppingCartRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -150,7 +151,7 @@ public class ShoppingCartService {
     }
 
     public ShoppingCartResponseDTO setDeliveryAddress(
-            CreateAddressDTO createAddressDTO,
+            @Valid CreateAddressDTO createAddressDTO,
             Authentication authentication ) {
 
         User user = userService.getUser(authentication);

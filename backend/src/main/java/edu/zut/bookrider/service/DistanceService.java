@@ -5,6 +5,7 @@ import edu.zut.bookrider.dto.NavigationResponseDTO;
 import edu.zut.bookrider.model.DistanceCache;
 import edu.zut.bookrider.repository.DistanceCacheRepository;
 import edu.zut.bookrider.service.enums.TransportProfile;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +20,8 @@ public class DistanceService {
     private final DistanceCacheRepository distanceCacheRepository;
 
     public BigDecimal getDistance(
-            CoordinateDTO startCoordinates,
-            CoordinateDTO endCoordinates) {
+            @Valid CoordinateDTO startCoordinates,
+            @Valid CoordinateDTO endCoordinates) {
 
         BigDecimal startLat = BigDecimal.valueOf(startCoordinates.getLatitude());
         BigDecimal startLon = BigDecimal.valueOf(startCoordinates.getLongitude());

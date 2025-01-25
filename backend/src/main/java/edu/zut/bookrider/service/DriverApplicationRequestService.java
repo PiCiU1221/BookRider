@@ -10,6 +10,7 @@ import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.model.enums.DriverApplicationStatus;
 import edu.zut.bookrider.repository.DriverApplicationRequestRepository;
 import edu.zut.bookrider.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,7 +39,7 @@ public class DriverApplicationRequestService {
     @Transactional
     public CreateDriverApplicationResponseDTO createDriverApplication(
             Authentication authentication,
-            List<CreateDriverDocumentDTO> documents) {
+            List<@Valid CreateDriverDocumentDTO> documents) {
 
         String driverEmail = authentication.getName().split(":")[0];
 

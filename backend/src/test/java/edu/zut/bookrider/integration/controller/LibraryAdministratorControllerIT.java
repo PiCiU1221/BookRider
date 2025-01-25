@@ -28,7 +28,8 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Transactional
@@ -56,6 +57,9 @@ public class LibraryAdministratorControllerIT {
 
     @Autowired
     private LibraryRepository libraryRepository;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     private User libraryAdminReference;
     private User librarianReference;
@@ -183,5 +187,43 @@ public class LibraryAdministratorControllerIT {
         String tempPasswordValue = JsonPath.parse(response).read("$.tempPassword");
 
         assertTrue(passwordEncoder.matches(tempPasswordValue, librarianReference.getPassword()));
+    }
+
+    @Test
+    @WithMockUser(username = "library_administator@gmail.com", roles = {"library_administrator"})
+    void whenValidCreateLibrarianData_thenReturnCreatedAndLibrarian() throws Exception {
+
+        CreateLibrarianDTO createLibrarianDTO = new CreateLibrarianDTO();
+        createLibrarianDTO.setUsername("new_librarian");
+        createLibrarianDTO.setFirstName("Adam");
+        createLibrarianDTO.setLastName("Smith");
+
+        String jsonBody = objectMapper.writeValueAsString(createLibrarianDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/library-admins/librarians")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody))
+                .andExpect(status().isCreated())
+                .andExpect(content().string(notNullValue()))
+                .andExpect(jsonPath("$.username").value("new_librarian"))
+                .andExpect(jsonPath("$.firstName").value("Adam"))
+                .andExpect(jsonPath("$.lastName").value("Smith"));
+    }
+
+    @Test
+    @WithMockUser(username = "library_administator@gmail.com", roles = {"library_administrator"})
+    void whenEmailInLibrarianUsernameWhileCreateLibrarian_thenReturnBadRequest() throws Exception {
+
+        CreateLibrarianDTO createLibrarianDTO = new CreateLibrarianDTO();
+        createLibrarianDTO.setUsername("new_librarian@bookrider.com");
+        createLibrarianDTO.setFirstName("Adam");
+        createLibrarianDTO.setLastName("Smith");
+
+        String jsonBody = objectMapper.writeValueAsString(createLibrarianDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/library-admins/librarians")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody))
+                .andExpect(status().isBadRequest());
     }
 }
