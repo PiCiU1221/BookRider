@@ -2,7 +2,6 @@ package edu.zut.bookrider.controller;
 
 import edu.zut.bookrider.dto.CreateLibrarianDTO;
 import edu.zut.bookrider.dto.CreateLibrarianResponseDTO;
-import edu.zut.bookrider.dto.LibrarianDTO;
 import edu.zut.bookrider.security.AuthService;
 import edu.zut.bookrider.service.LibraryAdministratorService;
 import jakarta.validation.Valid;
@@ -50,10 +49,8 @@ public class LibraryAdministratorController {
 
     @PatchMapping("/librarians/reset-password/{username}")
     public ResponseEntity<?> resetLibrarianPassword(
-            @PathVariable String username,
-            @RequestParam String newPassword,
-            Authentication authentication) {
-        LibrarianDTO updatedLibrarian = libraryAdministratorService.resetLibrarianPassword(username, newPassword, authentication);
+            @PathVariable String username) {
+        CreateLibrarianResponseDTO updatedLibrarian = libraryAdministratorService.resetLibrarianPassword(username);
         return ResponseEntity.ok(updatedLibrarian);
     }
 }

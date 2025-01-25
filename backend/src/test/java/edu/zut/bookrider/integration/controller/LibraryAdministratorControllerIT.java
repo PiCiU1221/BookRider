@@ -1,7 +1,6 @@
 package edu.zut.bookrider.integration.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.zut.bookrider.dto.CreateLibrarianDTO;
+import com.jayway.jsonpath.JsonPath;
 import edu.zut.bookrider.model.Address;
 import edu.zut.bookrider.model.Library;
 import edu.zut.bookrider.model.Role;
@@ -20,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -177,22 +177,16 @@ public class LibraryAdministratorControllerIT {
 
         assertTrue(passwordEncoder.matches("password", librarianReference.getPassword()));
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/api/library-admins/librarians/reset-password/{username}", librarianReference.getUsername())
-                        .param("newPassword", "Password1@")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/library-admins/librarians/reset-password/{username}", librarianReference.getUsername())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
 
-        assertTrue(passwordEncoder.matches("Password1@", librarianReference.getPassword()));
-    }
+        String response = result.getResponse().getContentAsString();
 
-    @Test
-    @WithMockUser(username = "library_administator@gmail.com", roles = {"library_administrator"})
-    void whenWrongPasswordFormat_thenReturnBadRequest() throws Exception {
+        String tempPasswordValue = JsonPath.parse(response).read("$.tempPassword");
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/api/library-admins/librarians/reset-password/{username}", librarianReference.getUsername())
-                        .param("newPassword", "password")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+        assertTrue(passwordEncoder.matches(tempPasswordValue, librarianReference.getPassword()));
     }
 
     @Test

@@ -1,8 +1,10 @@
 package edu.zut.bookrider.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.zut.bookrider.dto.ChangePasswordDto;
 import edu.zut.bookrider.dto.IsVerifiedResponseDto;
 import edu.zut.bookrider.dto.UserIdResponseDto;
+import edu.zut.bookrider.exception.UserNotFoundException;
 import edu.zut.bookrider.model.Role;
 import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.repository.RoleRepository;
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
@@ -43,6 +46,9 @@ public class UserControllerIT {
 
     @Autowired
     private UserIdGeneratorService userIdGeneratorService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private User userReference;
 
@@ -83,5 +89,41 @@ public class UserControllerIT {
         IsVerifiedResponseDto responseDto = new ObjectMapper().readValue(responseBody, IsVerifiedResponseDto.class);
 
         assertEquals(userReference.getIsVerified(), responseDto.getIsVerified());
+    }
+
+    @Test
+    @WithMockUser(username = "example@usit.com", roles = {"user"})
+    void whenUserIsValid_thenChangeUserPasswordAndReturnNoContent() throws Exception {
+
+        String newPassword = "newPassword";
+        ChangePasswordDto changePasswordDto = new ChangePasswordDto("password", newPassword);
+
+        String jsonBody = objectMapper.writeValueAsString(changePasswordDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/users/change-password")
+                        .content(jsonBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andReturn();
+
+        User user = userRepository.findById(userReference.getId())
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userReference.getId()));
+
+        assertTrue(passwordEncoder.matches(newPassword, user.getPassword()));
+    }
+
+    @Test
+    @WithMockUser(username = "example@usit.com", roles = {"user"})
+    void whenUserIsValidWithIncorrectOldPassword_thenReturn() throws Exception {
+
+        String newPassword = "newPassword";
+        ChangePasswordDto changePasswordDto = new ChangePasswordDto("wrongPassword", newPassword);
+
+        String jsonBody = objectMapper.writeValueAsString(changePasswordDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/users/change-password")
+                        .content(jsonBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
     }
 }

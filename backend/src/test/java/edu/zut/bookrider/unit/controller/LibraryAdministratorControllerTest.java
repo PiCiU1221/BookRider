@@ -119,17 +119,18 @@ public class LibraryAdministratorControllerTest {
 
     @Test
     void resetLibrarianPassword_shouldReturnUpdatedLibrarian() throws Exception {
-        when(libraryAdministratorService.resetLibrarianPassword(eq("test_user"), eq("newPassword"), eq(authentication)))
-                .thenReturn(librarianDTO);
+        when(libraryAdministratorService.resetLibrarianPassword(eq("test_user")))
+                .thenReturn(createLibrarianResponseDTO);
 
         mockMvc.perform(patch("/api/library-admins/librarians/reset-password/{username}", "test_user")
-                        .principal(authentication)
-                        .param("newPassword", "newPassword"))
+                        .principal(authentication))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.username").value("test_user"))
                 .andExpect(jsonPath("$.firstName").value("TestName"))
-                .andExpect(jsonPath("$.lastName").value("TestLastName"));
+                .andExpect(jsonPath("$.lastName").value("TestLastName"))
+                .andExpect(jsonPath("$.tempPassword").value("tempPassword"));
 
-        verify(libraryAdministratorService).resetLibrarianPassword(eq("test_user"), eq("newPassword"), eq(authentication));
+        verify(libraryAdministratorService).resetLibrarianPassword(eq("test_user"));
     }
 }
