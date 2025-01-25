@@ -15,7 +15,4 @@ public class ChangePasswordDto {
 
     @NotBlank(message = "New password is required")
     private String newPassword;
-
-    @NotBlank(message = "Confirmation password is required")
-    private String confirmPassword;
 }
