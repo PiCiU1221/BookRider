@@ -103,22 +103,14 @@ public class UserService {
     }
 
     @Transactional
-    public void changePassword(Authentication authentication, String username, ChangePasswordDto changePasswordDto) {
-        User libraryAdmin = getUser(authentication);
-        Integer libraryId = libraryAdmin.getLibrary().getId();
+    public void changePassword(ChangePasswordDto changePasswordDto) {
+        User user = getUser();
 
-        User librarian = findLibrarianByUsernameAndLibraryId(username, libraryId);
-
-        if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), librarian.getPassword())) {
+        if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())) {
             throw new InvalidPasswordException("Old password is not correct");
         }
 
-        if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
-            throw new InvalidPasswordException("The new password and its confirmation do not match");
-        }
-
-        librarian.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
-        userRepository.save(librarian);
+        user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+        userRepository.save(user);
     }
-
 }

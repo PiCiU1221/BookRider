@@ -12,9 +12,13 @@ import edu.zut.bookrider.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -86,10 +90,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenOldPasswordIsCorrect_andPasswordsMatch_thenChangePasswordSuccessfully() {
-        User libraryAdmin = new User();
-        libraryAdmin.setId("RANDOM");
-
+    public void whenOldPasswordIsCorrect_thenChangePasswordSuccessfully() {
         Library library = new Library();
         library.setId(1);
 
@@ -102,22 +103,34 @@ public class UserServiceTest {
         ChangePasswordDto changePasswordDto = new ChangePasswordDto();
         changePasswordDto.setOldPassword("oldPassword");
         changePasswordDto.setNewPassword("newPassword");
-        changePasswordDto.setConfirmPassword("newPassword");
 
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getName()).thenReturn("librarian:1");
+        UserRepository mockUserRepository = mock(UserRepository.class);
+        PasswordEncoder mockPasswordEncoder = mock(PasswordEncoder.class);
 
-        mockStatic(SecurityUtils.class);
-        when(SecurityUtils.getFirstAuthority()).thenReturn("ROLE_USER");
+        Authentication mockAuthentication = mock(Authentication.class);
+        when(mockAuthentication.getName()).thenReturn("librarian:1");
 
-        when(userRepository.findByUsernameAndLibraryId("librarian", 1)).thenReturn(Optional.of(librarian));
-        when(passwordEncoder.matches("oldPassword", "password")).thenReturn(true);
-        when(passwordEncoder.encode("newPassword")).thenReturn("encodedNewPassword");
+        SecurityContextHolder.setContext(new SecurityContextImpl());
+        SecurityContextHolder.getContext().setAuthentication(mockAuthentication);
 
-        userService.changePassword(authentication, "librarian", changePasswordDto);
+        try (MockedStatic<SecurityUtils> mock = Mockito.mockStatic(SecurityUtils.class)) {
+            mock.when(SecurityUtils::getFirstAuthority).thenReturn("ROLE_librarian");
 
-        assertEquals("encodedNewPassword", librarian.getPassword());
-        verify(userRepository, times(1)).save(librarian);
+            UserService userService = new UserService(mockUserRepository, mockPasswordEncoder);
+
+            when(mockUserRepository.findByUsernameAndLibraryId("librarian", 1))
+                    .thenReturn(Optional.of(librarian));
+            when(mockPasswordEncoder.matches("oldPassword", "password"))
+                    .thenReturn(true);
+            when(mockPasswordEncoder.encode("newPassword"))
+                    .thenReturn("encodedNewPassword");
+
+            userService.changePassword(changePasswordDto);
+
+            assertEquals("encodedNewPassword", librarian.getPassword());
+            verify(mockUserRepository, times(1)).save(librarian);
+            verify(mockPasswordEncoder, times(1)).encode("newPassword");
+        }
     }
 
     @Test
@@ -134,48 +147,26 @@ public class UserServiceTest {
         ChangePasswordDto changePasswordDto = new ChangePasswordDto();
         changePasswordDto.setOldPassword("wrongPassword");
         changePasswordDto.setNewPassword("newPassword");
-        changePasswordDto.setConfirmPassword("newPassword");
 
         Authentication authentication = mock(Authentication.class);
         when(authentication.getName()).thenReturn("librarian:1");
 
-        when(userRepository.findByUsernameAndLibraryId("librarian", 1)).thenReturn(Optional.of(librarian));
-        when(passwordEncoder.matches("wrongPassword", "password")).thenReturn(false);
+        SecurityContextHolder.setContext(new SecurityContextImpl());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        InvalidPasswordException exception = assertThrows(InvalidPasswordException.class, () -> {
-            userService.changePassword(authentication, "librarian", changePasswordDto);
-        });
+        try (MockedStatic<SecurityUtils> mock = Mockito.mockStatic(SecurityUtils.class)) {
+            mock.when(SecurityUtils::getFirstAuthority).thenReturn("ROLE_USER");
 
-        assertEquals("Old password is not correct", exception.getMessage());
+            when(userRepository.findByUsernameAndLibraryId("librarian", 1)).thenReturn(Optional.of(librarian));
+            when(passwordEncoder.matches("wrongPassword", "password")).thenReturn(false);
+
+            InvalidPasswordException exception = assertThrows(InvalidPasswordException.class, () -> {
+                userService.changePassword(changePasswordDto);
+            });
+
+            assertEquals("Old password is not correct", exception.getMessage());
+
+            verify(userRepository, never()).save(any(User.class));
+        }
     }
-
-    @Test
-    public void whenNewPasswordDoesNotMatchConfirmPassword_thenThrowInvalidPasswordException() {
-        User librarian = new User();
-        librarian.setId("Random");
-        librarian.setUsername("librarian");
-        librarian.setPassword("password");
-
-        Library library = new Library();
-        library.setId(1);
-        librarian.setLibrary(library);
-
-        ChangePasswordDto changePasswordDto = new ChangePasswordDto();
-        changePasswordDto.setOldPassword("oldPassword");
-        changePasswordDto.setNewPassword("newPassword");
-        changePasswordDto.setConfirmPassword("NewPassword");
-
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getName()).thenReturn("librarian:1");
-
-        when(userRepository.findByUsernameAndLibraryId("librarian", 1)).thenReturn(Optional.of(librarian));
-        when(passwordEncoder.matches("oldPassword", "password")).thenReturn(true);
-
-        InvalidPasswordException exception = assertThrows(InvalidPasswordException.class, () -> {
-            userService.changePassword(authentication, "librarian", changePasswordDto);
-        });
-
-        assertEquals("The new password and its confirmation do not match", exception.getMessage());
-    }
-
 }

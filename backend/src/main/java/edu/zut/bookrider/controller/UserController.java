@@ -8,7 +8,6 @@ import edu.zut.bookrider.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,14 +34,12 @@ public class UserController {
 
         return ResponseEntity.ok(new IsVerifiedResponseDto(isVerified));
     }
-    @PreAuthorize("hasRole('librarian')")
-    @PutMapping("/{username}/change-password")
-    public ResponseEntity<?> changePassword(
-            @PathVariable String username,
-            @RequestBody @Valid ChangePasswordDto changePasswordDto,
-            Authentication authentication) {
 
-        userService.changePassword(authentication, username, changePasswordDto);
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @RequestBody @Valid ChangePasswordDto changePasswordDto) {
+
+        userService.changePassword(changePasswordDto);
         return ResponseEntity.noContent().build();
     }
 }
