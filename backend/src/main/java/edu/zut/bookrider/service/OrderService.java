@@ -373,16 +373,6 @@ public class OrderService {
             throw new IllegalArgumentException("You are not assigned to this order.");
         }
 
-        byte[] imageBase64 = Base64.getDecoder().decode(requestDTO.getPhotoBase64());
-        MultipartFile multipartFile = new BASE64DecodedMultipartFile(imageBase64);
-        String deliveryPhotoUrl;
-
-        try {
-            deliveryPhotoUrl = imageUploadService.uploadImage(multipartFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         CoordinateDTO targetCoordinates = coordinateMapper.map(order.getTargetAddress());
 
         double distanceToDeliveryAddress = LocationUtils.calculateDistance(
@@ -392,6 +382,16 @@ public class OrderService {
 
         if (distanceToDeliveryAddress > 200) {
             throw new IllegalArgumentException("Driver is too far from the delivery location.");
+        }
+
+        byte[] imageBase64 = Base64.getDecoder().decode(requestDTO.getPhotoBase64());
+        MultipartFile multipartFile = new BASE64DecodedMultipartFile(imageBase64);
+        String deliveryPhotoUrl;
+
+        try {
+            deliveryPhotoUrl = imageUploadService.uploadImage(multipartFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         order.setDeliveryPhotoUrl(deliveryPhotoUrl);
