@@ -190,7 +190,7 @@ public class OrderService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         List<OrderStatus> orderStatusList = List.of(
-                OrderStatus.ACCEPTED,OrderStatus.DECLINED, OrderStatus.DRIVER_PICKED, OrderStatus.IN_TRANSIT_TO_CUSTOMER, OrderStatus.DELIVERED);
+                OrderStatus.IN_TRANSIT_TO_CUSTOMER, OrderStatus.DELIVERED, OrderStatus.DRIVER_PICKED, OrderStatus.DECLINED);
         Page<Order> completedOrders = orderRepository.findByLibraryIdAndStatusIn(
                 librarian.getLibrary().getId(), orderStatusList, pageable);
 

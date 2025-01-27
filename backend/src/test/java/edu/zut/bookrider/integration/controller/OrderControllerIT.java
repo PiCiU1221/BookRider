@@ -238,6 +238,51 @@ public class OrderControllerIT {
         order2.setPaymentStatus(PaymentStatus.COMPLETED);
         orderRepository.save(order2);
 
+        Order order3 = new Order();
+        order3.setUser(user);
+        order3.setLibrary(library);
+        order3.setStatus(OrderStatus.ACCEPTED);
+        order3.setTargetAddress(address);
+        order3.setAmount(BigDecimal.valueOf(10));
+        order3.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order3);
+
+        Order order4 = new Order();
+        order4.setUser(user);
+        order4.setLibrary(library);
+        order4.setStatus(OrderStatus.IN_TRANSIT_TO_CUSTOMER);
+        order4.setTargetAddress(address);
+        order4.setAmount(BigDecimal.valueOf(10));
+        order4.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order4);
+
+        Order order5 = new Order();
+        order5.setUser(user);
+        order5.setLibrary(library);
+        order5.setStatus(OrderStatus.DRIVER_PICKED);
+        order5.setTargetAddress(address);
+        order5.setAmount(BigDecimal.valueOf(10));
+        order5.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order5);
+
+        Order order6 = new Order();
+        order6.setUser(user);
+        order6.setLibrary(library);
+        order6.setStatus(OrderStatus.DELIVERED);
+        order6.setTargetAddress(address);
+        order6.setAmount(BigDecimal.valueOf(10));
+        order6.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order6);
+
+        Order order7 = new Order();
+        order7.setUser(user);
+        order7.setLibrary(library);
+        order7.setStatus(OrderStatus.DECLINED);
+        order7.setTargetAddress(address);
+        order7.setAmount(BigDecimal.valueOf(10));
+        order7.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order7);
+
         mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/librarian/pending"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
@@ -268,6 +313,51 @@ public class OrderControllerIT {
         order2.setAmount(BigDecimal.valueOf(10));
         order2.setPaymentStatus(PaymentStatus.COMPLETED);
         orderRepository.save(order2);
+
+        Order order3 = new Order();
+        order3.setUser(user);
+        order3.setLibrary(library);
+        order3.setStatus(OrderStatus.PENDING);
+        order3.setTargetAddress(address);
+        order3.setAmount(BigDecimal.valueOf(10));
+        order3.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order3);
+
+        Order order4 = new Order();
+        order4.setUser(user);
+        order4.setLibrary(library);
+        order4.setStatus(OrderStatus.IN_TRANSIT_TO_CUSTOMER);
+        order4.setTargetAddress(address);
+        order4.setAmount(BigDecimal.valueOf(10));
+        order4.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order4);
+
+        Order order5 = new Order();
+        order5.setUser(user);
+        order5.setLibrary(library);
+        order5.setStatus(OrderStatus.DRIVER_PICKED);
+        order5.setTargetAddress(address);
+        order5.setAmount(BigDecimal.valueOf(10));
+        order5.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order5);
+
+        Order order6 = new Order();
+        order6.setUser(user);
+        order6.setLibrary(library);
+        order6.setStatus(OrderStatus.DELIVERED);
+        order6.setTargetAddress(address);
+        order6.setAmount(BigDecimal.valueOf(10));
+        order6.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order6);
+
+        Order order7 = new Order();
+        order7.setUser(user);
+        order7.setLibrary(library);
+        order7.setStatus(OrderStatus.DECLINED);
+        order7.setTargetAddress(address);
+        order7.setAmount(BigDecimal.valueOf(10));
+        order7.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order7);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/librarian/in-realization"))
                 .andExpect(status().isOk())
@@ -327,10 +417,19 @@ public class OrderControllerIT {
         order5.setPaymentStatus(PaymentStatus.COMPLETED);
         orderRepository.save(order5);
 
+        Order order6 = new Order();
+        order6.setUser(user);
+        order6.setLibrary(library);
+        order6.setStatus(OrderStatus.DELIVERED);
+        order6.setTargetAddress(address);
+        order6.setAmount(BigDecimal.valueOf(10));
+        order6.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order6);
+
         mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/librarian/completed"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content", hasSize(greaterThan(5-1))))
+                .andExpect(jsonPath("$.content", hasSize(greaterThan(4-1))))
                 .andExpect(jsonPath("$.currentPage", is(0)))
                 .andExpect(jsonPath("$.pageSize", is(10)))
                 .andExpect(jsonPath("$.totalPages", greaterThan(0)));
