@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomModal from "@/app/components/custom_modal";
 import CONFIG from "@/config";
+import {Feather} from "@expo/vector-icons";
 
 interface OrderDetailsDTO {
     orderId: number;
@@ -113,30 +114,46 @@ export default function OrderHistory() {
                 loading={loading}
             >
                 {selectedOrder && (
-                    <View className="space-y-4">
-                        <Text className="text-white text-2xl font-semibold mb-2">Order ID: {selectedOrder.orderId}</Text>
-                        <Text className="text-white">Amount: {selectedOrder.amount} zł</Text>
-                        <Text className="text-white mt-4">Status: {selectedOrder.status}</Text>
-                        <Text className="text-white">Payment Status: {selectedOrder.paymentStatus}</Text>
-
-                        <Text className="text-white">
-                            Note to Driver: {selectedOrder.noteToDriver || "None"}
-                        </Text>
-
-                        <Text className="text-white mt-4">Library Name: {selectedOrder.libraryName}</Text>
-                        <Text className="text-white">Delivery Address: {selectedOrder.deliveryAddress}</Text>
+                    <View className="space-y-4 mb-2">
+                        <View className="flex-row items-center">
+                            <Feather name="hash" size={20} color="#f7ca65" />
+                            <Text className="text-white text-2xl font-semibold ml-2">Order ID: {selectedOrder.orderId}</Text>
+                        </View>
+                        <View className="flex-row items-center">
+                            <Feather name="dollar-sign" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Amount: {selectedOrder.amount} zł</Text>
+                        </View>
+                        <View className="flex-row items-center mt-4">
+                            <Feather name="info" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Status: {selectedOrder.status}</Text>
+                        </View>
+                        <View className="flex-row items-center">
+                            <Feather name="credit-card" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Payment Status: {selectedOrder.paymentStatus}</Text>
+                        </View>
+                        <View className="flex-row items-center mt-4">
+                            <Feather name="message-square" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Note to Driver: {selectedOrder.noteToDriver || "None"}</Text>
+                        </View>
+                        <View className="flex-row items-center mt-4">
+                            <Feather name="book" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Library Name: {selectedOrder.libraryName}</Text>
+                        </View>
+                        <View className="flex-row items-center">
+                            <Feather name="map-pin" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Delivery Address: {selectedOrder.deliveryAddress}</Text>
+                        </View>
 
                         <Text className="text-white text-xl font-semibold mt-4 mb-2">Order Items:</Text>
-
-                        <View className="bg-black/10 p-4 rounded-lg space-y-2 mb-2">
-                            <View className="flex-row justify-between border-b pb-2">
+                        <View className="bg-black/10 p-4 rounded-lg space-y-2 mb-2 border border-gray-300">
+                            <View className="flex-row justify-between border-gray-300 pb-2">
                                 <Text className="text-white font-semibold">Book Title</Text>
                                 <Text className="text-white font-semibold">Authors</Text>
                                 <Text className="text-white font-semibold">Quantity</Text>
                             </View>
 
                             {selectedOrder.orderItems.map((item, index) => (
-                                <View key={index} className="flex-row justify-between py-2 border-b">
+                                <View key={index} className="flex-row justify-between py-2 border-t border-gray-300">
                                     <Text className="text-white">{item.book.title}</Text>
                                     <Text className="text-white">{item.book.authorNames.join(", ")}</Text>
                                     <Text className="text-white">{item.quantity}</Text>

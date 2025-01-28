@@ -9,6 +9,7 @@ import { Barcode } from 'expo-barcode-generator';
 import {router} from "expo-router";
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
+import {Feather} from "@expo/vector-icons";
 
 interface OrderDetailsDTO {
     orderId: number;
@@ -53,6 +54,7 @@ export default function Deliveries() {
     const [deliveryImageBase64, setDeliveryImageBase64] = useState<string>("");
     const [deliveryCompleted, setDeliveryCompleted] = useState(false);
     const [customMessage, setCustomMessage] = useState(null);
+    const [hasSearched, setHasSearched] = useState(false);
 
     const fetchInRealizationOrders = async (): Promise<void> => {
         setLoading(true);
@@ -210,6 +212,7 @@ export default function Deliveries() {
     const fetchPendingOrders = async (): Promise<void> => {
         setLoading(true);
         setModalVisible(true);
+        setHasSearched(true);
 
         try {
             const userLocation = await getUserLocation();
@@ -371,22 +374,28 @@ export default function Deliveries() {
             </View>
 
             <Text className="text-xl font-bold text-white mb-2">Pending Orders</Text>
-            <View className="flex-row items-center mb-4">
-                <TextInput
-                    className="p-2 bg-white rounded text-black flex-1"
-                    placeholder="Enter max search distance in meters"
-                    value={maxDistance}
-                    onChangeText={(text) => setMaxDistance(text)}
-                    keyboardType="numeric"
-                />
-                <TouchableOpacity
-                    onPress={fetchPendingOrders}
-                    className="bg-blue-500 px-6 py-2 rounded ml-2"
-                >
-                    <Text className="text-white text-center font-semibold text-base">
-                        Search
-                    </Text>
-                </TouchableOpacity>
+            <View className="mb-4">
+                <Text className="text-white text-base mb-2">
+                    Enter the maximum search distance (in meters):
+                </Text>
+                <View className="flex-row items-center">
+                    <TextInput
+                        className="p-2 bg-white rounded text-black flex-1"
+                        placeholder="Enter max search distance in meters"
+                        value={maxDistance}
+                        onChangeText={(text) => setMaxDistance(text)}
+                        keyboardType="numeric"
+                    />
+                    <TouchableOpacity
+                        onPress={fetchPendingOrders}
+                        className="bg-blue-500 px-3 py-2 rounded ml-2 flex-row items-center justify-center"
+                    >
+                        <Feather name="search" size={18} color="white" />
+                        <Text className="text-white font-semibold text-base ml-2">
+                            Search
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <FlatList
@@ -405,7 +414,11 @@ export default function Deliveries() {
                     </TouchableOpacity>
                 )}
                 ListEmptyComponent={
-                    !loading ? <Text className="text-white">No orders in realization.</Text> : null
+                    !loading && hasSearched ? (
+                        <Text className="text-white">
+                            No pending orders in the selected radius.
+                        </Text>
+                    ) : null
                 }
             />
 
@@ -441,25 +454,45 @@ export default function Deliveries() {
             >
                 {!loading && selectedOrder && !userId && !deliverMode && (
                     <View className="space-y-4">
-                        <Text className="text-white text-2xl font-semibold mb-2">Order ID: {selectedOrder.orderId}</Text>
-                        <Text className="text-white">Amount: {selectedOrder.amount} zł</Text>
-                        <Text className="text-white">Status: {selectedOrder.status}</Text>
-                        <Text className="text-white">Payment Status: {selectedOrder.paymentStatus}</Text>
-                        <Text className="text-white">
-                            Note to Driver: {selectedOrder.noteToDriver || "None"}
-                        </Text>
-                        <Text className="text-white mt-4">Library Name: {selectedOrder.libraryName}</Text>
-                        <Text className="text-white">Delivery Address: {selectedOrder.deliveryAddress}</Text>
+                        <View className="flex-row items-center">
+                            <Feather name="hash" size={20} color="#f7ca65" />
+                            <Text className="text-white text-2xl font-semibold ml-2">Order ID: {selectedOrder.orderId}</Text>
+                        </View>
+                        <View className="flex-row items-center">
+                            <Feather name="dollar-sign" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Amount: {selectedOrder.amount} zł</Text>
+                        </View>
+                        <View className="flex-row items-center mt-4">
+                            <Feather name="info" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Status: {selectedOrder.status}</Text>
+                        </View>
+                        <View className="flex-row items-center">
+                            <Feather name="credit-card" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Payment Status: {selectedOrder.paymentStatus}</Text>
+                        </View>
+                        <View className="flex-row items-center mt-4">
+                            <Feather name="message-square" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Note to Driver: {selectedOrder.noteToDriver || "None"}</Text>
+                        </View>
+                        <View className="flex-row items-center mt-4">
+                            <Feather name="book" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Library Name: {selectedOrder.libraryName}</Text>
+                        </View>
+                        <View className="flex-row items-center">
+                            <Feather name="map-pin" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Delivery Address: {selectedOrder.deliveryAddress}</Text>
+                        </View>
 
                         <Text className="text-white text-xl font-semibold mt-4 mb-2">Order Items:</Text>
-                        <View className="bg-black/10 p-4 rounded-lg space-y-2">
-                            <View className="flex-row justify-between border-b pb-2">
+                        <View className="bg-black/10 p-4 rounded-lg space-y-2 mb-2 border border-gray-300">
+                            <View className="flex-row justify-between border-gray-300 pb-2">
                                 <Text className="text-white font-semibold">Book Title</Text>
                                 <Text className="text-white font-semibold">Authors</Text>
                                 <Text className="text-white font-semibold">Quantity</Text>
                             </View>
+
                             {selectedOrder.orderItems.map((item, index) => (
-                                <View key={index} className="flex-row justify-between py-2 border-b">
+                                <View key={index} className="flex-row justify-between py-2 border-t border-gray-300">
                                     <Text className="text-white">{item.book.title}</Text>
                                     <Text className="text-white">{item.book.authorNames.join(", ")}</Text>
                                     <Text className="text-white">{item.quantity}</Text>
@@ -470,12 +503,12 @@ export default function Deliveries() {
                         {selectedOrder?.status === "ACCEPTED" ? (
                             <TouchableOpacity
                                 onPress={() => assignDriverToOrder(selectedOrder.orderId)}
-                                className="bg-green-500 px-6 py-3 rounded-lg flex-1 mt-4 mb-4"
+                                className="bg-green-500 px-6 py-3 rounded-lg flex-1 mt-2 mb-4"
                             >
                                 <Text className="text-white text-center font-semibold text-lg">ASSIGN</Text>
                             </TouchableOpacity>
                         ) : (
-                            <View className="flex-row justify-between mt-4 mb-4">
+                            <View className="flex-row justify-between mt-2 mb-4">
                                 <TouchableOpacity
                                     onPress={handleNavigation}
                                     className="bg-blue-500 px-6 py-1 rounded-lg flex-1 mr-2"
