@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Text, TouchableOpacity, View, ActivityIndicator, Alert } from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomModal from "@/app/components/custom_modal";
 import CONFIG from "@/config";
-
-interface OrderItem {
-    orderId: number;
-    deliveryAddress: string;
-    libraryName: string;
-    amount: string;
-}
 
 interface OrderDetailsDTO {
     orderId: number;
