@@ -1,6 +1,7 @@
 package edu.zut.bookrider.service;
 
 import edu.zut.bookrider.dto.ChangePasswordDto;
+import edu.zut.bookrider.dto.UserProfileDTO;
 import edu.zut.bookrider.exception.InsufficientBalanceException;
 import edu.zut.bookrider.exception.InvalidPasswordException;
 import edu.zut.bookrider.exception.UserNotFoundException;
@@ -112,5 +113,18 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public UserProfileDTO getUserProfile() {
+        User user = getUser();
+
+        return new UserProfileDTO(
+                user.getUsername(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getBalance(),
+                user.getCreatedAt()
+        );
     }
 }

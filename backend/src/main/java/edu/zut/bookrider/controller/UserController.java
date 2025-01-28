@@ -3,6 +3,7 @@ package edu.zut.bookrider.controller;
 import edu.zut.bookrider.dto.ChangePasswordDto;
 import edu.zut.bookrider.dto.IsVerifiedResponseDto;
 import edu.zut.bookrider.dto.UserIdResponseDto;
+import edu.zut.bookrider.dto.UserProfileDTO;
 import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.service.UserService;
 import jakarta.validation.Valid;
@@ -41,5 +42,11 @@ public class UserController {
 
         userService.changePassword(changePasswordDto);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserProfileDTO> getAccountInfo() {
+        UserProfileDTO userProfile = userService.getUserProfile();
+        return ResponseEntity.ok(userProfile);
     }
 }
