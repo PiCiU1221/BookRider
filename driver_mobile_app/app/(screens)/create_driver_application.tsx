@@ -6,6 +6,7 @@ import { router } from "expo-router";
 import * as ImagePicker from 'expo-image-picker';
 import CustomModal from '@/app/components/custom_modal';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CONFIG from "@/config";
 
 interface Document {
     documentType: string;
@@ -59,7 +60,7 @@ export default function CreateDriverApplication() {
         try {
             const token = await AsyncStorage.getItem("jwtToken");
 
-            const response = await fetch('http://192.168.0.108:8080/api/driver-applications', {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/driver-applications`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
