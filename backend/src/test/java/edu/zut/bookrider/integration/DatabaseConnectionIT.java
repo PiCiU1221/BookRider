@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-public class DatabaseConnectionTest {
+public class DatabaseConnectionIT {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-public class GeocodeServiceIntegrationTest {
+public class GeocodeServiceIT {
 
     @Autowired
     private GeocodeService geocodeService;

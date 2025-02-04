@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-public class ImageUploadServiceIntegrationTest {
+public class ImageUploadServiceIT {
 
     @Autowired
     private ImageUploadService imageUploadService;
