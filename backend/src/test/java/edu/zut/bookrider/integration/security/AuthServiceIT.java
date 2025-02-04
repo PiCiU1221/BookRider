@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
-public class AuthServiceIntegrationTest {
+public class AuthServiceIT {
 
     @Autowired
     private AuthService authService;
