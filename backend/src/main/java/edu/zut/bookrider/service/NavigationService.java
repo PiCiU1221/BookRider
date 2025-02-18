@@ -4,9 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.zut.bookrider.dto.CoordinateDTO;
+import edu.zut.bookrider.dto.DeliveryNavigationRequestDTO;
 import edu.zut.bookrider.dto.NavigationResponseDTO;
 import edu.zut.bookrider.exception.ExternalApiException;
 import edu.zut.bookrider.exception.InvalidCoordinatesException;
+import edu.zut.bookrider.exception.InvalidTransportProfileException;
+import edu.zut.bookrider.model.Address;
+import edu.zut.bookrider.model.Order;
 import edu.zut.bookrider.service.enums.TransportProfile;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -154,4 +158,30 @@ public class NavigationService {
 
         return navigationResponseDTO;
     }
+
+    public NavigationResponseDTO getNavigationForOrder(
+            Order order,
+            DeliveryNavigationRequestDTO navigationRequestDTO,
+            boolean isPickupNavigation) {
+
+        double startLatitude = navigationRequestDTO.getLatitude();
+        double startLongitude = navigationRequestDTO.getLongitude();
+
+        Address targetAddress = isPickupNavigation ? order.getPickupAddress() : order.getDestinationAddress();
+        double endLatitude = targetAddress.getLatitude().doubleValue();
+        double endLongitude = targetAddress.getLongitude().doubleValue();
+
+        TransportProfile profile;
+        try {
+            profile = TransportProfile.valueOf(navigationRequestDTO.getTransportProfile().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidTransportProfileException("Invalid transport profile: " + navigationRequestDTO.getTransportProfile());
+        }
+
+        CoordinateDTO startCoordinates = new CoordinateDTO(startLatitude, startLongitude);
+        CoordinateDTO endCoordinates = new CoordinateDTO(endLatitude, endLongitude);
+
+        return getDirectionsFromCoordinates(startCoordinates, endCoordinates, profile);
+    }
+
 }

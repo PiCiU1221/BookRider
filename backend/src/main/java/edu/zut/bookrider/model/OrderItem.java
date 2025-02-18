@@ -1,10 +1,7 @@
 package edu.zut.bookrider.model;
 
-import edu.zut.bookrider.model.enums.OrderItemStatus;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -25,16 +22,4 @@ public class OrderItem extends BaseEntity<Integer> {
 
     @Column(nullable = false)
     private int quantity;
-
-    @Column(name = "return_deadline")
-    private LocalDateTime returnDeadline;
-
-    @Column(name = "returned_quantity")
-    private int returnedQuantity = 0;
-
-    @Column(name = "returned_at")
-    private LocalDateTime returnedAt;
-
-    @Enumerated(EnumType.STRING)
-    private OrderItemStatus status;
 }

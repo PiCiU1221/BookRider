@@ -75,18 +75,21 @@ VALUES
 
 INSERT INTO library_addition_requests (created_by, address_id, library_name, phone_number, email, status)
 VALUES
-    ('LIZ5395XCG', 1, 'Miejska Biblioteka Publiczna w Szczecinie - Filia nr 1', '123-422-221', 'filia1@biblioteka.szczecin.pl', 'pending');
+    ('LIZ5395XCG', 1, 'Miejska Biblioteka Publiczna w Szczecinie - Filia nr 1', '123-422-221', 'filia1@biblioteka.szczecin.pl', 'PENDING');
 
 INSERT INTO libraries (address_id, name, phone_number, email)
 VALUES
     (1, 'Miejska Biblioteka Publiczna w Szczecinie - Filia nr 1', '123-422-221', 'filia1@biblioteka.szczecin.pl');
 
 UPDATE library_addition_requests
-SET reviewed_by = 'YBWNYIBF1S', status = 'accepted', reviewed_at = CURRENT_TIMESTAMP
+SET reviewed_by = 'YBWNYIBF1S',
+    status = 'ACCEPTED',
+    reviewed_at = CURRENT_TIMESTAMP
 WHERE id = 1;
 
 UPDATE users
-SET library_id = 1, is_verified = TRUE
+SET library_id = 1,
+    is_verified = TRUE
 WHERE id = 'LIZ5395XCG';
 
 -- Creating librarian accounts
@@ -117,18 +120,21 @@ VALUES
 
 INSERT INTO library_addition_requests (created_by, address_id, library_name, phone_number, email, status)
 VALUES
-    ('TST6J7W5NZ', 2, 'Miejska Biblioteka Publiczna w Szczecinie - Filia nr 2', '765-982-221', 'filia2@biblioteka.szczecin.pl', 'pending');
+    ('TST6J7W5NZ', 2, 'Miejska Biblioteka Publiczna w Szczecinie - Filia nr 2', '765-982-221', 'filia2@biblioteka.szczecin.pl', 'PENDING');
 
 INSERT INTO libraries (address_id, name, phone_number, email)
 VALUES
     (2, 'Miejska Biblioteka Publiczna w Szczecinie - Filia nr 2', '765-982-221', 'filia2@biblioteka.szczecin.pl');
 
 UPDATE library_addition_requests
-SET reviewed_by = 'YBWNYIBF1S', status = 'accepted', reviewed_at = CURRENT_TIMESTAMP
+SET reviewed_by = 'YBWNYIBF1S',
+    status = 'ACCEPTED',
+    reviewed_at = CURRENT_TIMESTAMP
 WHERE id = 2;
 
 UPDATE users
-SET library_id = 2, is_verified = TRUE
+SET library_id = 2,
+    is_verified = TRUE
 WHERE id = 'TST6J7W5NZ';
 
 -- Creating librarian accounts
@@ -157,15 +163,17 @@ VALUES
 
 INSERT INTO driver_application_requests (user_id, status)
 VALUES
-    ('8IP8HAOAB4', 'pending');
+    ('8IP8HAOAB4', 'PENDING');
 
 INSERT INTO driver_documents (driver_application_id, document_type, document_photo_url, expiry_date)
 VALUES
     (1, 'ID', 'imgur.com/driver1-id', '2028-06-01'),
-    (1, 'driving_licence', 'imgur.com/driver1-driving-licence', '2041-01-01');
+    (1, 'DRIVER_LICENSE', 'imgur.com/driver1-driving-licence', '2041-01-01');
 
 UPDATE driver_application_requests
-SET reviewed_by = 'YBWNYIBF1S', status = 'APPROVED', reviewed_at = CURRENT_TIMESTAMP
+SET reviewed_by = 'YBWNYIBF1S',
+    status = 'APPROVED',
+    reviewed_at = CURRENT_TIMESTAMP
 WHERE id = 1;
 
 UPDATE users
@@ -182,15 +190,17 @@ VALUES
 
 INSERT INTO driver_application_requests (user_id, status)
 VALUES
-    ('3XEJRZW5IC', 'pending');
+    ('3XEJRZW5IC', 'PENDING');
 
 INSERT INTO driver_documents (driver_application_id, document_type, document_photo_url, expiry_date)
 VALUES
     (2, 'ID', 'imgur.com/driver2-id', '2029-03-01'),
-    (2, 'driving_licence', 'imgur.com/driver2-driving_licence', '2035-02-01');
+    (2, 'DRIVER_LICENSE', 'imgur.com/driver2-driving_licence', '2035-02-01');
 
 UPDATE driver_application_requests
-SET reviewed_by = 'YBWNYIBF1S', status = 'APPROVED', reviewed_at = CURRENT_TIMESTAMP
+SET reviewed_by = 'YBWNYIBF1S',
+    status = 'APPROVED',
+    reviewed_at = CURRENT_TIMESTAMP
 WHERE id = 2;
 
 UPDATE users
@@ -214,77 +224,158 @@ UPDATE users
 SET is_verified = TRUE
 WHERE id = 'GWVF51WKGG';
 
+
 -- User book order
-INSERT INTO transactions (user_id, amount, transaction_type)
-VALUES
-    ('GWVF51WKGG', 10.00, 'deposit');
+
 
 -- Initial user balance deposit
+INSERT INTO transactions (user_id, amount, transaction_type)
+VALUES
+    ('GWVF51WKGG', 100.00, 'WALLET_DEPOSIT');
+
 UPDATE users
-SET balance = balance + 10.00
+SET balance = balance + 100.00
 WHERE id = 'GWVF51WKGG';
 
 INSERT INTO addresses (street, city, postal_code, latitude, longitude)
 VALUES
     ('ul. Gdańska 12', 'Szczecin', '70-743', 53.4485, 14.5525);
 
-INSERT INTO orders (user_id, library_id, target_address_id, status, amount, payment_status)
+INSERT INTO orders (user_id, library_id, pickup_address_id, destination_address_id, is_return, status, amount, payment_status)
 VALUES
-    ('GWVF51WKGG', 1, 3, 'pending', 10.00, 'pending');
+    ('GWVF51WKGG', 1, 1, 3, false,'PENDING', 10.00, 'PENDING');
 
-INSERT INTO order_items (order_id, book_id, quantity, status)
+INSERT INTO order_items (order_id, book_id, quantity)
 VALUES
-    (1, 2, 2, 'pending');
+    (1, 2, 2);
 
 -- Payment for the order from the user balance
 INSERT INTO transactions (user_id, order_id, amount, transaction_type)
 VALUES
-    ('GWVF51WKGG', 1, 10.00, 'order_payment');
+    ('GWVF51WKGG', 1, 10.00, 'BOOK_ORDER_PAYMENT');
 
 UPDATE users
 SET balance = balance - 10.00
 WHERE id = 'GWVF51WKGG';
 
 UPDATE orders
-SET payment_status = 'completed'
+SET payment_status = 'COMPLETED'
 WHERE id = 1;
 
 -- Order acceptation by the librarian
 UPDATE orders
-SET librarian_id = 'EG2XHFX7E0', status = 'accepted', accepted_at = CURRENT_TIMESTAMP
+SET librarian_id = 'EG2XHFX7E0',
+    status = 'ACCEPTED',
+    accepted_at = CURRENT_TIMESTAMP
 WHERE id = 1;
-
-UPDATE order_items
-SET status = 'accepted'
-WHERE order_id = 1;
 
 -- Driver accepted the order
 UPDATE orders
-SET driver_id = '3XEJRZW5IC'
+SET driver_id = '3XEJRZW5IC',
+    status = 'DRIVER_ACCEPTED'
 WHERE id = 1;
 
 -- Driver picked up the order from the librarian
 UPDATE orders
-SET status = 'in_transit', picked_up_at = CURRENT_TIMESTAMP
+SET status = 'IN_TRANSIT',
+    picked_up_at = CURRENT_TIMESTAMP
 WHERE id = 1;
-
-UPDATE order_items
-SET status = 'in_transit'
-WHERE order_id = 1;
 
 -- Driver delivers the order
 UPDATE orders
-SET delivery_photo_url = 'imgur.com/driver2-delivery1', status = 'delivered', delivered_at = CURRENT_TIMESTAMP
+SET delivery_photo_url = 'imgur.com/driver2-delivery1',
+    status = 'DELIVERED',
+    delivered_at = CURRENT_TIMESTAMP
 WHERE id = 1;
 
-UPDATE order_items
-SET status = 'delivered'
-WHERE order_id = 1;
+INSERT INTO rentals (user_id, book_id, library_id, order_id, quantity, rented_at, return_deadline, status)
+VALUES
+    ('GWVF51WKGG', 2, 1, 1, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '30 days', 'RENTED');
 
 -- Driver payment for the delivery
 INSERT INTO transactions (user_id, amount, transaction_type)
 VALUES
-    ('3XEJRZW5IC', 7.50, 'driver_payment');
+    ('3XEJRZW5IC', 7.50, 'DRIVER_EARNINGS');
+
+UPDATE users
+SET balance = balance + 7.50
+WHERE id = '3XEJRZW5IC';
+
+
+-- User book return
+
+
+-- User creates the return order
+INSERT INTO orders (user_id, library_id, pickup_address_id, destination_address_id, is_return, status, amount, payment_status)
+VALUES
+    ('GWVF51WKGG', 1, 3, 1, true, 'PENDING', 10.00, 'PENDING');
+
+INSERT INTO order_items (order_id, book_id, quantity)
+VALUES
+    (2, 2, 2);
+
+-- User pays for the return order
+INSERT INTO transactions (user_id, order_id, amount, transaction_type)
+VALUES
+    ('GWVF51WKGG', 2, 10.00, 'BOOK_RETURN_PAYMENT');
+
+UPDATE users
+SET balance = balance - 10.00
+WHERE id = 'GWVF51WKGG';
+
+UPDATE orders
+SET payment_status = 'COMPLETED'
+WHERE id = 2;
+
+UPDATE rentals
+SET status = 'RETURN_IN_PROGRESS'
+WHERE id = 1;
+
+-- Rental table for tracking rentals (because they can be partial)
+INSERT INTO rental_returns (return_order_id, returned_at, status)
+VALUES
+    (1,NULL, 'IN_PROGRESS');
+
+INSERT INTO rental_return_items (rental_return_id, rental_id, book_id, returned_quantity)
+VALUES
+    (1, 1, 2, 2);
+
+-- Driver accept the return order
+UPDATE orders
+SET driver_id = '3XEJRZW5IC',
+    status = 'DRIVER_ACCEPTED'
+WHERE id = 2;
+
+-- Driver picks up the books
+UPDATE orders
+SET status = 'IN_TRANSIT',
+    picked_up_at = CURRENT_TIMESTAMP
+WHERE id = 2;
+
+-- Driver delivers the returned books to the library
+UPDATE orders
+SET delivery_photo_url = 'imgur.com/driver2-return1',
+    status = 'DELIVERED',
+    delivered_at = CURRENT_TIMESTAMP
+WHERE id = 2;
+
+UPDATE orders
+SET payment_status = 'COMPLETED'
+WHERE id = 2;
+
+UPDATE rentals
+SET status = 'RETURNED'
+WHERE id = 1;
+
+UPDATE rental_returns
+SET returned_at = CURRENT_TIMESTAMP,
+    status = 'COMPLETED'
+WHERE id = 1;
+
+-- Driver payment for the delivery
+INSERT INTO transactions (user_id, amount, transaction_type)
+VALUES
+    ('3XEJRZW5IC', 7.50, 'DRIVER_EARNINGS');
 
 UPDATE users
 SET balance = balance + 7.50

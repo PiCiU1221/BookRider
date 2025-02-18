@@ -46,6 +46,24 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidDocumentTypeException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleInvalidDocumentType(InvalidDocumentTypeException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidReturnQuantityException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleInvalidReturnQuantity(InvalidReturnQuantityException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RentalNotFoundException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleRentalNotFound(RentalNotFoundException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(InvalidCoordinatesException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleInvalidCoordinatesException(InvalidCoordinatesException ex) {
         ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, ex.getMessage());
@@ -155,6 +173,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(RentalReturnNotFoundException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleRentalReturnNotFoundException(RentalReturnNotFoundException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleInvalidPasswordException(InvalidPasswordException ex) {
         ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(401,  ex.getMessage());
@@ -178,6 +202,13 @@ public class GlobalExceptionHandler {
         ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400,  ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(RentalAlreadyReturnedException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleRentalAlreadyReturnedException(RentalAlreadyReturnedException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(409,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleIllegalStateException(IllegalStateException ex) {

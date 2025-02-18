@@ -4,6 +4,7 @@ import edu.zut.bookrider.dto.CreateDriverDocumentDTO;
 import edu.zut.bookrider.dto.CreateDriverDocumentResponseDTO;
 import edu.zut.bookrider.model.DriverApplicationRequest;
 import edu.zut.bookrider.model.DriverDocument;
+import edu.zut.bookrider.model.enums.DocumentType;
 import edu.zut.bookrider.repository.DriverDocumentRepository;
 import edu.zut.bookrider.service.DriverDocumentService;
 import edu.zut.bookrider.service.ImageUploadService;
@@ -44,15 +45,15 @@ public class DriverDocumentServiceTest {
         applicationRequest.setId(1);
 
         documentDto = new CreateDriverDocumentDTO();
-        documentDto.setDocumentType("License");
+        documentDto.setDocumentType(DocumentType.DRIVER_LICENSE);
         documentDto.setExpiryDate(LocalDate.now().plusYears(5));
         documentDto.setImageInBytes(new byte[0]);
     }
 
     @Test
     void whenValidInputData_thenReturnCreatedDTO() throws IOException {
-        String documentUrl = "http://example.com/license.jpg";
-        MultipartFile multipartFile = new MockMultipartFile("licence.jpg", documentDto.getImageInBytes());
+        String documentUrl = "http://example.com/driver-license.jpg";
+        MultipartFile multipartFile = new MockMultipartFile("driver_license.jpg", documentDto.getImageInBytes());
         when(imageUploadService.uploadImage(multipartFile)).thenReturn(documentUrl);
 
         DriverDocument driverDocument = new DriverDocument();
@@ -65,7 +66,7 @@ public class DriverDocumentServiceTest {
 
         CreateDriverDocumentResponseDTO response = driverDocumentService.saveDriverDocument(documentDto, applicationRequest);
 
-        assertEquals("License", response.getDocumentType());
+        assertEquals(DocumentType.DRIVER_LICENSE, response.getDocumentType());
         assertEquals(documentUrl, response.getDocumentPhotoUrl());
         assertEquals(LocalDate.now().plusYears(5), response.getExpiryDate());
     }

@@ -86,7 +86,7 @@ public class LibraryAdditionRequestServiceTest {
         when(libraryRepository.existsByNameAndCity(createLibraryAdditionDTO.getLibraryName(), createLibraryAdditionDTO.getCity()))
                 .thenReturn(false);
 
-        when(addressService.createAddress(any(CreateAddressDTO.class)))
+        when(addressService.findOrCreateAddress(any(CreateAddressDTO.class)))
                 .thenReturn(new Address());
 
         LibraryAdditionRequest savedRequest = new LibraryAdditionRequest();

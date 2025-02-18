@@ -25,6 +25,10 @@ public class Transaction extends BaseEntity<Integer> {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rental_return_id")
+    private RentalReturn rentalReturn;
+
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 

@@ -18,12 +18,17 @@ public class AddressService {
     private final GeocodeService geocodeService;
     private final AddressRepository addressRepository;
 
-    public Address createAddress(@Valid CreateAddressDTO createAddressDTO) {
-        Address address = new Address();
+    public Address findOrCreateAddress(@Valid CreateAddressDTO createAddressDTO) {
 
-        address.setStreet(createAddressDTO.getStreet());
-        address.setCity(createAddressDTO.getCity());
-        address.setPostalCode(createAddressDTO.getPostalCode());
+        Optional<Address> existingAddress = addressRepository.findByStreetAndCityAndPostalCode(
+                createAddressDTO.getStreet(),
+                createAddressDTO.getCity(),
+                createAddressDTO.getPostalCode()
+        );
+
+        if (existingAddress.isPresent()) {
+            return existingAddress.get();
+        }
 
         CoordinateDTO coordinateDTO = geocodeService.getCoordinatesFromAddress(
                 createAddressDTO.getStreet(),
@@ -31,17 +36,13 @@ public class AddressService {
                 createAddressDTO.getPostalCode()
         );
 
+        Address address = new Address();
+        address.setStreet(createAddressDTO.getStreet());
+        address.setCity(createAddressDTO.getCity());
+        address.setPostalCode(createAddressDTO.getPostalCode());
         address.setLatitude(BigDecimal.valueOf(coordinateDTO.getLatitude()));
         address.setLongitude(BigDecimal.valueOf(coordinateDTO.getLongitude()));
 
         return addressRepository.save(address);
-    }
-
-    public Optional<Address> findExistingAddress(@Valid CreateAddressDTO createAddressDTO) {
-        return addressRepository.findByStreetAndCityAndPostalCode(
-                createAddressDTO.getStreet(),
-                createAddressDTO.getCity(),
-                createAddressDTO.getPostalCode()
-        );
     }
 }

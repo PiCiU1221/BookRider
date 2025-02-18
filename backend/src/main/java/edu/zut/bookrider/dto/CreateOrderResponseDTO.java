@@ -14,7 +14,9 @@ public class CreateOrderResponseDTO {
     private Integer orderId;
     private String userId;
     private String libraryName;
-    private String deliveryAddress;
+    private String pickupAddress;
+    private String destinationAddress;
+    private Boolean isReturn;
     private String status;
     private BigDecimal amount;
     private String paymentStatus;

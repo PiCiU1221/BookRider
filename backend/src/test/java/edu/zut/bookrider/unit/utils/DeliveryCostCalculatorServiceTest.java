@@ -1,4 +1,4 @@
-package edu.zut.bookrider.unit.service;
+package edu.zut.bookrider.unit.utils;
 
 import edu.zut.bookrider.service.DeliveryCostCalculatorService;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class DeliveryCostCalculatorServiceTest {
 
     @Autowired
-    private DeliveryCostCalculatorService deliveryCostCalculatorService;
+    DeliveryCostCalculatorService deliveryCostCalculatorService;
 
     @Test
     void calculateCostWithLibraryInCart_thenReturnCorrectResult() {

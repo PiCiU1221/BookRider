@@ -68,7 +68,7 @@ public class LibraryAdditionRequestService {
                 createLibraryAdditionDTO.getPostalCode()
         );
 
-        Address address = addressService.createAddress(createAddressDTO);
+        Address address = addressService.findOrCreateAddress(createAddressDTO);
 
         libraryRequest.setAddress(address);
 

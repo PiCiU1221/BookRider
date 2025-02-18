@@ -1,6 +1,5 @@
 package edu.zut.bookrider.service;
 
-import edu.zut.bookrider.dto.CoordinateDTO;
 import edu.zut.bookrider.dto.CreateAddressDTO;
 import edu.zut.bookrider.dto.ShoppingCartResponseDTO;
 import edu.zut.bookrider.mapper.shoppingCart.ShoppingCartMapper;
@@ -22,11 +21,10 @@ public class ShoppingCartService {
 
     private final QuoteOptionService quoteOptionService;
     private final ShoppingCartRepository shoppingCartRepository;
-    private final DeliveryCostCalculatorService deliveryCostCalculatorService;
     private final UserService userService;
     private final AddressService addressService;
-    private final DistanceService distanceService;
     private final ShoppingCartMapper shoppingCartMapper;
+    private final DeliveryCostCalculatorService deliveryCostCalculatorService;
 
     @Transactional
     public ShoppingCartResponseDTO addQuoteOptionToCart(Integer quoteOptionId, Authentication authentication) {
@@ -55,14 +53,14 @@ public class ShoppingCartService {
             if (existingSubItem.isPresent()) {
                 ShoppingCartSubItem subItem = existingSubItem.get();
                 subItem.setQuantity(subItem.getQuantity() + quoteOption.getQuote().getQuantity());
-                cartItem.setTotalItemDeliveryCost(calculateTotalItemDeliveryCost(cartItem));
+                cartItem.setTotalItemDeliveryCost(deliveryCostCalculatorService.calculateTotalItemDeliveryCost(cartItem));
             } else {
                 ShoppingCartSubItem newSubItem = new ShoppingCartSubItem();
                 newSubItem.setBook(quoteOption.getQuote().getBook());
                 newSubItem.setQuantity(quoteOption.getQuote().getQuantity());
                 newSubItem.setShoppingCartItem(cartItem);
                 cartItem.getBooks().add(newSubItem);
-                cartItem.setTotalItemDeliveryCost(calculateTotalItemDeliveryCost(cartItem));
+                cartItem.setTotalItemDeliveryCost(deliveryCostCalculatorService.calculateTotalItemDeliveryCost(cartItem));
             }
 
         } else {
@@ -109,35 +107,13 @@ public class ShoppingCartService {
         if (parentItem.getBooks().isEmpty()) {
             cart.getItems().remove(parentItem);
         } else {
-            parentItem.setTotalItemDeliveryCost(calculateTotalItemDeliveryCost(parentItem));
+            parentItem.setTotalItemDeliveryCost(deliveryCostCalculatorService.calculateTotalItemDeliveryCost(parentItem));
         }
 
         cart.setTotalCartDeliveryCost(calculateTotalCartDeliveryCost(cart));
 
         ShoppingCart savedShoppingCart = shoppingCartRepository.save(cart);
         return shoppingCartMapper.map(savedShoppingCart);
-    }
-
-    private BigDecimal calculateTotalItemDeliveryCost(ShoppingCartItem cartItem) {
-
-        Address itemLibraryAddress = cartItem.getLibrary().getAddress();
-        double libraryLatitude = itemLibraryAddress.getLatitude().doubleValue();
-        double libraryLongitude = itemLibraryAddress.getLongitude().doubleValue();
-        CoordinateDTO startCoordinates = new CoordinateDTO(libraryLatitude, libraryLongitude);
-
-        Address targetAddress = cartItem.getShoppingCart().getDeliveryAddress();
-        double targetLatitude = targetAddress.getLatitude().doubleValue();
-        double targetLongitude = targetAddress.getLongitude().doubleValue();
-        CoordinateDTO endCoordinates = new CoordinateDTO(targetLatitude, targetLongitude);
-
-        BigDecimal distance = distanceService.getDistance(startCoordinates, endCoordinates);
-
-        int quantity = 0;
-        for (ShoppingCartSubItem subItem : cartItem.getBooks()) {
-            quantity += subItem.getQuantity();
-        }
-
-        return deliveryCostCalculatorService.calculateCost(distance, quantity, false);
     }
 
     private BigDecimal calculateTotalCartDeliveryCost(ShoppingCart cart) {
@@ -158,8 +134,7 @@ public class ShoppingCartService {
 
         ShoppingCart shoppingCart = user.getShoppingCart();
 
-        Address addressToSet = addressService.findExistingAddress(createAddressDTO)
-                .orElseGet(() -> addressService.createAddress(createAddressDTO));
+        Address addressToSet = addressService.findOrCreateAddress(createAddressDTO);
 
         shoppingCart.setDeliveryAddress(addressToSet);
 
