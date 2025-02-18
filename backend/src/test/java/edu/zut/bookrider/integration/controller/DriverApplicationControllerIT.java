@@ -3,14 +3,17 @@ package edu.zut.bookrider.integration.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.zut.bookrider.dto.CreateDriverDocumentStringDTO;
 import edu.zut.bookrider.exception.DriverApplicationNotFoundException;
-import edu.zut.bookrider.model.*;
+import edu.zut.bookrider.model.DriverApplicationRequest;
+import edu.zut.bookrider.model.Role;
+import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.model.enums.DocumentType;
 import edu.zut.bookrider.model.enums.DriverApplicationStatus;
 import edu.zut.bookrider.repository.DriverApplicationRequestRepository;
 import edu.zut.bookrider.repository.RoleRepository;
 import edu.zut.bookrider.repository.UserRepository;
 import edu.zut.bookrider.service.UserIdGeneratorService;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +30,6 @@ import java.util.Arrays;
 import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
@@ -112,15 +113,10 @@ public class DriverApplicationControllerIT {
 
         String jsonBody = objectMapper.writeValueAsString(Arrays.asList(driverLicenseDTO, identityCardDTO));
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/driver-applications")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/driver-applications")
                         .content(jsonBody)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        String responseBody = mvcResult.getResponse().getContentAsString();
-
-        //System.out.println("Response Body: " + responseBody);
+                .andExpect(status().isCreated());
     }
 
     @Test
