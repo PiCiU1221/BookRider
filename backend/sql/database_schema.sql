@@ -214,7 +214,9 @@ CREATE TABLE orders
     driver_id CHAR(10) REFERENCES users(id),
     librarian_id CHAR(10) REFERENCES users(id),
     library_id INT NOT NULL REFERENCES libraries(id),
-    target_address_id INT NOT NULL REFERENCES addresses(id),
+    pickup_address_id INT NOT NULL REFERENCES addresses(id),
+    destination_address_id INT NOT NULL REFERENCES addresses(id),
+    is_return BOOLEAN NOT NULL,
     status VARCHAR(50) NOT NULL,
     amount NUMERIC(10, 2) NOT NULL,
     payment_status VARCHAR(50) NOT NULL,
@@ -234,11 +236,38 @@ CREATE TABLE order_items
     id SERIAL PRIMARY KEY,
     order_id INT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     book_id INT NOT NULL REFERENCES books(id),
+    quantity INT NOT NULL CHECK (quantity > 0)
+);
+
+CREATE TABLE rentals
+(
+    id SERIAL PRIMARY KEY,
+    user_id CHAR(10) NOT NULL REFERENCES users(id),
+    book_id INT NOT NULL REFERENCES books(id),
+    library_id INT NOT NULL REFERENCES libraries(id),
+    order_id INT NOT NULL REFERENCES orders(id),
     quantity INT NOT NULL CHECK (quantity > 0),
-    return_deadline TIMESTAMP DEFAULT NULL,
-    returned_quantity INT DEFAULT 0,
+    rented_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    return_deadline TIMESTAMP NOT NULL,
+    status VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE rental_returns
+(
+    id SERIAL PRIMARY KEY,
+    return_order_id INT REFERENCES orders(id) ON DELETE CASCADE,
     returned_at TIMESTAMP DEFAULT NULL,
-    status VARCHAR(50)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE rental_return_items
+(
+    id SERIAL PRIMARY KEY,
+    rental_return_id INT NOT NULL REFERENCES rental_returns(id) ON DELETE CASCADE,
+    rental_id INT NOT NULL REFERENCES rentals(id) ON DELETE CASCADE,
+    book_id INT NOT NULL REFERENCES books(id),
+    returned_quantity INT NOT NULL CHECK (returned_quantity > 0)
 );
 
 CREATE TABLE transactions
@@ -246,6 +275,7 @@ CREATE TABLE transactions
     id SERIAL PRIMARY KEY,
     user_id CHAR(10) NOT NULL REFERENCES users(id),
     order_id INT REFERENCES orders(id),
+    rental_return_id INT REFERENCES rental_returns(id),
     amount NUMERIC(10, 2) NOT NULL,
     transaction_type VARCHAR(50) NOT NULL,
     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
