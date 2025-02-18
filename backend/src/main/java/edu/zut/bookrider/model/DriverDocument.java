@@ -1,5 +1,6 @@
 package edu.zut.bookrider.model;
 
+import edu.zut.bookrider.model.enums.DocumentType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,8 +21,9 @@ public class DriverDocument extends BaseEntity<Integer> {
     @JoinColumn(name = "driver_application_id", nullable = false)
     private DriverApplicationRequest driverApplicationRequest;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "document_type", nullable = false)
-    private String documentType;
+    private DocumentType documentType;
 
     @Column(name = "document_photo_url")
     private String documentPhotoUrl;
