@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Data
@@ -44,7 +45,7 @@ public class User {
 
     @Builder.Default
     @Column(precision = 10, scale = 2)
-    private BigDecimal balance = BigDecimal.ZERO;
+    private BigDecimal balance = BigDecimal.valueOf(0.00).setScale(2, RoundingMode.CEILING);
 
     @Builder.Default
     @Column(name = "is_verified")
