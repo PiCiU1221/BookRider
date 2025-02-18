@@ -3,6 +3,7 @@ package edu.zut.bookrider.service;
 import edu.zut.bookrider.dto.CreateTransactionResponseDTO;
 import edu.zut.bookrider.mapper.transaction.TransactionMapper;
 import edu.zut.bookrider.model.Order;
+import edu.zut.bookrider.model.RentalReturn;
 import edu.zut.bookrider.model.Transaction;
 import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.model.enums.OrderStatus;
@@ -15,11 +16,11 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
+import static edu.zut.bookrider.config.SystemConstants.SERVICE_FEE_PERCENTAGE;
+
 @RequiredArgsConstructor
 @Service
 public class TransactionService {
-
-    public static final BigDecimal SERVICE_FEE_PERCENTAGE = new BigDecimal("0.20");
 
     private final UserService userService;
     private final TransactionRepository transactionRepository;
@@ -36,7 +37,7 @@ public class TransactionService {
         Transaction transaction = new Transaction();
         transaction.setUser(user);
         transaction.setAmount(amount);
-        transaction.setTransactionType(TransactionType.USER_DEPOSIT);
+        transaction.setTransactionType(TransactionType.WALLET_DEPOSIT);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
@@ -59,7 +60,7 @@ public class TransactionService {
         transaction.setUser(user);
         transaction.setOrder(order);
         transaction.setAmount(amount);
-        transaction.setTransactionType(TransactionType.USER_PAYMENT);
+        transaction.setTransactionType(TransactionType.BOOK_ORDER_PAYMENT);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
@@ -69,6 +70,23 @@ public class TransactionService {
                 false);
 
         transactionMapper.map(savedTransaction);
+    }
+
+    @Transactional
+    public void createUserLateFeeTransaction(
+            User user,
+            BigDecimal lateFeeAmount,
+            RentalReturn rentalReturn) {
+
+        Transaction lateFeeTransaction = new Transaction();
+        lateFeeTransaction.setUser(user);
+        lateFeeTransaction.setRentalReturn(rentalReturn);
+        lateFeeTransaction.setAmount(lateFeeAmount);
+        lateFeeTransaction.setTransactionType(TransactionType.LATE_FEE_PAYMENT);
+
+        transactionRepository.save(lateFeeTransaction);
+
+        userService.adjustBalance(user, lateFeeAmount, false);
     }
 
     @Transactional
@@ -87,7 +105,7 @@ public class TransactionService {
         transaction.setUser(driver);
         transaction.setOrder(order);
         transaction.setAmount(driverPayout);
-        transaction.setTransactionType(TransactionType.DRIVER_PAYOUT);
+        transaction.setTransactionType(TransactionType.DRIVER_EARNINGS);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
