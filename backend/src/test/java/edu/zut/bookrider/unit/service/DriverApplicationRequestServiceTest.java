@@ -4,6 +4,7 @@ import edu.zut.bookrider.dto.*;
 import edu.zut.bookrider.model.DriverApplicationRequest;
 import edu.zut.bookrider.model.Role;
 import edu.zut.bookrider.model.User;
+import edu.zut.bookrider.model.enums.DocumentType;
 import edu.zut.bookrider.model.enums.DriverApplicationStatus;
 import edu.zut.bookrider.repository.DriverApplicationRequestRepository;
 import edu.zut.bookrider.repository.UserRepository;
@@ -65,7 +66,7 @@ public class DriverApplicationRequestServiceTest {
         applicationRequest.setStatus(DriverApplicationStatus.PENDING);
 
         documentDto = new CreateDriverDocumentDTO();
-        documentDto.setDocumentType("License");
+        documentDto.setDocumentType(DocumentType.DRIVER_LICENSE);
         documentDto.setExpiryDate(LocalDate.now().plusYears(5));
         documentDto.setImageInBytes(new byte[0]);
     }
@@ -78,9 +79,9 @@ public class DriverApplicationRequestServiceTest {
 
         when(driverApplicationRequestRepository.save(any(DriverApplicationRequest.class))).thenReturn(applicationRequest);
 
-        String documentUrl = "http://example.com/license.jpg";
+        String documentUrl = "http://example.com/driver-license.jpg";
         when(driverDocumentService.saveDriverDocument(documentDto, applicationRequest)).thenReturn(
-                new CreateDriverDocumentResponseDTO("License", documentUrl, LocalDate.now().plusYears(5)));
+                new CreateDriverDocumentResponseDTO(DocumentType.DRIVER_LICENSE, documentUrl, LocalDate.now().plusYears(5)));
 
         CreateDriverApplicationResponseDTO response = driverApplicationRequestService.createDriverApplication(authentication, List.of(documentDto));
 
@@ -88,7 +89,7 @@ public class DriverApplicationRequestServiceTest {
         assertEquals("driver@email.com", response.getEmail());
         assertEquals("PENDING", response.getStatus());
         assertEquals(1, response.getCreatedDocuments().size());
-        assertEquals("License", response.getCreatedDocuments().get(0).getDocumentType());
+        assertEquals(DocumentType.DRIVER_LICENSE, response.getCreatedDocuments().get(0).getDocumentType());
         assertEquals(documentUrl, response.getCreatedDocuments().get(0).getDocumentPhotoUrl());
         assertEquals(LocalDate.now().plusYears(5), response.getCreatedDocuments().get(0).getExpiryDate());
     }

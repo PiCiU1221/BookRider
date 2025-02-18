@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.zut.bookrider.dto.CreateDriverDocumentStringDTO;
 import edu.zut.bookrider.exception.DriverApplicationNotFoundException;
 import edu.zut.bookrider.model.*;
+import edu.zut.bookrider.model.enums.DocumentType;
 import edu.zut.bookrider.model.enums.DriverApplicationStatus;
 import edu.zut.bookrider.repository.DriverApplicationRequestRepository;
 import edu.zut.bookrider.repository.RoleRepository;
@@ -103,10 +104,10 @@ public class DriverApplicationControllerIT {
         String identityCardString = Base64.getEncoder().encodeToString(java.nio.file.Files.readAllBytes(identityCard.toPath()));
 
         CreateDriverDocumentStringDTO driverLicenseDTO = new CreateDriverDocumentStringDTO(
-                driverLicenseString, "Driving License", "2025-12-31"
+                driverLicenseString, DocumentType.DRIVER_LICENSE.toString(), "2025-12-31"
         );
         CreateDriverDocumentStringDTO identityCardDTO = new CreateDriverDocumentStringDTO(
-                identityCardString, "Identity Card", "2025-12-31"
+                identityCardString, DocumentType.ID.toString(), "2025-12-31"
         );
 
         String jsonBody = objectMapper.writeValueAsString(Arrays.asList(driverLicenseDTO, identityCardDTO));

@@ -2,11 +2,13 @@ package edu.zut.bookrider.service;
 
 import edu.zut.bookrider.dto.*;
 import edu.zut.bookrider.exception.DriverApplicationNotFoundException;
+import edu.zut.bookrider.exception.InvalidDocumentTypeException;
 import edu.zut.bookrider.exception.UserNotFoundException;
 import edu.zut.bookrider.mapper.driverApplication.DriverApplicationReadMapper;
 import edu.zut.bookrider.model.DriverApplicationRequest;
 import edu.zut.bookrider.model.DriverDocument;
 import edu.zut.bookrider.model.User;
+import edu.zut.bookrider.model.enums.DocumentType;
 import edu.zut.bookrider.model.enums.DriverApplicationStatus;
 import edu.zut.bookrider.repository.DriverApplicationRequestRepository;
 import edu.zut.bookrider.repository.UserRepository;
@@ -21,10 +23,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -35,6 +41,34 @@ public class DriverApplicationRequestService {
     private final DriverDocumentService driverDocumentService;
     private final DriverApplicationReadMapper driverApplicationReadMapper;
     private final UserService userService;
+
+    @Transactional
+    public CreateDriverApplicationResponseDTO processDriverApplication(
+            Authentication authentication,
+            List<CreateDriverDocumentStringDTO> files) {
+
+        List<CreateDriverDocumentDTO> documents = files.stream().map(documentDTO -> {
+            byte[] decodedBytes = Base64.getDecoder().decode(documentDTO.getBase64Image());
+
+            DocumentType documentType;
+            try {
+                documentType = DocumentType.valueOf(documentDTO.getDocumentType().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new InvalidDocumentTypeException("Invalid document type: " + documentDTO.getDocumentType());
+            }
+
+            LocalDate expirationDate = LocalDate.parse(documentDTO.getExpirationDate(), DateTimeFormatter.ISO_DATE);
+
+            CreateDriverDocumentDTO document = new CreateDriverDocumentDTO();
+            document.setImageInBytes(decodedBytes);
+            document.setDocumentType(documentType);
+            document.setExpiryDate(expirationDate);
+
+            return document;
+        }).collect(Collectors.toList());
+
+        return createDriverApplication(authentication, documents);
+    }
 
     @Transactional
     public CreateDriverApplicationResponseDTO createDriverApplication(
