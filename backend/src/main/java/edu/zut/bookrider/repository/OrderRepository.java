@@ -1,6 +1,7 @@
 package edu.zut.bookrider.repository;
 
 import edu.zut.bookrider.model.Order;
+import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 
@@ -19,15 +21,19 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     @Query("SELECT o FROM Order o " +
             "JOIN o.library l " +
             "JOIN l.address a " +
-            "WHERE o.status = :status " +
+            "WHERE (o.status = 'ACCEPTED' AND o.isReturn = false) " +
+            "OR (o.status = 'PENDING' AND o.isReturn = true) " +
             "AND (ST_DistanceSphere(ST_MakePoint(a.latitude, a.longitude), " +
             "ST_MakePoint(:driverLatitude, :driverLongitude)) <= :maxDistanceInMeters)")
-    Page<Order> findAcceptedOrdersForDriverWithDistance(
-            @Param("status") OrderStatus status,
+    Page<Order> findOrdersForDriverWithDistance(
             @Param("driverLatitude") BigDecimal driverLatitude,
             @Param("driverLongitude") BigDecimal driverLongitude,
             @Param("maxDistanceInMeters") double maxDistanceInMeters,
             Pageable pageable);
 
     Page<Order> findByDriverIdAndStatusIn(String driverId, List<OrderStatus> status, Pageable pageable);
+
+    boolean existsByDriverAndStatusNot(User driver, OrderStatus status);
+
+    Optional<Order> findFirstByDriverIdAndStatusIn(String driverId, List<OrderStatus> statuses);
 }

@@ -1,17 +1,14 @@
 package edu.zut.bookrider.service;
 
 import edu.zut.bookrider.dto.*;
-import edu.zut.bookrider.exception.InvalidTransportProfileException;
 import edu.zut.bookrider.exception.OrderNotFoundException;
 import edu.zut.bookrider.mapper.coordinate.CoordinateMapper;
 import edu.zut.bookrider.mapper.order.OrderMapper;
 import edu.zut.bookrider.model.*;
-import edu.zut.bookrider.model.enums.OrderItemStatus;
 import edu.zut.bookrider.model.enums.OrderStatus;
 import edu.zut.bookrider.model.enums.PaymentStatus;
 import edu.zut.bookrider.model.enums.TransactionType;
 import edu.zut.bookrider.repository.OrderRepository;
-import edu.zut.bookrider.service.enums.TransportProfile;
 import edu.zut.bookrider.util.BASE64DecodedMultipartFile;
 import edu.zut.bookrider.util.LocationUtils;
 import jakarta.validation.Valid;
@@ -31,13 +28,13 @@ import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static edu.zut.bookrider.config.SystemConstants.SERVICE_FEE_PERCENTAGE;
 import static java.util.Objects.isNull;
 
 @RequiredArgsConstructor
 @Service
 public class OrderService {
 
-    private final OrderRepository orderRepository;
     private final UserService userService;
     private final OrderMapper orderMapper;
     private final ImageUploadService imageUploadService;
@@ -45,6 +42,10 @@ public class OrderService {
     private final TransactionService transactionService;
     private final LibraryCardService libraryCardService;
     private final NavigationService navigationService;
+    private final DeliveryCostCalculatorService deliveryCostCalculatorService;
+    private final RentalService rentalService;
+
+    private final OrderRepository orderRepository;
 
     @Transactional
     public Order createOrderFromCartItem(ShoppingCartItem item) {
@@ -55,7 +56,9 @@ public class OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setLibrary(item.getLibrary());
-        order.setTargetAddress(item.getShoppingCart().getDeliveryAddress());
+        order.setPickupAddress(order.getLibrary().getAddress());
+        order.setDestinationAddress(item.getShoppingCart().getDeliveryAddress());
+        order.setIsReturn(false);
         order.setStatus(OrderStatus.PENDING);
         order.setAmount(item.getTotalItemDeliveryCost());
         order.setPaymentStatus(PaymentStatus.PENDING);
@@ -66,7 +69,6 @@ public class OrderService {
                     orderItem.setOrder(order);
                     orderItem.setBook(shoppingCartSubItem.getBook());
                     orderItem.setQuantity(shoppingCartSubItem.getQuantity());
-                    orderItem.setStatus(OrderItemStatus.BORROWED);
                     return orderItem;
                 })
                 .collect(Collectors.toList());
@@ -84,129 +86,75 @@ public class OrderService {
     }
 
     public PageResponseDTO<CreateOrderResponseDTO> getUserPendingOrders(int page, int size) {
-        User user = userService.getUser();
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Order> pendingOrders = orderRepository.findByUserIdAndStatusIn(
-                user.getId(), List.of(OrderStatus.PENDING), pageable);
-
-        List<CreateOrderResponseDTO> orderDtos = pendingOrders.getContent().stream()
-                .map(orderMapper::map)
-                .toList();
-
-        return new PageResponseDTO<>(
-                orderDtos,
-                pendingOrders.getNumber(),
-                pendingOrders.getSize(),
-                pendingOrders.getTotalElements(),
-                pendingOrders.getTotalPages()
-        );
+        return getUserOrdersByStatus(List.of(OrderStatus.PENDING), page, size);
     }
 
     public PageResponseDTO<CreateOrderResponseDTO> getUserInRealizationOrders(int page, int size) {
-        User user = userService.getUser();
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        List<OrderStatus> orderStatusList = List.of(
-                OrderStatus.ACCEPTED, OrderStatus.DRIVER_PICKED, OrderStatus.IN_TRANSIT_TO_CUSTOMER);
-        Page<Order> inRealizationOrders = orderRepository.findByUserIdAndStatusIn(
-                user.getId(), orderStatusList, pageable);
-
-        List<CreateOrderResponseDTO> orderDtos = inRealizationOrders.getContent().stream()
-                .map(orderMapper::map)
-                .toList();
-
-        return new PageResponseDTO<>(
-                orderDtos,
-                inRealizationOrders.getNumber(),
-                inRealizationOrders.getSize(),
-                inRealizationOrders.getTotalElements(),
-                inRealizationOrders.getTotalPages()
-        );
+        return getUserOrdersByStatus(
+                List.of(OrderStatus.ACCEPTED, OrderStatus.DRIVER_ACCEPTED, OrderStatus.IN_TRANSIT),
+                page, size);
     }
 
     public PageResponseDTO<CreateOrderResponseDTO> getUserCompletedOrders(int page, int size) {
+        return getUserOrdersByStatus(List.of(OrderStatus.DELIVERED, OrderStatus.DECLINED), page, size);
+    }
+
+    private PageResponseDTO<CreateOrderResponseDTO> getUserOrdersByStatus(
+            List<OrderStatus> statuses, int page, int size) {
+
         User user = userService.getUser();
-
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Order> completedOrders = orderRepository.findByUserIdAndStatusIn(
-                user.getId(), List.of(OrderStatus.DELIVERED, OrderStatus.DECLINED), pageable);
 
-        List<CreateOrderResponseDTO> orderDtos = completedOrders.getContent().stream()
+        Page<Order> orders = orderRepository.findByUserIdAndStatusIn(user.getId(), statuses, pageable);
+
+        List<CreateOrderResponseDTO> orderDtos = orders.getContent().stream()
                 .map(orderMapper::map)
                 .toList();
 
         return new PageResponseDTO<>(
                 orderDtos,
-                completedOrders.getNumber(),
-                completedOrders.getSize(),
-                completedOrders.getTotalElements(),
-                completedOrders.getTotalPages()
+                orders.getNumber(),
+                orders.getSize(),
+                orders.getTotalElements(),
+                orders.getTotalPages()
         );
     }
 
     public PageResponseDTO<CreateOrderResponseDTO> getLibraryPendingOrders(int page, int size) {
-        User librarian = userService.getUser();
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Order> pendingOrders = orderRepository.findByLibraryIdAndStatusIn(
-                librarian.getLibrary().getId(), List.of(OrderStatus.PENDING), pageable);
-
-        List<CreateOrderResponseDTO> pendingOrderDtos = pendingOrders.getContent().stream()
-                .map(orderMapper::map)
-                .toList();
-
-        return new PageResponseDTO<>(
-                pendingOrderDtos,
-                pendingOrders.getNumber(),
-                pendingOrders.getSize(),
-                pendingOrders.getTotalElements(),
-                pendingOrders.getTotalPages()
-        );
+        return getLibraryOrdersByStatus(List.of(OrderStatus.PENDING), page, size);
     }
 
     public PageResponseDTO<CreateOrderResponseDTO> getLibraryInRealizationOrders(int page, int size) {
-        User librarian = userService.getUser();
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Order> inRealizationOrders = orderRepository.findByLibraryIdAndStatusIn(
-                librarian.getLibrary().getId(), List.of(OrderStatus.ACCEPTED), pageable);
-
-        List<CreateOrderResponseDTO> inRealizationOrderDtos = inRealizationOrders.getContent().stream()
-                .map(orderMapper::map)
-                .toList();
-
-        return new PageResponseDTO<>(
-                inRealizationOrderDtos,
-                inRealizationOrders.getNumber(),
-                inRealizationOrders.getSize(),
-                inRealizationOrders.getTotalElements(),
-                inRealizationOrders.getTotalPages()
-        );
+        return getLibraryOrdersByStatus(List.of(OrderStatus.ACCEPTED), page, size);
     }
 
     public PageResponseDTO<CreateOrderResponseDTO> getLibraryCompletedOrders(int page, int size) {
+        return getLibraryOrdersByStatus(
+                List.of(OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED, OrderStatus.DRIVER_ACCEPTED, OrderStatus.DECLINED),
+                page, size);
+    }
+
+    private PageResponseDTO<CreateOrderResponseDTO> getLibraryOrdersByStatus(
+            List<OrderStatus> statuses, int page, int size) {
+
         User librarian = userService.getUser();
-
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        List<OrderStatus> orderStatusList = List.of(
-                OrderStatus.IN_TRANSIT_TO_CUSTOMER, OrderStatus.DELIVERED, OrderStatus.DRIVER_PICKED, OrderStatus.DECLINED);
-        Page<Order> completedOrders = orderRepository.findByLibraryIdAndStatusIn(
-                librarian.getLibrary().getId(), orderStatusList, pageable);
 
-        List<CreateOrderResponseDTO> completedOrderDtos = completedOrders.getContent().stream()
+        Page<Order> orders = orderRepository.findByLibraryIdAndStatusIn(
+                librarian.getLibrary().getId(), statuses, pageable);
+
+        List<CreateOrderResponseDTO> orderDtos = orders.getContent().stream()
                 .map(orderMapper::map)
                 .toList();
 
         return new PageResponseDTO<>(
-                completedOrderDtos,
-                completedOrders.getNumber(),
-                completedOrders.getSize(),
-                completedOrders.getTotalElements(),
-                completedOrders.getTotalPages()
+                orderDtos,
+                orders.getNumber(),
+                orders.getSize(),
+                orders.getTotalElements(),
+                orders.getTotalPages()
         );
     }
-
 
     @Transactional
     public void acceptOrder(Integer orderId) {
@@ -214,8 +162,9 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
-        if (order.getStatus() == OrderStatus.ACCEPTED || order.getStatus() == OrderStatus.DECLINED) {
-            throw new IllegalStateException("Order cannot be accepted because it is already accepted or declined");
+        if (!((order.getStatus() == OrderStatus.DRIVER_ACCEPTED && order.getIsReturn()) ||
+                (order.getStatus() == OrderStatus.PENDING && !order.getIsReturn()))) {
+            throw new IllegalStateException("Order cannot be accepted because it is not in the correct status for handover.");
         }
 
         User librarian = userService.getUser();
@@ -250,15 +199,19 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
-        if (order.getStatus() != OrderStatus.DRIVER_PICKED) {
-            throw new IllegalStateException("Order cannot be handed over unless it is in DRIVER_PICKED state.");
+        if (order.getStatus() != OrderStatus.DRIVER_ACCEPTED) {
+            throw new IllegalStateException("Order cannot be handed over unless it is in DRIVER_ACCEPTED state.");
+        }
+
+        if (order.getIsReturn()) {
+            throw new IllegalStateException("Order cannot be handed over as a librarian for a return order");
         }
 
         if (!order.getDriver().getId().equals(providedDriverId)) {
             throw new IllegalArgumentException("Provided driver ID does not match the driver assigned to the order.");
         }
 
-        order.setStatus(OrderStatus.IN_TRANSIT_TO_CUSTOMER);
+        order.setStatus(OrderStatus.IN_TRANSIT);
         order.setPickedUpAt(LocalDateTime.now());
         orderRepository.save(order);
     }
@@ -267,14 +220,15 @@ public class OrderService {
             @Valid CoordinateDTO location, double maxDistanceInMeters, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Order> pendingOrders = orderRepository.findAcceptedOrdersForDriverWithDistance(
-                OrderStatus.ACCEPTED, BigDecimal.valueOf(location.getLatitude()),
-                BigDecimal.valueOf(location.getLongitude()), maxDistanceInMeters, pageable);
+        Page<Order> pendingOrders = orderRepository.findOrdersForDriverWithDistance(
+                BigDecimal.valueOf(location.getLatitude()),
+                BigDecimal.valueOf(location.getLongitude()),
+                maxDistanceInMeters, pageable);
 
         List<CreateOrderResponseDTO> pendingOrderDtos = pendingOrders.getContent().stream().map(order -> {
             CreateOrderResponseDTO dto = orderMapper.map(order);
-            BigDecimal userPayment = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.USER_PAYMENT);
-            BigDecimal netAmount = userPayment.subtract(userPayment.multiply(TransactionService.SERVICE_FEE_PERCENTAGE));
+            BigDecimal userPayment = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.BOOK_ORDER_PAYMENT);
+            BigDecimal netAmount = userPayment.subtract(userPayment.multiply(SERVICE_FEE_PERCENTAGE));
             dto.setAmount(netAmount);
 
             return dto;
@@ -294,12 +248,12 @@ public class OrderService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Order> inRealizationOrders = orderRepository.findByDriverIdAndStatusIn(
-                driver.getId(), List.of(OrderStatus.DRIVER_PICKED, OrderStatus.IN_TRANSIT_TO_CUSTOMER), pageable);
+                driver.getId(), List.of(OrderStatus.DRIVER_ACCEPTED, OrderStatus.IN_TRANSIT), pageable);
 
         List<CreateOrderResponseDTO> inRealizationOrderDtos = inRealizationOrders.getContent().stream().map(order -> {
             CreateOrderResponseDTO dto = orderMapper.map(order);
-            BigDecimal userPayment = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.USER_PAYMENT);
-            BigDecimal netAmount = userPayment.subtract(userPayment.multiply(TransactionService.SERVICE_FEE_PERCENTAGE));
+            BigDecimal userPayment = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.BOOK_ORDER_PAYMENT);
+            BigDecimal netAmount = userPayment.subtract(userPayment.multiply(SERVICE_FEE_PERCENTAGE));
             dto.setAmount(netAmount);
 
             return dto;
@@ -324,7 +278,7 @@ public class OrderService {
 
         List<CreateOrderResponseDTO> completedOrderDtos = completedOrders.getContent().stream().map(order -> {
             CreateOrderResponseDTO dto = orderMapper.map(order);
-            BigDecimal driverPayout = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.DRIVER_PAYOUT);
+            BigDecimal driverPayout = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.DRIVER_EARNINGS);
             dto.setAmount(driverPayout);
 
             return dto;
@@ -345,8 +299,14 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
-        if (order.getStatus() != OrderStatus.ACCEPTED) {
-            throw new IllegalStateException("Order cannot be picked unless it is in ACCEPTED state.");
+        if (!((order.getStatus() == OrderStatus.ACCEPTED && !order.getIsReturn()) ||
+                (order.getStatus() == OrderStatus.PENDING && order.getIsReturn()))) {
+            throw new IllegalStateException("Order cannot be picked unless it is in ACCEPTED state (for non-return) or PENDING state (for return).");
+        }
+
+        boolean hasOngoingOrder = orderRepository.existsByDriverAndStatusNot(driver, OrderStatus.DELIVERED);
+        if (hasOngoingOrder) {
+            throw new IllegalArgumentException("Driver can only have one order in realization at the time.");
         }
 
         if (!isNull(order.getDriver())) {
@@ -354,17 +314,17 @@ public class OrderService {
         }
 
         order.setDriver(driver);
-        order.setStatus(OrderStatus.DRIVER_PICKED);
+        order.setStatus(OrderStatus.DRIVER_ACCEPTED);
         order.setDriverAssignedAt(LocalDateTime.now());
         orderRepository.save(order);
     }
 
     @Transactional
-    public CreateTransactionResponseDTO deliverOrder(Integer orderId, @Valid DeliverOrderRequestDTO requestDTO) {
+    public DeliverOrderResponseDTO deliverOrder(Integer orderId, @Valid DeliverOrderRequestDTO requestDTO) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
-        if (order.getStatus() != OrderStatus.IN_TRANSIT_TO_CUSTOMER) {
+        if (order.getStatus() != OrderStatus.IN_TRANSIT) {
             throw new IllegalArgumentException("Order is not in the correct state for delivery.");
         }
 
@@ -373,7 +333,7 @@ public class OrderService {
             throw new IllegalArgumentException("You are not assigned to this order.");
         }
 
-        CoordinateDTO targetCoordinates = coordinateMapper.map(order.getTargetAddress());
+        CoordinateDTO targetCoordinates = coordinateMapper.map(order.getDestinationAddress());
 
         double distanceToDeliveryAddress = LocationUtils.calculateDistance(
                 requestDTO.getLocation(),
@@ -396,19 +356,37 @@ public class OrderService {
 
         order.setDeliveryPhotoUrl(deliveryPhotoUrl);
         order.setDeliveredAt(LocalDateTime.now());
+
+        if (order.getIsReturn()) {
+            order.setStatus(OrderStatus.AWAITING_LIBRARY_CONFIRMATION);
+            orderRepository.save(order);
+
+            return new DeliverOrderResponseDTO(false);
+        } else {
+            order.setStatus(OrderStatus.DELIVERED);
+            for (OrderItem item : order.getOrderItems()) {
+                rentalService.createRental(item);
+            }
+            orderRepository.save(order);
+
+            transactionService.createDriverPayoutTransaction(driver, order);
+            return new DeliverOrderResponseDTO(true);
+        }
+    }
+
+    public void completeReturnOrder(Order order) {
+
         order.setStatus(OrderStatus.DELIVERED);
         orderRepository.save(order);
 
-        return transactionService.createDriverPayoutTransaction(driver, order);
+        User driver = order.getDriver();
+        transactionService.createDriverPayoutTransaction(driver, order);
     }
 
     public NavigationResponseDTO getNavigation(
             Integer orderId,
             DeliveryNavigationRequestDTO navigationRequestDTO,
             boolean isPickupNavigation) {
-
-        double startLatitude = navigationRequestDTO.getLatitude();
-        double startLongitude = navigationRequestDTO.getLongitude();
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
@@ -418,31 +396,50 @@ public class OrderService {
             throw new IllegalArgumentException("You are not assigned to this order.");
         }
 
-        Address targetAddress;
-        if (isPickupNavigation) {
-            targetAddress = order.getLibrary().getAddress();
-        } else {
-            targetAddress = order.getTargetAddress();
-        }
+        return navigationService.getNavigationForOrder(order, navigationRequestDTO, isPickupNavigation);
+    }
 
-        double endLatitude = targetAddress.getLatitude().doubleValue();
-        double endLongitude = targetAddress.getLongitude().doubleValue();
-
-        TransportProfile profile;
-        String transportProfile = navigationRequestDTO.getTransportProfile();
-        try {
-            profile = TransportProfile.valueOf(transportProfile.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new InvalidTransportProfileException("Invalid transport profile: " + transportProfile);
-        }
-
-        CoordinateDTO startCoordinates = new CoordinateDTO(startLatitude, startLongitude);
-        CoordinateDTO endCoordinates = new CoordinateDTO(endLatitude, endLongitude);
-
-        return navigationService.getDirectionsFromCoordinates(
-                startCoordinates,
-                endCoordinates,
-                profile
+    @Transactional
+    public Order createReturnOrder(List<RentalWithQuantityDTO> rentals, Address pickupAddress, Library library) {
+        User user = userService.getUser();
+        BigDecimal returnOrderAmount = deliveryCostCalculatorService.calculateReturnDeliveryCost(
+                rentals, pickupAddress, library
         );
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setLibrary(library);
+        order.setPickupAddress(pickupAddress);
+        order.setDestinationAddress(order.getLibrary().getAddress());
+        order.setIsReturn(true);
+        order.setStatus(OrderStatus.PENDING);
+        order.setAmount(returnOrderAmount);
+        order.setPaymentStatus(PaymentStatus.PENDING);
+
+        List<OrderItem> orderItems = rentals.stream()
+                .map(rentalWithQuantityDTO -> {
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setOrder(order);
+                    orderItem.setBook(rentalWithQuantityDTO.getRental().getBook());
+                    orderItem.setQuantity(rentalWithQuantityDTO.getQuantityToReturn());
+                    return orderItem;
+                })
+                .collect(Collectors.toList());
+
+        order.setOrderItems(orderItems);
+        return orderRepository.save(order);
+    }
+
+    public Order getSingleInRealizationOrder(String driverId) {
+        return orderRepository.findFirstByDriverIdAndStatusIn(
+                driverId,
+                List.of(OrderStatus.AWAITING_LIBRARY_CONFIRMATION)
+        ).orElseThrow(() -> new OrderNotFoundException("No active order found for this driver."));
+    }
+
+    @Transactional
+    public void updateOrderStatus(Order order, OrderStatus newStatus) {
+        order.setStatus(newStatus);
+        orderRepository.save(order);
     }
 }

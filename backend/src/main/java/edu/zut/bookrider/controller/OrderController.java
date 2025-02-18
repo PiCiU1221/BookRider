@@ -148,11 +148,11 @@ public class OrderController {
 
     @PreAuthorize("hasRole('driver')")
     @PostMapping("/{orderId}/deliver")
-    public ResponseEntity<?> deliverOrder(
+    public ResponseEntity<DeliverOrderResponseDTO> deliverOrder(
             @PathVariable Integer orderId,
             @Valid @RequestBody DeliverOrderRequestDTO request) {
 
-        CreateTransactionResponseDTO response = orderService.deliverOrder(orderId, request);
+        DeliverOrderResponseDTO response = orderService.deliverOrder(orderId, request);
 
         return ResponseEntity.ok(response);
     }

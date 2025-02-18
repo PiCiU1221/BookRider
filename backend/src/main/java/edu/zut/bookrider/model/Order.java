@@ -39,8 +39,15 @@ public class Order extends BaseEntity<Integer> {
     private Library library;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_address_id", nullable = false)
-    private Address targetAddress;
+    @JoinColumn(name = "pickup_address_id", nullable = false)
+    private Address pickupAddress;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "destination_address_id", nullable = false)
+    private Address destinationAddress;
+
+    @Column(nullable = false)
+    private Boolean isReturn;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
