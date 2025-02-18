@@ -29,10 +29,18 @@ public class RentalReturnController {
     }
 
     @PreAuthorize("hasRole('librarian')")
-    @PatchMapping("/{rentalReturnId}/complete")
-    public ResponseEntity<Void> markRentalReturnAsCompleted(@PathVariable Integer rentalReturnId) {
+    @PatchMapping("/{rentalReturnId}/complete-delivery")
+    public ResponseEntity<Void> markDeliveryRentalReturnAsCompleted(@PathVariable Integer rentalReturnId) {
 
-        rentalReturnService.markAsCompleted(rentalReturnId);
+        rentalReturnService.markDeliveryReturnAsCompleted(rentalReturnId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('librarian')")
+    @PatchMapping("/{rentalReturnId}/complete-in-person")
+    public ResponseEntity<Void> markInPersonRentalReturnAsCompleted(@PathVariable Integer rentalReturnId) {
+
+        rentalReturnService.markInPersonReturnAsCompleted(rentalReturnId);
         return ResponseEntity.noContent().build();
     }
 
@@ -91,4 +99,13 @@ public class RentalReturnController {
         rentalReturnService.confirmHandover(rentalReturnId, driverId);
         return ResponseEntity.noContent().build();
     }
+
+    @PreAuthorize("hasRole('librarian')")
+    @GetMapping("/{rentalReturnId}")
+    public ResponseEntity<RentalReturnDTO> getRentalReturnById(@PathVariable Integer rentalReturnId) {
+
+        RentalReturnDTO rentalReturnDTO = rentalReturnService.getRentalReturnWithId(rentalReturnId);
+        return ResponseEntity.ok(rentalReturnDTO);
+    }
+
 }

@@ -103,17 +103,37 @@ public class RentalReturnService {
         return new RentalReturnPriceResponseDTO(totalPrice, BigDecimal.ZERO, totalLateFees, lateFeeBreakdown);
     }
 
-    public void markAsCompleted(Integer rentalReturnId) {
+    public void markDeliveryReturnAsCompleted(Integer rentalReturnId) {
 
         RentalReturn rentalReturn = rentalReturnRepository.findById(rentalReturnId)
                 .orElseThrow(() -> new RentalReturnNotFoundException("Rental return not found with ID: " + rentalReturnId));
 
-        rentalService.updateRentalQuantities(rentalReturn.getRentalReturnItems());
+        if (rentalReturn.getStatus() != RentalReturnStatus.IN_PROGRESS) {
+            throw new IllegalStateException("This rental return doesn't have the correct status.");
+        }
 
+        rentalService.updateRentalQuantities(rentalReturn.getRentalReturnItems());
         rentalReturn.setStatus(RentalReturnStatus.COMPLETED);
 
         Order returnOrder = rentalReturn.getReturnOrder();
         orderService.completeReturnOrder(returnOrder);
+
+        rentalReturnRepository.save(rentalReturn);
+    }
+
+    public void markInPersonReturnAsCompleted(Integer rentalReturnId) {
+
+        RentalReturn rentalReturn = rentalReturnRepository.findById(rentalReturnId)
+                .orElseThrow(() -> new RentalReturnNotFoundException("Rental return not found with ID: " + rentalReturnId));
+
+        if (rentalReturn.getStatus() != RentalReturnStatus.IN_PERSON) {
+            throw new IllegalStateException("This rental return doesn't have the correct status.");
+        }
+
+        rentalService.updateRentalQuantities(rentalReturn.getRentalReturnItems());
+        rentalReturn.setStatus(RentalReturnStatus.COMPLETED);
+
+        rentalReturnRepository.save(rentalReturn);
     }
 
     @Transactional
@@ -265,5 +285,13 @@ public class RentalReturnService {
 
         Order returnOrder = rentalReturn.getReturnOrder();
         orderService.updateOrderStatus(returnOrder, OrderStatus.IN_TRANSIT);
+    }
+
+    public RentalReturnDTO getRentalReturnWithId(Integer rentalReturnId) {
+
+        RentalReturn rentalReturn = rentalReturnRepository.findById(rentalReturnId)
+                .orElseThrow(() -> new RentalReturnNotFoundException("No rental return found with ID: " + rentalReturnId ));
+
+        return rentalReturnMapper.map(rentalReturn);
     }
 }
