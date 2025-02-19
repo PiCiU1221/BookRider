@@ -1,5 +1,7 @@
 package edu.zut.bookrider.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,6 +12,11 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Configuration
+@OpenAPIDefinition(
+        servers = {
+                @Server(url = "/", description = "Default Server URL")
+        }
+)
 public class SwaggerConfig {
 
     @Bean
