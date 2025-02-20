@@ -248,7 +248,7 @@ public class OrderService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Order> inRealizationOrders = orderRepository.findByDriverIdAndStatusIn(
-                driver.getId(), List.of(OrderStatus.DRIVER_ACCEPTED, OrderStatus.IN_TRANSIT), pageable);
+                driver.getId(), List.of(OrderStatus.DRIVER_ACCEPTED, OrderStatus.IN_TRANSIT, OrderStatus.AWAITING_LIBRARY_CONFIRMATION), pageable);
 
         List<CreateOrderResponseDTO> inRealizationOrderDtos = inRealizationOrders.getContent().stream().map(order -> {
             CreateOrderResponseDTO dto = orderMapper.map(order);

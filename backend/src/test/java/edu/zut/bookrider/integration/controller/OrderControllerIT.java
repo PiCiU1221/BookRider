@@ -728,10 +728,22 @@ public class OrderControllerIT {
         order2.setPaymentStatus(PaymentStatus.COMPLETED);
         orderRepository.save(order2);
 
+        Order order3 = new Order();
+        order3.setDriver(driver);
+        order3.setUser(user);
+        order3.setLibrary(library);
+        order3.setPickupAddress(library.getAddress());
+        order3.setDestinationAddress(address);
+        order3.setIsReturn(true);
+        order3.setStatus(OrderStatus.AWAITING_LIBRARY_CONFIRMATION);
+        order3.setAmount(BigDecimal.valueOf(10));
+        order3.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order3);
+
         mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/driver/in-realization"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content", hasSize(3)))
                 .andExpect(jsonPath("$.currentPage", is(0)))
                 .andExpect(jsonPath("$.pageSize", is(10)))
                 .andExpect(jsonPath("$.totalPages", is(1)));
