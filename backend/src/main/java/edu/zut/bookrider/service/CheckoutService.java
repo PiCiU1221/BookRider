@@ -1,6 +1,6 @@
 package edu.zut.bookrider.service;
 
-import edu.zut.bookrider.dto.CreateOrderResponseDTO;
+import edu.zut.bookrider.dto.OrderResponseDTO;
 import edu.zut.bookrider.exception.EmptyCartException;
 import edu.zut.bookrider.mapper.order.OrderMapper;
 import edu.zut.bookrider.model.Order;
@@ -27,7 +27,7 @@ public class CheckoutService {
     private final ShoppingCartService shoppingCartService;
 
     @Transactional
-    public List<CreateOrderResponseDTO> checkout(Authentication authentication) {
+    public List<OrderResponseDTO> checkout(Authentication authentication) {
 
         User user = userService.getUser(authentication);
         ShoppingCart cart = user.getShoppingCart();

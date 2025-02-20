@@ -1,6 +1,6 @@
 package edu.zut.bookrider.controller;
 
-import edu.zut.bookrider.dto.CreateOrderResponseDTO;
+import edu.zut.bookrider.dto.OrderResponseDTO;
 import edu.zut.bookrider.service.CheckoutService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class CheckoutController {
     @PostMapping
     public ResponseEntity<?> checkout(Authentication authentication) {
 
-        List<CreateOrderResponseDTO> orders = checkoutService.checkout(authentication);
+        List<OrderResponseDTO> orders = checkoutService.checkout(authentication);
         return ResponseEntity.ok(orders);
     }
 }
