@@ -5,12 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateOrderResponseDTO {
+public class OrderResponseDTO {
     private Integer orderId;
     private String userId;
     private String libraryName;
@@ -21,5 +22,9 @@ public class CreateOrderResponseDTO {
     private BigDecimal amount;
     private String paymentStatus;
     private String noteToDriver;
-    private List<CreateOrderItemResponseDTO> orderItems;
+    private LocalDateTime createdAt;
+    private LocalDateTime acceptedAt;
+    private LocalDateTime pickedUpAt;
+    private LocalDateTime deliveredAt;
+    private List<OrderItemResponseDTO> orderItems;
 }

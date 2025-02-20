@@ -1,7 +1,7 @@
 package edu.zut.bookrider.mapper.order;
 
-import edu.zut.bookrider.dto.CreateOrderItemResponseDTO;
-import edu.zut.bookrider.dto.CreateOrderResponseDTO;
+import edu.zut.bookrider.dto.OrderItemResponseDTO;
+import edu.zut.bookrider.dto.OrderResponseDTO;
 import edu.zut.bookrider.mapper.Mapper;
 import edu.zut.bookrider.model.Order;
 import lombok.RequiredArgsConstructor;
@@ -11,18 +11,18 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class OrderMapper implements Mapper<Order, CreateOrderResponseDTO> {
+public class OrderMapper implements Mapper<Order, OrderResponseDTO> {
 
     private final OrderItemMapper orderItemMapper;
 
     @Override
-    public CreateOrderResponseDTO map(Order order) {
+    public OrderResponseDTO map(Order order) {
 
-        List<CreateOrderItemResponseDTO> orderItemDtos = order.getOrderItems().stream()
+        List<OrderItemResponseDTO> orderItemDtos = order.getOrderItems().stream()
                 .map(orderItemMapper::map)
                 .toList();
 
-        return new CreateOrderResponseDTO(
+        return new OrderResponseDTO(
                 order.getId(),
                 order.getUser().getId(),
                 order.getLibrary().getName(),
@@ -33,6 +33,10 @@ public class OrderMapper implements Mapper<Order, CreateOrderResponseDTO> {
                 order.getAmount(),
                 order.getPaymentStatus().toString(),
                 order.getNoteToDriver(),
+                order.getCreatedAt(),
+                order.getAcceptedAt(),
+                order.getPickedUpAt(),
+                order.getDeliveredAt(),
                 orderItemDtos
         );
     }
