@@ -284,7 +284,7 @@ public class RentalReturnService {
         }
 
         Order returnOrder = rentalReturn.getReturnOrder();
-        orderService.updateOrderStatus(returnOrder, OrderStatus.IN_TRANSIT);
+        orderService.confirmReturnHandover(returnOrder);
     }
 
     public RentalReturnDTO getRentalReturnWithId(Integer rentalReturnId) {
