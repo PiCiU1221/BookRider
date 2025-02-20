@@ -728,10 +728,22 @@ public class OrderControllerIT {
         order2.setPaymentStatus(PaymentStatus.COMPLETED);
         orderRepository.save(order2);
 
+        Order order3 = new Order();
+        order3.setDriver(driver);
+        order3.setUser(user);
+        order3.setLibrary(library);
+        order3.setPickupAddress(library.getAddress());
+        order3.setDestinationAddress(address);
+        order3.setIsReturn(true);
+        order3.setStatus(OrderStatus.AWAITING_LIBRARY_CONFIRMATION);
+        order3.setAmount(BigDecimal.valueOf(10));
+        order3.setPaymentStatus(PaymentStatus.COMPLETED);
+        orderRepository.save(order3);
+
         mockMvc.perform(MockMvcRequestBuilders.get("/api/orders/driver/in-realization"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content", hasSize(3)))
                 .andExpect(jsonPath("$.currentPage", is(0)))
                 .andExpect(jsonPath("$.pageSize", is(10)))
                 .andExpect(jsonPath("$.totalPages", is(1)));
@@ -1170,18 +1182,6 @@ public class OrderControllerIT {
         order.setOrderItems(orderItems);
 
         return orderRepository.save(order);
-    }
-
-    private Rental createRental(Order order, int quantity) {
-        Rental rental = new Rental();
-        rental.setUser(order.getUser());
-        rental.setBook(order.getOrderItems().get(0).getBook());
-        rental.setLibrary(order.getLibrary());
-        rental.setOrder(order);
-        rental.setQuantity(quantity);
-        rental.setReturnDeadline(LocalDateTime.now().plusDays(30));
-        rental.setStatus(RentalStatus.RENTED);
-        return rentalRepository.save(rental);
     }
 
     @Test
