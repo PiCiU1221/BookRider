@@ -23,7 +23,7 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        PageResponseDTO<CreateOrderResponseDTO> response = orderService.getUserPendingOrders(page, size);
+        PageResponseDTO<OrderResponseDTO> response = orderService.getUserPendingOrders(page, size);
         return ResponseEntity.ok(response);
     }
 
@@ -33,7 +33,7 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        PageResponseDTO<CreateOrderResponseDTO> response = orderService.getUserInRealizationOrders(page, size);
+        PageResponseDTO<OrderResponseDTO> response = orderService.getUserInRealizationOrders(page, size);
         return ResponseEntity.ok(response);
     }
 
@@ -43,34 +43,34 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        PageResponseDTO<CreateOrderResponseDTO> response = orderService.getUserCompletedOrders(page, size);
+        PageResponseDTO<OrderResponseDTO> response = orderService.getUserCompletedOrders(page, size);
         return ResponseEntity.ok(response);
     }
 
     @PreAuthorize("hasRole('librarian')")
     @GetMapping("/librarian/pending")
-    public ResponseEntity<PageResponseDTO<CreateOrderResponseDTO>> getLibrarianPendingOrders(
+    public ResponseEntity<PageResponseDTO<OrderResponseDTO>> getLibrarianPendingOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        PageResponseDTO<CreateOrderResponseDTO> response = orderService.getLibraryPendingOrders(page, size);
+        PageResponseDTO<OrderResponseDTO> response = orderService.getLibraryPendingOrders(page, size);
         return ResponseEntity.ok(response);
     }
 
     @PreAuthorize("hasRole('librarian')")
     @GetMapping("/librarian/in-realization")
-    public ResponseEntity<PageResponseDTO<CreateOrderResponseDTO>> getLibrarianInRealizationOrders(
+    public ResponseEntity<PageResponseDTO<OrderResponseDTO>> getLibrarianInRealizationOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        PageResponseDTO<CreateOrderResponseDTO> response = orderService.getLibraryInRealizationOrders(page, size);
+        PageResponseDTO<OrderResponseDTO> response = orderService.getLibraryInRealizationOrders(page, size);
         return ResponseEntity.ok(response);
     }
 
     @PreAuthorize("hasRole('librarian')")
     @GetMapping("/librarian/completed")
-    public ResponseEntity<PageResponseDTO<CreateOrderResponseDTO>> getLibrarianCompletedOrders(
+    public ResponseEntity<PageResponseDTO<OrderResponseDTO>> getLibrarianCompletedOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        PageResponseDTO<CreateOrderResponseDTO> response = orderService.getLibraryCompletedOrders(page, size);
+        PageResponseDTO<OrderResponseDTO> response = orderService.getLibraryCompletedOrders(page, size);
         return ResponseEntity.ok(response);
     }
 
@@ -115,7 +115,7 @@ public class OrderController {
 
         CoordinateDTO location = new CoordinateDTO(locationLatitude, locationLongitude);
 
-        PageResponseDTO<CreateOrderResponseDTO> response = orderService.getDriverPendingOrdersWithDistance(
+        PageResponseDTO<OrderResponseDTO> response = orderService.getDriverPendingOrdersWithDistance(
                 location, maxDistanceInMeters, page, size);
         return ResponseEntity.ok(response);
     }
@@ -125,7 +125,7 @@ public class OrderController {
     public ResponseEntity<?> getDriverInRealizationOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        PageResponseDTO<CreateOrderResponseDTO> response = orderService.getDriverInRealizationOrders(page, size);
+        PageResponseDTO<OrderResponseDTO> response = orderService.getDriverInRealizationOrders(page, size);
         return ResponseEntity.ok(response);
     }
 
@@ -134,7 +134,7 @@ public class OrderController {
     public ResponseEntity<?> getDriverCompletedOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        PageResponseDTO<CreateOrderResponseDTO> response = orderService.getDriverCompletedOrders(page, size);
+        PageResponseDTO<OrderResponseDTO> response = orderService.getDriverCompletedOrders(page, size);
         return ResponseEntity.ok(response);
     }
 

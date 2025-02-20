@@ -85,21 +85,21 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public PageResponseDTO<CreateOrderResponseDTO> getUserPendingOrders(int page, int size) {
+    public PageResponseDTO<OrderResponseDTO> getUserPendingOrders(int page, int size) {
         return getUserOrdersByStatus(List.of(OrderStatus.PENDING), page, size);
     }
 
-    public PageResponseDTO<CreateOrderResponseDTO> getUserInRealizationOrders(int page, int size) {
+    public PageResponseDTO<OrderResponseDTO> getUserInRealizationOrders(int page, int size) {
         return getUserOrdersByStatus(
                 List.of(OrderStatus.ACCEPTED, OrderStatus.DRIVER_ACCEPTED, OrderStatus.IN_TRANSIT),
                 page, size);
     }
 
-    public PageResponseDTO<CreateOrderResponseDTO> getUserCompletedOrders(int page, int size) {
+    public PageResponseDTO<OrderResponseDTO> getUserCompletedOrders(int page, int size) {
         return getUserOrdersByStatus(List.of(OrderStatus.DELIVERED, OrderStatus.DECLINED), page, size);
     }
 
-    private PageResponseDTO<CreateOrderResponseDTO> getUserOrdersByStatus(
+    private PageResponseDTO<OrderResponseDTO> getUserOrdersByStatus(
             List<OrderStatus> statuses, int page, int size) {
 
         User user = userService.getUser();
@@ -107,7 +107,7 @@ public class OrderService {
 
         Page<Order> orders = orderRepository.findByUserIdAndStatusIn(user.getId(), statuses, pageable);
 
-        List<CreateOrderResponseDTO> orderDtos = orders.getContent().stream()
+        List<OrderResponseDTO> orderDtos = orders.getContent().stream()
                 .map(orderMapper::map)
                 .toList();
 
@@ -120,21 +120,21 @@ public class OrderService {
         );
     }
 
-    public PageResponseDTO<CreateOrderResponseDTO> getLibraryPendingOrders(int page, int size) {
+    public PageResponseDTO<OrderResponseDTO> getLibraryPendingOrders(int page, int size) {
         return getLibraryOrdersByStatus(List.of(OrderStatus.PENDING), page, size);
     }
 
-    public PageResponseDTO<CreateOrderResponseDTO> getLibraryInRealizationOrders(int page, int size) {
+    public PageResponseDTO<OrderResponseDTO> getLibraryInRealizationOrders(int page, int size) {
         return getLibraryOrdersByStatus(List.of(OrderStatus.ACCEPTED), page, size);
     }
 
-    public PageResponseDTO<CreateOrderResponseDTO> getLibraryCompletedOrders(int page, int size) {
+    public PageResponseDTO<OrderResponseDTO> getLibraryCompletedOrders(int page, int size) {
         return getLibraryOrdersByStatus(
                 List.of(OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED, OrderStatus.DRIVER_ACCEPTED, OrderStatus.DECLINED),
                 page, size);
     }
 
-    private PageResponseDTO<CreateOrderResponseDTO> getLibraryOrdersByStatus(
+    private PageResponseDTO<OrderResponseDTO> getLibraryOrdersByStatus(
             List<OrderStatus> statuses, int page, int size) {
 
         User librarian = userService.getUser();
@@ -143,7 +143,7 @@ public class OrderService {
         Page<Order> orders = orderRepository.findByLibraryIdAndStatusIn(
                 librarian.getLibrary().getId(), statuses, pageable);
 
-        List<CreateOrderResponseDTO> orderDtos = orders.getContent().stream()
+        List<OrderResponseDTO> orderDtos = orders.getContent().stream()
                 .map(orderMapper::map)
                 .toList();
 
@@ -216,7 +216,7 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public PageResponseDTO<CreateOrderResponseDTO> getDriverPendingOrdersWithDistance(
+    public PageResponseDTO<OrderResponseDTO> getDriverPendingOrdersWithDistance(
             @Valid CoordinateDTO location, double maxDistanceInMeters, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
@@ -225,8 +225,8 @@ public class OrderService {
                 BigDecimal.valueOf(location.getLongitude()),
                 maxDistanceInMeters, pageable);
 
-        List<CreateOrderResponseDTO> pendingOrderDtos = pendingOrders.getContent().stream().map(order -> {
-            CreateOrderResponseDTO dto = orderMapper.map(order);
+        List<OrderResponseDTO> pendingOrderDtos = pendingOrders.getContent().stream().map(order -> {
+            OrderResponseDTO dto = orderMapper.map(order);
             BigDecimal userPayment = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.BOOK_ORDER_PAYMENT);
             BigDecimal netAmount = userPayment.subtract(userPayment.multiply(SERVICE_FEE_PERCENTAGE));
             dto.setAmount(netAmount);
@@ -243,15 +243,15 @@ public class OrderService {
         );
     }
 
-    public PageResponseDTO<CreateOrderResponseDTO> getDriverInRealizationOrders(int page, int size) {
+    public PageResponseDTO<OrderResponseDTO> getDriverInRealizationOrders(int page, int size) {
         User driver = userService.getUser();
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Order> inRealizationOrders = orderRepository.findByDriverIdAndStatusIn(
                 driver.getId(), List.of(OrderStatus.DRIVER_ACCEPTED, OrderStatus.IN_TRANSIT, OrderStatus.AWAITING_LIBRARY_CONFIRMATION), pageable);
 
-        List<CreateOrderResponseDTO> inRealizationOrderDtos = inRealizationOrders.getContent().stream().map(order -> {
-            CreateOrderResponseDTO dto = orderMapper.map(order);
+        List<OrderResponseDTO> inRealizationOrderDtos = inRealizationOrders.getContent().stream().map(order -> {
+            OrderResponseDTO dto = orderMapper.map(order);
             BigDecimal userPayment = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.BOOK_ORDER_PAYMENT);
             BigDecimal netAmount = userPayment.subtract(userPayment.multiply(SERVICE_FEE_PERCENTAGE));
             dto.setAmount(netAmount);
@@ -269,15 +269,15 @@ public class OrderService {
         );
     }
 
-    public PageResponseDTO<CreateOrderResponseDTO> getDriverCompletedOrders(int page, int size) {
+    public PageResponseDTO<OrderResponseDTO> getDriverCompletedOrders(int page, int size) {
         User driver = userService.getUser();
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Order> completedOrders = orderRepository.findByDriverIdAndStatusIn(
                 driver.getId(), List.of(OrderStatus.DELIVERED), pageable);
 
-        List<CreateOrderResponseDTO> completedOrderDtos = completedOrders.getContent().stream().map(order -> {
-            CreateOrderResponseDTO dto = orderMapper.map(order);
+        List<OrderResponseDTO> completedOrderDtos = completedOrders.getContent().stream().map(order -> {
+            OrderResponseDTO dto = orderMapper.map(order);
             BigDecimal driverPayout = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.DRIVER_EARNINGS);
             dto.setAmount(driverPayout);
 
