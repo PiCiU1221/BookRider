@@ -24,6 +24,7 @@ public class OrderResponseDTO {
     private String noteToDriver;
     private LocalDateTime createdAt;
     private LocalDateTime acceptedAt;
+    private LocalDateTime driverAssignedAt;
     private LocalDateTime pickedUpAt;
     private LocalDateTime deliveredAt;
     private List<OrderItemResponseDTO> orderItems;

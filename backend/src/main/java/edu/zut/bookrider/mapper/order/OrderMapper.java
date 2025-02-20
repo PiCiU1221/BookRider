@@ -35,6 +35,7 @@ public class OrderMapper implements Mapper<Order, OrderResponseDTO> {
                 order.getNoteToDriver(),
                 order.getCreatedAt(),
                 order.getAcceptedAt(),
+                order.getDriverAssignedAt(),
                 order.getPickedUpAt(),
                 order.getDeliveredAt(),
                 orderItemDtos
