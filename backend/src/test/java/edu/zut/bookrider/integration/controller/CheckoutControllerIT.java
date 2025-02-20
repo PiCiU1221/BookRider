@@ -2,7 +2,8 @@ package edu.zut.bookrider.integration.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.zut.bookrider.dto.CreateOrderResponseDTO;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import edu.zut.bookrider.dto.OrderResponseDTO;
 import edu.zut.bookrider.model.*;
 import edu.zut.bookrider.repository.*;
 import edu.zut.bookrider.service.UserIdGeneratorService;
@@ -190,7 +191,8 @@ public class CheckoutControllerIT {
 
         String responseContent = result.getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();
-        List<CreateOrderResponseDTO> orders = objectMapper.readValue(
+        objectMapper.registerModule(new JavaTimeModule());
+        List<OrderResponseDTO> orders = objectMapper.readValue(
                 responseContent,
                 new TypeReference<>() {
                 }
@@ -198,7 +200,7 @@ public class CheckoutControllerIT {
 
         assertEquals(1, orders.size(), "The returned orders list should contain only one item");
 
-        CreateOrderResponseDTO order = orders.get(0);
+        OrderResponseDTO order = orders.get(0);
         assertNotNull(order.getOrderItems(), "Order items list should not be null");
         assertEquals(1, order.getOrderItems().size(), "The orderItems list should contain only one object");
 
@@ -299,7 +301,8 @@ public class CheckoutControllerIT {
 
         String responseContent = result.getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();
-        List<CreateOrderResponseDTO> orders = objectMapper.readValue(
+        objectMapper.registerModule(new JavaTimeModule());
+        List<OrderResponseDTO> orders = objectMapper.readValue(
                 responseContent,
                 new TypeReference<>() {
                 }
@@ -307,11 +310,11 @@ public class CheckoutControllerIT {
 
         assertEquals(2, orders.size(), "The returned orders list should contain two items");
 
-        CreateOrderResponseDTO order1 = orders.get(0);
+        OrderResponseDTO order1 = orders.get(0);
         assertNotNull(order1.getOrderItems(), "Order items list should not be null");
         assertEquals(1, order1.getOrderItems().size(), "The orderItems list should contain only one object");
 
-        CreateOrderResponseDTO order2 = orders.get(1);
+        OrderResponseDTO order2 = orders.get(1);
         assertNotNull(order2.getOrderItems(), "Order items list should not be null");
         assertEquals(2, order2.getOrderItems().size(), "The orderItems list should contain two objects");
 
