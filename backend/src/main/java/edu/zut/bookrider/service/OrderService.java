@@ -4,6 +4,7 @@ import edu.zut.bookrider.dto.*;
 import edu.zut.bookrider.exception.OrderNotFoundException;
 import edu.zut.bookrider.mapper.coordinate.CoordinateMapper;
 import edu.zut.bookrider.mapper.order.OrderMapper;
+import edu.zut.bookrider.mapper.order.OrderWithPhotoMapper;
 import edu.zut.bookrider.model.*;
 import edu.zut.bookrider.model.enums.OrderStatus;
 import edu.zut.bookrider.model.enums.PaymentStatus;
@@ -46,6 +47,7 @@ public class OrderService {
     private final RentalService rentalService;
 
     private final OrderRepository orderRepository;
+    private final OrderWithPhotoMapper orderWithPhotoMapper;
 
     @Transactional
     public Order createOrderFromCartItem(ShoppingCartItem item) {
@@ -269,15 +271,15 @@ public class OrderService {
         );
     }
 
-    public PageResponseDTO<OrderResponseDTO> getDriverCompletedOrders(int page, int size) {
+    public PageResponseDTO<OrderWithPhotoResponseDTO> getDriverCompletedOrders(int page, int size) {
         User driver = userService.getUser();
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("deliveredAt").descending());
         Page<Order> completedOrders = orderRepository.findByDriverIdAndStatusIn(
                 driver.getId(), List.of(OrderStatus.DELIVERED), pageable);
 
-        List<OrderResponseDTO> completedOrderDtos = completedOrders.getContent().stream().map(order -> {
-            OrderResponseDTO dto = orderMapper.map(order);
+        List<OrderWithPhotoResponseDTO> completedOrderDtos = completedOrders.getContent().stream().map(order -> {
+            OrderWithPhotoResponseDTO dto = orderWithPhotoMapper.map(order);
             BigDecimal driverPayout = transactionService.getTransactionAmountByOrderIdAndType(order.getId(), TransactionType.DRIVER_EARNINGS);
             dto.setAmount(driverPayout);
 

@@ -134,7 +134,7 @@ public class OrderController {
     public ResponseEntity<?> getDriverCompletedOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        PageResponseDTO<OrderResponseDTO> response = orderService.getDriverCompletedOrders(page, size);
+        PageResponseDTO<OrderWithPhotoResponseDTO> response = orderService.getDriverCompletedOrders(page, size);
         return ResponseEntity.ok(response);
     }
 

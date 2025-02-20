@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderResponseDTO {
+public class OrderWithPhotoResponseDTO {
     private Integer orderId;
     private String userId;
     private String libraryName;
@@ -22,6 +22,7 @@ public class OrderResponseDTO {
     private BigDecimal amount;
     private String paymentStatus;
     private String noteToDriver;
+    private String deliveryPhotoUrl;
     private LocalDateTime createdAt;
     private LocalDateTime acceptedAt;
     private LocalDateTime driverAssignedAt;
