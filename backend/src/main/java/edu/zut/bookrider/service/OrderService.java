@@ -377,6 +377,7 @@ public class OrderService {
     public void completeReturnOrder(Order order) {
 
         order.setStatus(OrderStatus.DELIVERED);
+        order.setAcceptedAt(LocalDateTime.now());
         orderRepository.save(order);
 
         User driver = order.getDriver();
@@ -438,8 +439,9 @@ public class OrderService {
     }
 
     @Transactional
-    public void updateOrderStatus(Order order, OrderStatus newStatus) {
-        order.setStatus(newStatus);
+    public void confirmReturnHandover(Order order) {
+        order.setStatus(OrderStatus.IN_TRANSIT);
+        order.setPickedUpAt(LocalDateTime.now());
         orderRepository.save(order);
     }
 }
