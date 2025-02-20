@@ -1184,18 +1184,6 @@ public class OrderControllerIT {
         return orderRepository.save(order);
     }
 
-    private Rental createRental(Order order, int quantity) {
-        Rental rental = new Rental();
-        rental.setUser(order.getUser());
-        rental.setBook(order.getOrderItems().get(0).getBook());
-        rental.setLibrary(order.getLibrary());
-        rental.setOrder(order);
-        rental.setQuantity(quantity);
-        rental.setReturnDeadline(LocalDateTime.now().plusDays(30));
-        rental.setStatus(RentalStatus.RENTED);
-        return rentalRepository.save(rental);
-    }
-
     @Test
     @WithMockUser(username = "testdriver@ocit.com:driver", roles = {"driver"})
     void whenDriverDeliversReturnOrder_thenReturnOkAndCreateRentalReturn() throws Exception {
