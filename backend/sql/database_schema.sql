@@ -4,6 +4,8 @@ BEGIN;
 
 CREATE EXTENSION postgis;
 
+SET TIME ZONE 'Europe/Warsaw';
+
 -- Book related tables
 
 CREATE TABLE authors
