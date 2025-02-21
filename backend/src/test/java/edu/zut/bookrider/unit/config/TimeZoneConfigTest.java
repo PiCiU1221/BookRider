@@ -12,11 +12,9 @@ public class TimeZoneConfigTest {
 
     @Test
     void testLocalDateTimeUsesWarsawTime() {
+        int warsawHour = ZonedDateTime.now(ZoneId.of("Europe/Warsaw")).getHour();
+        int systemHour = LocalDateTime.now().getHour();
 
-        LocalDateTime now = LocalDateTime.now();
-        ZonedDateTime warsawNow = ZonedDateTime.now(ZoneId.of("Europe/Warsaw"));
-        ZonedDateTime convertedNow = now.atZone(ZoneId.systemDefault());
-
-        assertEquals(warsawNow.getOffset(), convertedNow.getOffset(), "Timezone is incorrect!");
+        assertEquals(warsawHour, systemHour, "The system timezone is not Europe/Warsaw");
     }
 }
