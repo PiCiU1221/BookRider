@@ -4,6 +4,10 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:17-jdk-jammy
+
+ENV TZ=Europe/Warsaw
+RUN apt-get update && apt-get install -y tzdata
+
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
