@@ -32,9 +32,8 @@ jobs:
   
       - name: Build and Test
         run: |
-          sudo timedatectl set-timezone Europe/Warsaw
           cd backend
-          mvn clean verify
+          mvn clean verify -Duser.timezone=Europe/Warsaw
 
   deploy:
     needs: build-and-test
