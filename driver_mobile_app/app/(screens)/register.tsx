@@ -17,11 +17,27 @@ export default function Register() {
     const [firstName, setFirstName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [onCloseAction, setOnCloseAction] = useState<() => void>(() => () => setModalVisible(false));
 
     const handleRegister = async () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            setModalVisible(true);
+            setApiResponse({ status: "error", message: "Email is not a valid email address." });
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setApiResponse({ status: "error", message: "Passwords do not match." });
+            setModalVisible(true);
+            return;
+        }
+
         setLoading(true);
         setModalVisible(true);
 
@@ -44,6 +60,7 @@ export default function Register() {
             const responseData = await response.json();
 
             if (response.ok) {
+                setOnCloseAction(() => () => router.replace("/login"));
                 setApiResponse({
                     status: "success",
                     data: responseData,
@@ -98,6 +115,7 @@ export default function Register() {
                             placeholderTextColor={"#C8C8C8"}
                             value={email}
                             onChangeText={setEmail}
+                            autoCapitalize="none"
                         />
                     </Animated.View>
 
@@ -125,16 +143,32 @@ export default function Register() {
                     </Animated.View>
 
                     <Animated.View entering={FadeInDown.delay(400).duration(1000).springify()}
-                                   className="bg-black/10 px-2 rounded-xl w-full mb-11 h-14 justify-center"
+                                   className="flex-row justify-center mb-11"
                     >
-                        <TextInput
-                            className="text-base text-white"
-                            placeholder="Password"
-                            placeholderTextColor={"#C8C8C8"}
-                            secureTextEntry={true}
-                            value={password}
-                            onChangeText={setPassword}
-                        />
+
+                        <View className="bg-black/10 px-2 rounded-xl w-full h-14 justify-center flex-1 mr-2">
+                            <TextInput
+                                className="text-base text-white"
+                                placeholder="Password"
+                                placeholderTextColor={"#C8C8C8"}
+                                secureTextEntry={true}
+                                value={password}
+                                onChangeText={setPassword}
+                                autoCapitalize="none"
+                            />
+                        </View>
+
+                        <View className="bg-black/10 px-2 rounded-xl w-full h-14 justify-center flex-1 ml-2">
+                            <TextInput
+                                className="text-base text-white"
+                                placeholder="Confirm Password"
+                                placeholderTextColor={"#C8C8C8"}
+                                secureTextEntry={true}
+                                value={confirmPassword}
+                                onChangeText={setConfirmPassword}
+                                autoCapitalize="none"
+                            />
+                        </View>
                     </Animated.View>
 
                     <Animated.View entering={FadeInDown.delay(600).duration(1000).springify()} className="w-full">
@@ -158,7 +192,7 @@ export default function Register() {
                         isVisible={modalVisible}
                         title={apiResponse?.status === "success" ? "Registration Successful!" : "Error"}
                         message={apiResponse?.message}
-                        onClose={() => router.replace("/login")}
+                        onClose={onCloseAction}
                         loading={loading}
                     />
                 </View>
