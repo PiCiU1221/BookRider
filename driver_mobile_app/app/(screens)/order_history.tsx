@@ -1,20 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View, Image } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomModal from "@/app/components/custom_modal";
 import CONFIG from "@/config";
 import {Feather} from "@expo/vector-icons";
 
-interface OrderDetailsDTO {
+interface OrderDriverDetailsDTO {
     orderId: number;
     userId: string;
     libraryName: string;
-    deliveryAddress: string;
+    pickupAddress: string;
+    destinationAddress: string;
+    isReturn: boolean;
     status: string;
     amount: string;
     paymentStatus: string;
     noteToDriver: string;
+    deliveryPhotoUrl: string;
+    createdAt: Date;
+    acceptedAt: Date;
+    driverAssignedAt: Date;
+    pickedUpAt: Date;
+    deliveredAt: Date;
     orderItems: Array<{ book: BookResponseDto; quantity: number }>;
 }
 
@@ -31,11 +39,12 @@ interface BookResponseDto {
 }
 
 export default function OrderHistory() {
-    const [orders, setOrders] = useState<OrderDetailsDTO[]>([]);
+    const [orders, setOrders] = useState<OrderDriverDetailsDTO[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const [selectedOrder, setSelectedOrder] = useState<OrderDetailsDTO | null>(null);
+    const [selectedOrder, setSelectedOrder] = useState<OrderDriverDetailsDTO | null>(null);
     const [apiResponse, setApiResponse] = useState<any>(null);
+    const [showImage, setShowImage] = useState(false);
 
     const fetchOrders = async (): Promise<void> => {
         setLoading(true);
@@ -77,7 +86,7 @@ export default function OrderHistory() {
         fetchOrders();
     }, []);
 
-    const handleOrderPress = (order: OrderDetailsDTO): void => {
+    const handleOrderPress = (order: OrderDriverDetailsDTO): void => {
         setSelectedOrder(order);
         setModalVisible(true);
     };
@@ -95,26 +104,39 @@ export default function OrderHistory() {
                         <View className="bg-black/10 p-4 mb-4 rounded-lg border border-gray-300 flex-row justify-between items-center">
                             <View className="flex-1">
                                 <Text className="text-lg font-semibold text-white">Order ID: {item.orderId}</Text>
-                                <Text className="text-white">Delivery Address: {item.deliveryAddress}</Text>
+                                <Text className="text-white">Pickup: {item.pickupAddress}</Text>
+                                <Text className="text-white">Destination: {item.destinationAddress}</Text>
                                 <Text className="text-white">Library: {item.libraryName}</Text>
+                                <Text className="text-white">
+                                    Delivered At: {new Date(item.deliveredAt).toLocaleString()}
+                                </Text>
                             </View>
                             <Text className="text-3xl font-bold text-green-500">{item.amount} zł</Text>
                         </View>
                     </TouchableOpacity>
                 )}
+                ListEmptyComponent={
+                    <View className="items-center justify-center">
+                        <Text className="text-white">You currently have no order history. Please assign new orders in the Deliveries tab to get started.</Text>
+                    </View>
+                }
             />
 
             <CustomModal
                 isVisible={modalVisible}
-                title={selectedOrder ? "Order Details" : "Loading..."}
+                title={showImage ? "Delivery Image" : selectedOrder ? "Order Details" : "Loading..."}
                 onClose={() => {
-                    setModalVisible(false);
-                    setSelectedOrder(null);
+                    if (showImage) {
+                        setShowImage(false);
+                    } else {
+                        setModalVisible(false);
+                        setSelectedOrder(null);
+                    }
                 }}
                 loading={loading}
             >
-                {selectedOrder && (
-                    <View className="space-y-4 mb-2">
+                {selectedOrder && !showImage ? (
+                    <View className="space-y-4">
                         <View className="flex-row items-center">
                             <Feather name="hash" size={20} color="#f7ca65" />
                             <Text className="text-white text-2xl font-semibold ml-2">Order ID: {selectedOrder.orderId}</Text>
@@ -141,11 +163,88 @@ export default function OrderHistory() {
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="map-pin" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Delivery Address: {selectedOrder.deliveryAddress}</Text>
+                            <Text className="text-white text-lg ml-2">Pickup Address: {selectedOrder.pickupAddress}</Text>
+                        </View>
+                        <View className="flex-row items-center">
+                            <Feather name="map-pin" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Destination Address: {selectedOrder.destinationAddress}</Text>
                         </View>
 
+                        {selectedOrder.isReturn ? (
+                            <>
+                                <View className="flex-row items-center mt-2">
+                                    <Feather name="refresh-cw" size={20} color="#ff5555" />
+                                    <Text className="text-red-400 text-lg font-bold ml-2">Return Order</Text>
+                                </View>
+
+                                <View className="flex-row items-center mt-2">
+                                    <Feather name="calendar" size={20} color="#f7ca65" />
+                                    <Text className="text-white text-lg ml-2">
+                                        Created At: {new Date(selectedOrder.createdAt).toLocaleString()}
+                                    </Text>
+                                </View>
+                                <View className="flex-row items-center">
+                                    <Feather name="user-check" size={20} color="#f7ca65" />
+                                    <Text className="text-white text-lg ml-2">
+                                        Driver Assigned At: {new Date(selectedOrder.driverAssignedAt).toLocaleString()}
+                                    </Text>
+                                </View>
+                                <View className="flex-row items-center">
+                                    <Feather name="package" size={20} color="#f7ca65" />
+                                    <Text className="text-white text-lg ml-2">
+                                        Picked Up At: {new Date(selectedOrder.pickedUpAt).toLocaleString()}
+                                    </Text>
+                                </View>
+                                <View className="flex-row items-center">
+                                    <Feather name="check-circle" size={20} color="#f7ca65" />
+                                    <Text className="text-white text-lg ml-2">
+                                        Delivered At: {new Date(selectedOrder.deliveredAt).toLocaleString()}
+                                    </Text>
+                                </View>
+                                <View className="flex-row items-center">
+                                    <Feather name="clock" size={20} color="#f7ca65" />
+                                    <Text className="text-white text-lg ml-2">
+                                        Accepted At: {new Date(selectedOrder.acceptedAt).toLocaleString()}
+                                    </Text>
+                                </View>
+                            </>
+                        ) : (
+                            <>
+                                <View className="flex-row items-center mt-4">
+                                    <Feather name="calendar" size={20} color="#f7ca65" />
+                                    <Text className="text-white text-lg ml-2">
+                                        Created At: {new Date(selectedOrder.createdAt).toLocaleString()}
+                                    </Text>
+                                </View>
+                                <View className="flex-row items-center">
+                                    <Feather name="clock" size={20} color="#f7ca65" />
+                                    <Text className="text-white text-lg ml-2">
+                                        Accepted At: {new Date(selectedOrder.acceptedAt).toLocaleString()}
+                                    </Text>
+                                </View>
+                                <View className="flex-row items-center">
+                                    <Feather name="user-check" size={20} color="#f7ca65" />
+                                    <Text className="text-white text-lg ml-2">
+                                        Driver Assigned At: {new Date(selectedOrder.driverAssignedAt).toLocaleString()}
+                                    </Text>
+                                </View>
+                                <View className="flex-row items-center">
+                                    <Feather name="package" size={20} color="#f7ca65" />
+                                    <Text className="text-white text-lg ml-2">
+                                        Picked Up At: {new Date(selectedOrder.pickedUpAt).toLocaleString()}
+                                    </Text>
+                                </View>
+                                <View className="flex-row items-center">
+                                    <Feather name="check-circle" size={20} color="#f7ca65" />
+                                    <Text className="text-white text-lg ml-2">
+                                        Delivered At: {new Date(selectedOrder.deliveredAt).toLocaleString()}
+                                    </Text>
+                                </View>
+                            </>
+                        )}
+
                         <Text className="text-white text-xl font-semibold mt-4 mb-2">Order Items:</Text>
-                        <View className="bg-black/10 p-4 rounded-lg space-y-2 mb-2 border border-gray-300">
+                        <View className="bg-black/10 p-4 rounded-lg space-y-2 border border-gray-300">
                             <View className="flex-row justify-between border-gray-300 pb-2">
                                 <Text className="text-white font-semibold">Book Title</Text>
                                 <Text className="text-white font-semibold">Authors</Text>
@@ -160,9 +259,24 @@ export default function OrderHistory() {
                                 </View>
                             ))}
                         </View>
+
+                        <TouchableOpacity
+                            onPress={() => setShowImage(true)}
+                            className="bg-blue-600 rounded-lg p-3 flex-row items-center justify-center mt-4"
+                        >
+                            <Feather name="image" size={20} color="white" />
+                            <Text className="text-white text-lg font-semibold ml-2">Show Delivery Image</Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <View>
+                        <Image
+                            source={{ uri: selectedOrder?.deliveryPhotoUrl }}
+                            className="w-full h-96 rounded-lg"
+                            resizeMode="cover"
+                        />
                     </View>
                 )}
-
             </CustomModal>
 
             <CustomModal
