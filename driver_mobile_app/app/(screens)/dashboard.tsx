@@ -5,6 +5,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import {router, useLocalSearchParams} from "expo-router";
+import CustomModal from "@/app/components/custom_modal";
+import {Feather} from "@expo/vector-icons";
 
 interface Coordinate {
     latitude: number;
@@ -18,6 +20,12 @@ export default function Dashboard() {
     const [totalDistance, setTotalDistance] = useState<number | null>(null);
     const [totalDuration, setTotalDuration] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const handleClearDirections = () => {
+        setDirections([]);
+        setModalVisible(false);
+    };
 
     useEffect(() => {
         const getLocation = async () => {
@@ -123,16 +131,27 @@ export default function Dashboard() {
                     )}
 
                     {directions.length > 0 && (
-                        <View className="absolute top-16 right-3 p-4 bg-theme_background rounded-lg shadow-md z-50">
-                            <Text className="text-white text-sm">
-                                <Text className="font-bold">Distance: </Text>
-                                {totalDistance?.toFixed(2)} km
-                            </Text>
-                            <Text className="text-white text-sm">
-                                <Text className="font-bold">Duration: </Text>
-                                {totalDuration ? `${(totalDuration / 60).toFixed(0)} min` : "N/A"}
-                            </Text>
-                        </View>
+                        <>
+                            <View className="absolute top-16 right-3 p-4 bg-theme_background rounded-lg shadow-md z-50">
+                                <Text className="text-white text-sm">
+                                    <Text className="font-bold">Distance: </Text>
+                                    {totalDistance?.toFixed(2)} km
+                                </Text>
+                                <Text className="text-white text-sm">
+                                    <Text className="font-bold">Duration: </Text>
+                                    {totalDuration ? `${(totalDuration / 60).toFixed(0)} min` : "N/A"}
+                                </Text>
+                            </View>
+
+                            <View className="absolute top-36 right-3">
+                                <TouchableOpacity
+                                    className="p-2 bg-red-600 rounded-lg shadow-md flex-row items-center"
+                                    onPress={() => setModalVisible(true)}
+                                >
+                                    <Feather name="x-circle" size={24} color="white" />
+                                </TouchableOpacity>
+                            </View>
+                        </>
                     )}
 
                     <View className="absolute bottom-0 left-0 w-full bg-theme_background flex-row">
@@ -170,6 +189,25 @@ export default function Dashboard() {
                             <Text className="text-white text-sm">Account</Text>
                         </TouchableOpacity>
                     </View>
+
+                    <CustomModal
+                        isVisible={modalVisible}
+                        title="Confirm Navigation Removal"
+                        onClose={() => setModalVisible(false)}
+                        loading={loading}
+                    >
+                        <Text className="text-lg text-center mb-4 text-white">
+                            Are you sure you want to remove the navigation?
+                        </Text>
+                        <TouchableOpacity
+                            onPress={handleClearDirections}
+                            className="bg-red-600 rounded-xl w-full py-3"
+                        >
+                            <Text className="text-xl text-white text-center font-semibold">
+                                Confirm
+                            </Text>
+                        </TouchableOpacity>
+                    </CustomModal>
                 </>
             )}
         </View>
