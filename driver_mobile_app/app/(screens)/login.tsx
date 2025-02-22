@@ -128,6 +128,7 @@ export default function Login() {
                             placeholderTextColor="#C8C8C8"
                             value={email}
                             onChangeText={setEmail}
+                            autoCapitalize="none"
                         />
                     </Animated.View>
 
@@ -142,6 +143,7 @@ export default function Login() {
                             secureTextEntry={true}
                             value={password}
                             onChangeText={setPassword}
+                            autoCapitalize="none"
                         />
                     </Animated.View>
 
