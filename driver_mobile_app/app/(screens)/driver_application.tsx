@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View, Alert, Image } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import {AntDesign, Feather} from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -16,7 +16,6 @@ interface DriverApplication {
 
 interface DriverApplicationDetailsDTO {
     id: number;
-    reviewerID: string;
     status: string;
     submittedAt: string;
     reviewedAt: string | null;
@@ -86,6 +85,7 @@ export default function DriverApplication() {
             });
 
             const details: DriverApplicationDetailsDTO = await response.json();
+            console.log(details);
             setSelectedApplication(details);
         } catch (error: any) {
             Alert.alert("Error", error.message || "Unknown error");
@@ -159,18 +159,36 @@ export default function DriverApplication() {
             >
                 {selectedApplication && (
                     <View className="space-y-4">
-                        <Text className="text-white text-2xl font-semibold">ID: <Text className="font-normal">{selectedApplication.id}</Text></Text>
-                        <Text className="text-white text-lg">Reviewer ID: <Text className="font-normal">{selectedApplication.reviewerID || "N/A"}</Text></Text>
-                        <Text className="text-white text-lg">Status: <Text className="font-normal">{selectedApplication.status}</Text></Text>
-                        <Text className="text-white text-lg">
-                            Submitted At: <Text className="font-normal">{new Date(selectedApplication.submittedAt).toLocaleString()}</Text>
-                        </Text>
-                        <Text className="text-white text-lg">
-                            Reviewed At: <Text className="font-normal">{selectedApplication.reviewedAt ? new Date(selectedApplication.reviewedAt).toLocaleString() : "N/A"}</Text>
-                        </Text>
-                        <Text className="text-white text-lg">
-                            Rejection Reason: <Text className="font-normal">{selectedApplication.rejectionReason || "N/A"}</Text>
-                        </Text>
+                        <View className="flex-row items-center">
+                            <Feather name="hash" size={20} color="#f7ca65" />
+                            <Text className="text-white text-2xl font-semibold ml-2">ID: <Text className="font-normal">{selectedApplication.id}</Text></Text>
+                        </View>
+
+                        <View className="flex-row items-center">
+                            <Feather name="check-circle" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">Status: <Text className="font-normal">{selectedApplication.status}</Text></Text>
+                        </View>
+
+                        <View className="flex-row items-center">
+                            <Feather name="calendar" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">
+                                Submitted At: <Text className="font-normal">{new Date(selectedApplication.submittedAt).toLocaleString()}</Text>
+                            </Text>
+                        </View>
+
+                        <View className="flex-row items-center">
+                            <Feather name="calendar" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">
+                                Reviewed At: <Text className="font-normal">{selectedApplication.reviewedAt ? new Date(selectedApplication.reviewedAt).toLocaleString() : "N/A"}</Text>
+                            </Text>
+                        </View>
+
+                        <View className="flex-row items-center">
+                            <Feather name="x-circle" size={20} color="#f7ca65" />
+                            <Text className="text-white text-lg ml-2">
+                                Rejection Reason: <Text className="font-normal">{selectedApplication.rejectionReason || "N/A"}</Text>
+                            </Text>
+                        </View>
 
                         <View className="mt-6">
                             <Text className="text-white text-xl font-semibold mb-2">Driver Documents:</Text>

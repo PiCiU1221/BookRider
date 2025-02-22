@@ -1,6 +1,5 @@
 const CONFIG = {
-    // local ip for dev, replace with server's address in prod
-    API_BASE_URL: 'http://192.168.0.108:8080',
+    API_BASE_URL: process.env.EXPO_PUBLIC_API_BASE_URL,
 };
 
 export default CONFIG;

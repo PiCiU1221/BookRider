@@ -50,7 +50,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
                         </ScrollView>
                         <TouchableOpacity
                             onPress={onClose}
-                            className="bg-theme_accent rounded-xl w-full py-3"
+                            className="bg-theme_accent rounded-xl w-full py-3 mt-4"
                         >
                             <Text className="text-xl text-white text-center font-semibold">OK</Text>
                         </TouchableOpacity>

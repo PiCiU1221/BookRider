@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { TextInput, Text, ScrollView, View, TouchableOpacity, BackHandler, Image } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
+import {AntDesign, Feather} from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { router } from "expo-router";
 import * as ImagePicker from 'expo-image-picker';
 import CustomModal from '@/app/components/custom_modal';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CONFIG from "@/config";
+import { Picker } from "@react-native-picker/picker";
+
+enum DocumentType {
+    ID = "ID",
+    DRIVER_LICENSE = "DRIVER_LICENSE",
+}
 
 interface Document {
     documentType: string;
@@ -106,7 +112,7 @@ export default function CreateDriverApplication() {
     const pickImage = async (index: number) => {
         let result = await ImagePicker.launchCameraAsync({
             allowsEditing: true,
-            quality: 1,
+            quality: 0.5,
             base64: true,
         });
 
@@ -168,20 +174,46 @@ export default function CreateDriverApplication() {
                         Document {index + 1}
                     </Text>
 
-                    <TextInput
-                        className="bg-black/5 p-3 rounded-lg mb-2 text-base text-white border border-gray-300"
-                        placeholder="Document Type (e.g., ID)"
-                        placeholderTextColor="#C8C8C8"
-                        value={document.documentType}
-                        onChangeText={(text) => handleChange(index, 'documentType', text)}
-                    />
+                    <Text
+                        className="text-base font-semibold mb-1"
+                        style={{ color: '#C8C8C8'}}
+                    >
+                        Document type:
+                    </Text>
+                    <View className="border border-gray-300 rounded-lg mb-2 h-12 flex justify-center">
+                        <Picker
+                            selectedValue={document.documentType}
+                            onValueChange={(itemValue: string) => handleChange(index, "documentType", itemValue as DocumentType)}
+                            className="bg-black/5 p-2 text-sm text-white border border-gray-300"
+                            dropdownIconColor="#C8C8C8"
+                        >
+                            {Object.values(DocumentType).map((type) => (
+                                <Picker.Item
+                                    key={type}
+                                    label={type.replace("_", " ")}
+                                    value={type}
+                                    color="#C8C8C8"
+                                />
+                            ))}
+                        </Picker>
+                    </View>
 
+                    <Text
+                        className="text-base font-semibold mb-1"
+                        style={{ color: '#C8C8C8'}}
+                    >
+                        Expiration date:
+                    </Text>
                     <TextInput
                         className="bg-black/5 p-3 rounded-lg mb-2 text-base text-white border border-gray-300"
                         placeholder="Expiration Date (YYYY-MM-DD)"
                         placeholderTextColor="#C8C8C8"
                         value={document.expirationDate}
-                        onChangeText={(text) => handleChange(index, 'expirationDate', text)}
+                        onChangeText={(text) => {
+                            const updatedDocuments = [...documents];
+                            updatedDocuments[index].expirationDate = text;
+                            setDocuments(updatedDocuments);
+                        }}
                     />
 
                     {document.imageUri && document.imageSaved && (
@@ -201,9 +233,10 @@ export default function CreateDriverApplication() {
 
                     {!document.imageUri && (
                         <TouchableOpacity
-                            className="bg-theme_accent p-3 rounded-lg items-center"
+                            className="bg-theme_accent p-3 rounded-lg flex flex-row items-center justify-center"
                             onPress={() => pickImage(index)}
                         >
+                            <Feather name="camera" size={20} color="white" className="mr-2" />
                             <Text className="text-white">Take a Picture</Text>
                         </TouchableOpacity>
                     )}
@@ -218,7 +251,7 @@ export default function CreateDriverApplication() {
             </TouchableOpacity>
 
             <TouchableOpacity
-                className="w-full bg-theme_accent rounded-xl mb-8 h-14 flex justify-center items-center"
+                className="w-full bg-green-500 rounded-xl mb-8 h-14 flex justify-center items-center"
                 onPress={handleSubmit}
                 disabled={isSubmitting}
             >
