@@ -6,6 +6,8 @@ on:
       - dev
     types:
       - closed
+    paths:
+      - 'backend/**'
 
 jobs:
   build-and-test:
