@@ -1,0 +1,79 @@
+{
+  "type": "FeatureCollection",
+  "bbox": [
+    14.504724,
+    53.434459,
+    14.504724,
+    53.434459
+  ],
+  "features": [
+    {
+      "bbox": [
+        14.504724,
+        53.434459,
+        14.504724,
+        53.434459
+      ],
+      "type": "Feature",
+      "properties": {
+        "segments": [
+          {
+            "distance": 0.0,
+            "duration": 0.0,
+            "steps": [
+              {
+                "distance": 0.0,
+                "duration": 0.0,
+                "type": 11,
+                "instruction": "Head east",
+                "name": "-",
+                "way_points": [
+                  0,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "way_points": [
+          0,
+          0
+        ],
+        "summary": {}
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            14.504724,
+            53.434459
+          ]
+        ],
+        "type": "LineString"
+      }
+    }
+  ],
+  "metadata": {
+    "attribution": "openrouteservice.org | OpenStreetMap contributors",
+    "service": "routing",
+    "timestamp": 1733055952041,
+    "query": {
+      "coordinates": [
+        [
+          14.504721,
+          53.434444
+        ],
+        [
+          14.504721,
+          53.434444
+        ]
+      ],
+      "profile": "driving-car",
+      "format": "json"
+    },
+    "engine": {
+      "version": "8.2.0",
+      "build_date": "2024-10-09T09:23:42Z",
+      "graph_date": "2024-09-23T14:39:49Z"
+    }
+  }
+}
