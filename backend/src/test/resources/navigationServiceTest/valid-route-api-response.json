@@ -1,0 +1,135 @@
+{
+  "type": "FeatureCollection",
+  "bbox": [
+    14.504724,
+    53.433336,
+    14.506455,
+    53.434459
+  ],
+  "features": [
+    {
+      "bbox": [
+        14.504724,
+        53.433336,
+        14.506455,
+        53.434459
+      ],
+      "type": "Feature",
+      "properties": {
+        "segments": [
+          {
+            "distance": 232.1,
+            "duration": 46.4,
+            "steps": [
+              {
+                "distance": 60.4,
+                "duration": 8.7,
+                "type": 11,
+                "instruction": "Head east on Krakusa",
+                "name": "Krakusa",
+                "way_points": [
+                  0,
+                  2
+                ]
+              },
+              {
+                "distance": 112.4,
+                "duration": 27.0,
+                "type": 1,
+                "instruction": "Turn right onto Jana Styki",
+                "name": "Jana Styki",
+                "way_points": [
+                  2,
+                  3
+                ]
+              },
+              {
+                "distance": 59.4,
+                "duration": 10.7,
+                "type": 0,
+                "instruction": "Turn left",
+                "name": "-",
+                "way_points": [
+                  3,
+                  5
+                ]
+              },
+              {
+                "distance": 0.0,
+                "duration": 0.0,
+                "type": 10,
+                "instruction": "Arrive at your destination, straight ahead",
+                "name": "-",
+                "way_points": [
+                  5,
+                  5
+                ]
+              }
+            ]
+          }
+        ],
+        "way_points": [
+          0,
+          5
+        ],
+        "summary": {
+          "distance": 232.1,
+          "duration": 46.4
+        }
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            14.504724,
+            53.434459
+          ],
+          [
+            14.504878,
+            53.434447
+          ],
+          [
+            14.50563,
+            53.4344
+          ],
+          [
+            14.505567,
+            53.433389
+          ],
+          [
+            14.50603,
+            53.433379
+          ],
+          [
+            14.506455,
+            53.433336
+          ]
+        ],
+        "type": "LineString"
+      }
+    }
+  ],
+  "metadata": {
+    "attribution": "openrouteservice.org | OpenStreetMap contributors",
+    "service": "routing",
+    "timestamp": 1733053056793,
+    "query": {
+      "coordinates": [
+        [
+          14.504721,
+          53.434444
+        ],
+        [
+          14.506454,
+          53.433332
+        ]
+      ],
+      "profile": "driving-car",
+      "format": "json"
+    },
+    "engine": {
+      "version": "8.2.0",
+      "build_date": "2024-10-09T09:23:42Z",
+      "graph_date": "2024-09-23T14:39:49Z"
+    }
+  }
+}
