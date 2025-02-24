@@ -1,0 +1,79 @@
+{
+  "geocoding": {
+    "version": "0.2",
+    "attribution": "https://openrouteservice.org/terms-of-service/#attribution-geocode",
+    "query": {
+      "text": "Wyszyńskiego 10 Stargard 73-110",
+      "size": 10,
+      "private": false,
+      "lang": {
+        "name": "English",
+        "iso6391": "en",
+        "iso6393": "eng",
+        "via": "default",
+        "defaulted": true
+      },
+      "querySize": 20,
+      "parser": "libpostal",
+      "parsed_text": {
+        "street": "wyszyńskiego",
+        "housenumber": "10",
+        "city": "stargard",
+        "postalcode": "73-110"
+      }
+    },
+    "engine": {
+      "name": "Pelias",
+      "author": "Mapzen",
+      "version": "1.0"
+    },
+    "timestamp": 1733056528240
+  },
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.03301,
+          53.339007
+        ]
+      },
+      "properties": {
+        "id": "way/194693074",
+        "gid": "openstreetmap:address:way/194693074",
+        "layer": "address",
+        "source": "openstreetmap",
+        "source_id": "way/194693074",
+        "name": "Kardynała Stefana Wyszyńskiego 10",
+        "housenumber": "10",
+        "street": "Kardynała Stefana Wyszyńskiego",
+        "confidence": 1,
+        "match_type": "exact",
+        "accuracy": "point",
+        "country": "Poland",
+        "country_gid": "whosonfirst:country:85633723",
+        "country_a": "POL",
+        "region": "Zachodniopomorskie",
+        "region_gid": "whosonfirst:region:85687271",
+        "region_a": "ZP",
+        "county": "Stargard",
+        "county_gid": "whosonfirst:county:102080083",
+        "localadmin": "Gmina Stargard",
+        "localadmin_gid": "whosonfirst:localadmin:1477752711",
+        "locality": "Stargard",
+        "locality_gid": "whosonfirst:locality:101752249",
+        "continent": "Europe",
+        "continent_gid": "whosonfirst:continent:102191581",
+        "label": "Kardynała Stefana Wyszyńskiego 10, Stargard, ZP, Poland"
+      }
+    }
+  ],
+  "bbox": [
+    15.03301,
+    53.339007,
+    15.03301,
+    53.339007
+  ]
+}
