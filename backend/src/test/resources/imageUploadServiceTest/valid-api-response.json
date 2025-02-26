@@ -1,0 +1,64 @@
+{
+  "status_code": 200,
+  "success": {
+    "message": "image uploaded",
+    "code": 200
+  },
+  "image": {
+    "name": "7286943bb27a",
+    "extension": "jpg",
+    "width": 1920,
+    "height": 1280,
+    "size": 768065,
+    "time": 1733566501,
+    "expiration": 0,
+    "likes": 0,
+    "description": null,
+    "original_filename": "7286943bb27a.jpg",
+    "is_animated": 0,
+    "nsfw": 0,
+    "id_encoded": "2GXfb8N",
+    "size_formatted": "768.1 KB",
+    "filename": "2GXfb8N.jpg",
+    "url": "https://iili.io/2GXfb8N.jpg",
+    "url_short": "https://freeimage.host/",
+    "url_seo": "https://freeimage.host/i/7286943bb27a.2GXfb8N",
+    "url_viewer": "https://freeimage.host/i/2GXfb8N",
+    "url_viewer_preview": "https://freeimage.host/i/2GXfb8N",
+    "url_viewer_thumb": "https://freeimage.host/i/2GXfb8N",
+    "image": {
+      "filename": "2GXfb8N.jpg",
+      "name": "2GXfb8N",
+      "mime": "image/jpeg",
+      "extension": "jpg",
+      "url": "https://iili.io/2GXfb8N.jpg",
+      "size": 768065
+    },
+    "thumb": {
+      "filename": "2GXfb8N.th.jpg",
+      "name": "2GXfb8N.th",
+      "mime": "image/jpeg",
+      "extension": "jpg",
+      "url": "https://iili.io/2GXfb8N.th.jpg"
+    },
+    "medium": {
+      "filename": "2GXfb8N.md.jpg",
+      "name": "2GXfb8N.md",
+      "mime": "image/jpeg",
+      "extension": "jpg",
+      "url": "https://iili.io/2GXfb8N.md.jpg"
+    },
+    "display_url": "https://iili.io/2GXfb8N.md.jpg",
+    "display_width": 1920,
+    "display_height": 1280,
+    "views_label": "views",
+    "likes_label": "likes",
+    "how_long_ago": "1 second ago",
+    "date_fixed_peer": "2024-12-07 10:15:01",
+    "title": "7286943bb27a",
+    "title_truncated": "7286943bb27a",
+    "title_truncated_html": "7286943bb27a",
+    "is_use_loader": false
+  },
+  "status_txt": "OK"
+}
