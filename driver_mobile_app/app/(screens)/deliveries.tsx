@@ -318,17 +318,8 @@ export default function Deliveries() {
 
         const requestBody = {
             location: {
-                // the actual device location (use this in prod)
-                //latitude: location.latitude,
-                //longitude: location.longitude,
-
-                // example user location (Wyszynskiego 10)
-                //latitude: 53.424517,
-                //longitude: 14.553033,
-
-                // example library location (Zolnierska 49)
-                latitude: 53.447002,
-                longitude: 14.492345,
+                latitude: location.latitude,
+                longitude: location.longitude,
             },
             photoBase64: deliveryImageBase64,
         };
@@ -529,12 +520,14 @@ export default function Deliveries() {
                                 <Text className="text-red-400 text-lg font-bold ml-2">Return Order</Text>
                             </View>
                         )}
-                        <View className="flex-row items-center">
-                            <Feather name="user-check" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2 mt-2">
-                                Driver Assigned At: {new Date(selectedOrder.driverAssignedAt).toLocaleString()}
-                            </Text>
-                        </View>
+                        {selectedOrder?.driverAssignedAt && (
+                            <View className="flex-row items-center">
+                                <Feather name="user-check" size={20} color="#f7ca65" />
+                                <Text className="text-white text-lg ml-2 mt-2">
+                                    Driver Assigned At: {new Date(selectedOrder.driverAssignedAt).toLocaleString()}
+                                </Text>
+                            </View>
+                        )}
 
                         <Text className="text-white text-xl font-semibold mt-4 mb-2">Order Items:</Text>
                         <View className="bg-black/10 p-4 rounded-lg space-y-2 mb-2 border border-gray-300">
@@ -565,7 +558,7 @@ export default function Deliveries() {
                             <View className="flex-row justify-between mt-2">
                                 <TouchableOpacity
                                     onPress={handleNavigation}
-                                    className="bg-blue-500 px-6 py-1 rounded-lg flex-1 mr-2"
+                                    className="bg-blue-500 px-6 py-1 rounded-lg flex-1 mr-2 justify-center"
                                 >
                                     <Text className="text-white text-center font-semibold text-sm">
                                         {(selectedOrder?.status === 'DRIVER_ACCEPTED' && !selectedOrder?.isReturn) ||

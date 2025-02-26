@@ -1,50 +1,114 @@
-# Welcome to your Expo app 👋
+# Driver Mobile App - v1.0
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Overview  
 
-## Get started
+The **Driver Mobile App** is a client application built specifically for the **system_name** backend. It provides a structured interface for drivers to interact with the system’s API, allowing them to:
 
-1. Install dependencies
+- View and accept available delivery orders.
+- Perform delivery actions that update order statuses.
+- Access navigation to pickup and drop-off locations.
+- Track completed deliveries and payments.
 
-   ```bash
-   npm install
-   ```
+This application was designed to integrate with our backend, ensuring that drivers can interact with the backend through a standardized and consistent interface.
 
-2. Start the app
+## 🔥 **Tech Stack**
 
-   ```bash
-    npx expo start
-   ```
+- **React Native**
+- **Expo**
+- **NativeWind**
 
-In the output, you'll find options to open the app in a
+## 🗺️ **Google Maps Integration**  
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+The app includes an embedded Google Maps display for visualizing delivery routes and locations. 
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Additionally, a **"Open in Google Maps"** button is provided, allowing drivers to open the delivery route in the **Google Maps app** for turn-by-turn navigation if they prefer using the external app for navigation instead of the embedded map view.  
 
-## Get a fresh project
+## 📸 Screenshots
 
-When you're ready, run:
+<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
+  <div style="text-align: center;">
+    <img src="docs/screenshots/main-screen.png" alt="main-screen" width="300"/>
+    <p>Main screen</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="docs/screenshots/order-history-details.png" alt="order-history-details" width="300"/>
+    <p>Order history view</p>
+  </div>
+</div>
 
-```bash
-npm run reset-project
-```
+<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
+  <div style="text-align: center;">
+    <img src="docs/screenshots/navigation-to-pickup.png" alt="navigation-to-pickup" width="300"/>
+    <p>Navigation to pickup</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="docs/screenshots/navigation-to-delivery.png" alt="navigation-to-delivery" width="300"/>
+    <p>Navigation to delivery</p>
+  </div>
+</div>
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
+  <div style="text-align: center;">
+    <img src="docs/screenshots/pending-order-view.png" alt="pending-order-view" width="300"/>
+    <p>Pending order view</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="docs/screenshots/pending-order-details.png" alt="pending-order-details" width="300"/>
+    <p>Pending order details</p>
+  </div>
+</div>
 
-## Learn more
+<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
+  <div style="text-align: center;">
+    <img src="docs/screenshots/in-realization-order-view.png" alt="in-realization-order-view" width="300"/>
+    <p>In realization order view</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="docs/screenshots/in-realization-details.png" alt="in-realization-details" width="300"/>
+    <p>In realization order details</p>
+  </div>
+</div>
 
-To learn more about developing your project with Expo, look at the following resources:
+<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
+  <div style="text-align: center;">
+    <img src="docs/screenshots/show_id_for_librarian.png" alt="show_id_for_librarian" width="300"/>
+    <p>Show ID for librarian screen</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="docs/screenshots/delivery-details-after-pickup.png" alt="delivery-details-after-pickup" width="300"/>
+    <p>Order details after pickup</p>
+  </div>
+</div>
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
+  <div style="text-align: center;">
+    <img src="docs/screenshots/delivery-screen.png" alt="delivery-screen." width="300"/>
+    <p>Complete delivery screen</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="docs/screenshots/delivery-image-details.png" alt="delivery-image-details" width="300"/>
+    <p>Delivery image display in order history</p>
+  </div>
+</div>
 
-## Join the community
+<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
+  <div style="text-align: center;">
+    <img src="docs/screenshots/account-info.png" alt="account-info" width="300"/>
+    <p>Account info screen</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="docs/screenshots/create-driver-application.png" alt="create-driver-application" width="300"/>
+    <p>Create driver application view</p>
+  </div>
+</div>
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+<div style="display: flex; justify-content: space-around; gap: 10px;">
+  <div style="text-align: center;">
+    <img src="docs/screenshots/login-screen.png" alt="login-screen" width="300"/>
+    <p>Login screen</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="docs/screenshots/register-screen.png" alt="register-screen" width="300"/>
+    <p>Register screen</p>
+  </div>
+</div>
