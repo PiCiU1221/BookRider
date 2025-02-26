@@ -25,90 +25,104 @@ Additionally, a **"Open in Google Maps"** button is provided, allowing drivers t
 
 ## 📸 Screenshots
 
-<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
-  <div style="text-align: center;">
-    <img src="docs/screenshots/main-screen.png" alt="main-screen" width="300"/>
-    <p>Main screen</p>
-  </div>
-  <div style="text-align: center;">
-    <img src="docs/screenshots/order-history-details.png" alt="order-history-details" width="300"/>
-    <p>Order history view</p>
-  </div>
-</div>
+<table>
+  <tr>
+    <td><img src="docs/screenshots/main-screen.png" alt="main-screen" width="300"/></td>
+    <td><img src="docs/screenshots/order-history-details.png" alt="order-history-details" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Main screen</td>
+    <td>Order history view</td>
+  </tr>
+</table>
 
-<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
-  <div style="text-align: center;">
-    <img src="docs/screenshots/navigation-to-pickup.png" alt="navigation-to-pickup" width="300"/>
-    <p>Navigation to pickup</p>
-  </div>
-  <div style="text-align: center;">
-    <img src="docs/screenshots/navigation-to-delivery.png" alt="navigation-to-delivery" width="300"/>
-    <p>Navigation to delivery</p>
-  </div>
-</div>
+<br>
 
-<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
-  <div style="text-align: center;">
-    <img src="docs/screenshots/pending-order-view.png" alt="pending-order-view" width="300"/>
-    <p>Pending order view</p>
-  </div>
-  <div style="text-align: center;">
-    <img src="docs/screenshots/pending-order-details.png" alt="pending-order-details" width="300"/>
-    <p>Pending order details</p>
-  </div>
-</div>
+<table>
+  <tr>
+    <td><img src="docs/screenshots/navigation-to-pickup.png" alt="navigation-to-pickup" width="300"/></td>
+    <td><img src="docs/screenshots/navigation-to-delivery.png" alt="navigation-to-delivery" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Navigation to pickup</td>
+    <td>Navigation to delivery</td>
+  </tr>
+</table>
 
-<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
-  <div style="text-align: center;">
-    <img src="docs/screenshots/in-realization-order-view.png" alt="in-realization-order-view" width="300"/>
-    <p>In realization order view</p>
-  </div>
-  <div style="text-align: center;">
-    <img src="docs/screenshots/in-realization-details.png" alt="in-realization-details" width="300"/>
-    <p>In realization order details</p>
-  </div>
-</div>
+<br>
 
-<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
-  <div style="text-align: center;">
-    <img src="docs/screenshots/show_id_for_librarian.png" alt="show_id_for_librarian" width="300"/>
-    <p>Show ID for librarian screen</p>
-  </div>
-  <div style="text-align: center;">
-    <img src="docs/screenshots/delivery-details-after-pickup.png" alt="delivery-details-after-pickup" width="300"/>
-    <p>Order details after pickup</p>
-  </div>
-</div>
+<table>
+  <tr>
+    <td><img src="docs/screenshots/pending-order-view.png" alt="pending-order-view" width="300"/></td>
+    <td><img src="docs/screenshots/pending-order-details.png" alt="pending-order-details" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Pending order view</td>
+    <td>Pending order details</td>
+  </tr>
+</table>
 
-<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
-  <div style="text-align: center;">
-    <img src="docs/screenshots/delivery-screen.png" alt="delivery-screen." width="300"/>
-    <p>Complete delivery screen</p>
-  </div>
-  <div style="text-align: center;">
-    <img src="docs/screenshots/delivery-image-details.png" alt="delivery-image-details" width="300"/>
-    <p>Delivery image display in order history</p>
-  </div>
-</div>
+<br>
 
-<div style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 10px;">
-  <div style="text-align: center;">
-    <img src="docs/screenshots/account-info.png" alt="account-info" width="300"/>
-    <p>Account info screen</p>
-  </div>
-  <div style="text-align: center;">
-    <img src="docs/screenshots/create-driver-application.png" alt="create-driver-application" width="300"/>
-    <p>Create driver application view</p>
-  </div>
-</div>
+<table>
+  <tr>
+    <td><img src="docs/screenshots/in-realization-order-view.png" alt="in-realization-order-view" width="300"/></td>
+    <td><img src="docs/screenshots/in-realization-details.png" alt="in-realization-details" width="300"/></td>
+  </tr>
+  <tr>
+    <td>In realization order view</td>
+    <td>In realization order details</td>
+  </tr>
+</table>
 
-<div style="display: flex; justify-content: space-around; gap: 10px;">
-  <div style="text-align: center;">
-    <img src="docs/screenshots/login-screen.png" alt="login-screen" width="300"/>
-    <p>Login screen</p>
-  </div>
-  <div style="text-align: center;">
-    <img src="docs/screenshots/register-screen.png" alt="register-screen" width="300"/>
-    <p>Register screen</p>
-  </div>
-</div>
+<br>
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/show_id_for_librarian.png" alt="show_id_for_librarian" width="300"/></td>
+    <td><img src="docs/screenshots/delivery-details-after-pickup.png" alt="delivery-details-after-pickup" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Show ID for librarian screen</td>
+    <td>Order details after pickup</td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/delivery-screen.png" alt="delivery-screen" width="300"/></td>
+    <td><img src="docs/screenshots/delivery-image-details.png" alt="delivery-image-details" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Complete delivery screen</td>
+    <td>Delivery image display in order history</td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/account-info.png" alt="account-info" width="300"/></td>
+    <td><img src="docs/screenshots/create-driver-application.png" alt="create-driver-application" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Account info screen</td>
+    <td>Create driver application view</td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/login-screen.png" alt="login-screen" width="300"/></td>
+    <td><img src="docs/screenshots/register-screen.png" alt="register-screen" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Login screen</td>
+    <td>Register screen</td>
+  </tr>
+</table>
