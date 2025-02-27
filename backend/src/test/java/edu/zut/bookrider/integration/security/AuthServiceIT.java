@@ -170,7 +170,7 @@ public class AuthServiceIT {
                 () -> authService.authenticateLibrarian(librarianLoginRequestDTO)
         );
 
-        assertEquals("Invalid email or password.", thrownException.getMessage());
+        assertEquals("Invalid username, libraryId and password combination.", thrownException.getMessage());
     }
 
     @Test
