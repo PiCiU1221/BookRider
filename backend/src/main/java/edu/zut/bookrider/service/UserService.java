@@ -98,9 +98,7 @@ public class UserService {
     public List<User> getAllLibrarians(User libraryAdmin) {
         Integer libraryId = libraryAdmin.getLibrary().getId();
 
-        return userRepository.findAll().stream()
-                .filter(user -> "librarian".equals(user.getRole().getName()) && user.getLibrary().getId().equals(libraryId))
-                .toList();
+        return userRepository.findByRoleNameAndLibraryId("librarian", libraryId);
     }
 
     @Transactional
