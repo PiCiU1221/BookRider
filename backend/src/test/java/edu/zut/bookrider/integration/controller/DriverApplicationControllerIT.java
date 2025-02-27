@@ -129,6 +129,16 @@ public class DriverApplicationControllerIT {
     }
 
     @Test
+    @WithMockUser(username = "admin@dacit.com", roles = {"system_administrator"})
+    void whenInvalidStatusEnum_thenReturnBadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/driver-applications")
+                        .param("statuses", "pending")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @WithMockUser(username = "driver@dacit.com", roles = {"driver"})
     void whenListMyApplicationsAsDriver_thenReturnOk() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/driver-applications/me")
