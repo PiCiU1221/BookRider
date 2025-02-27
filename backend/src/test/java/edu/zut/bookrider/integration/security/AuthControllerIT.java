@@ -186,7 +186,7 @@ public class AuthControllerIT {
                         .content(jsonRequest)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
-                .andExpect(content().json("{\"code\":401,\"message\":\"Invalid email or password.\"}"))
+                .andExpect(content().json("{\"code\":401,\"message\":\"Invalid username, libraryId and password combination.\"}"))
                 .andReturn();
     }
 
