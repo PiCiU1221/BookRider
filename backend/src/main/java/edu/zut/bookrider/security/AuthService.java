@@ -58,7 +58,7 @@ public class AuthService {
             Authentication authentication = authenticationManager.authenticate(authenticationRequest);
             return jwtService.generateToken(authentication.getName());
         } catch (AuthenticationException e) {
-            throw new BadCredentialsException("Invalid email or password.");
+            throw new BadCredentialsException("Invalid username, libraryId and password combination.");
         }
     }
 
@@ -89,6 +89,11 @@ public class AuthService {
     }
 
     public CreateAccountResponseDTO createAdvancedAccount(CreateAdvancedAccountDTO createAdvancedAccountDTO, String roleName) {
+
+        if ("system_administrator".equalsIgnoreCase(roleName)) {
+            throw new IllegalArgumentException("The 'system_administrator' role is not allowed for account creation.");
+        }
+
         if (userRepository.existsByEmailAndRoleName(createAdvancedAccountDTO.getEmail(), roleName)) {
             throw new IllegalArgumentException("Email: '" + createAdvancedAccountDTO.getEmail() + "' is already taken for the '" + roleName + "' role.");
         }
