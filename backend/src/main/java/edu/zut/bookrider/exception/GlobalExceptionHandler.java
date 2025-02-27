@@ -12,11 +12,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -136,6 +138,26 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleEnumTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        if (Objects.requireNonNull(ex.getRequiredType()).isEnum()) {
+            String invalidValue = Objects.requireNonNull(ex.getValue()).toString();
+            String enumType = ex.getRequiredType().getSimpleName();
+
+            Map<String, String> errors = new HashMap<>();
+            errors.put("enum", "Invalid value '" + invalidValue + "' for enum type " + enumType);
+
+            ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, errors.toString());
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", "Invalid argument type");
+
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(400, errors.toString());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MissingServletRequestPartException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleMissingServletRequestPartException(MissingServletRequestPartException ex) {
         String message = "Required part '" + ex.getRequestPartName() + "' is not present";
@@ -157,6 +179,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleOrderNotFoundException(OrderNotFoundException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404,  ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(LibraryRequestNotFoundException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleLibraryRequestNotFoundException(LibraryRequestNotFoundException ex) {
         ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(404,  ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
