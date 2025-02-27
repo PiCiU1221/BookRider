@@ -25,8 +25,8 @@ public class BookController {
             @RequestParam(required = false) Integer libraryId,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) String authorName,
-            @RequestParam(required = false) int releaseYearFrom,
-            @RequestParam(required = false) int releaseYearTo,
+            @RequestParam(required = false) Integer releaseYearFrom,
+            @RequestParam(required = false) Integer releaseYearTo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
