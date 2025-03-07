@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.zut.bookrider.controller.BookController;
 import edu.zut.bookrider.dto.BookRequestDto;
 import edu.zut.bookrider.dto.BookResponseDto;
+import edu.zut.bookrider.dto.PageResponseDTO;
 import edu.zut.bookrider.model.Author;
 import edu.zut.bookrider.model.Category;
 import edu.zut.bookrider.model.Language;
@@ -101,22 +102,23 @@ class BookControllerTest {
     }
 
     @Test
-    void getFilteredBooks_shouldReturnFilteredBooks() throws Exception {
-        List<BookResponseDto> books = Collections.singletonList(bookResponseDto);
+    void searchBooks_shouldReturnFilteredBooks() throws Exception {
+        List<BookResponseDto> bookList = Collections.singletonList(bookResponseDto);
 
-        when(bookService.getFilteredBooks(any(), any(), any(), any(), any(), anyInt(), anyInt())).thenReturn(books);
+        PageResponseDTO<BookResponseDto> booksResponse = new PageResponseDTO<>(bookList, 0, 10, bookList.size(), 1);
+        when(bookService.searchBooks(any(), any(), any(), any(), any(), any(), any(), any(), anyInt(), anyInt(), any())).thenReturn(booksResponse);
 
-        mockMvc.perform(get("/api/books/filtered")
+        mockMvc.perform(get("/api/books/search")
                         .param("authorName", "Author Name")
                         .param("releaseYearFrom", "2022")
                         .param("releaseYearTo", "2022")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Test Title"))
-                .andExpect(jsonPath("$[0].authorNames[0]").value("Author Name"));
+                .andExpect(jsonPath("$.content[0].title").value("Test Title"))
+                .andExpect(jsonPath("$.content[0].authorNames[0]").value("Author Name"));
 
-        verify(bookService).getFilteredBooks(any(), any(), any(), any(), any(), anyInt(), anyInt());
+        verify(bookService).searchBooks(any(), any(), any(), any(), any(), any(), any(), any(), anyInt(), anyInt(), any());
     }
 
     @Test
