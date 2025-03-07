@@ -1,6 +1,7 @@
 package edu.zut.bookrider.repository;
 
 import edu.zut.bookrider.model.Library;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -37,4 +38,7 @@ public interface LibraryRepository extends JpaRepository<Library, Integer> {
             @Param("userLat") BigDecimal userLatitude,
             @Param("userLon") BigDecimal userLongitude
     );
+
+    @Query("SELECT l FROM Library l WHERE LOWER(l.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    List<Library> findByNameLike(@Param("name") String name, Pageable pageable);
 }
