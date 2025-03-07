@@ -2,9 +2,13 @@ package edu.zut.bookrider.controller;
 
 import edu.zut.bookrider.dto.BookRequestDto;
 import edu.zut.bookrider.dto.BookResponseDto;
+import edu.zut.bookrider.dto.FilterResponseDTO;
+import edu.zut.bookrider.dto.PageResponseDTO;
 import edu.zut.bookrider.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,17 +24,34 @@ public class BookController {
 
     private final BookService bookService;
 
-    @GetMapping("/filtered")
-    public ResponseEntity<?> getFilteredBooks(
-            @RequestParam(required = false) Integer libraryId,
-            @RequestParam(required = false) Integer categoryId,
-            @RequestParam(required = false) String authorName,
+    @GetMapping("/search")
+    public ResponseEntity<?> searchBooks(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String library,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String language,
+            @RequestParam(required = false) String publisher,
+            @RequestParam(required = false) List<String> authorNames,
             @RequestParam(required = false) Integer releaseYearFrom,
             @RequestParam(required = false) Integer releaseYearTo,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort) {
 
-        List<BookResponseDto> books = bookService.getFilteredBooks(libraryId, categoryId, authorName, releaseYearFrom, releaseYearTo, page, size);
+        PageResponseDTO<BookResponseDto> books = bookService.searchBooks(
+                title,
+                library,
+                category,
+                language,
+                publisher,
+                authorNames,
+                releaseYearFrom,
+                releaseYearTo,
+                page,
+                size,
+                sort
+        );
+
         return ResponseEntity.ok(books);
     }
 
@@ -86,5 +107,14 @@ public class BookController {
 
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search-book-titles")
+    public ResponseEntity<List<FilterResponseDTO>> searchBookTitles(@RequestParam("title") String title) {
+        Pageable pageable = PageRequest.of(0, 5);
+
+        List<FilterResponseDTO> bookTitles = bookService.searchBookTitles(title, pageable);
+
+        return ResponseEntity.ok(bookTitles);
     }
 }

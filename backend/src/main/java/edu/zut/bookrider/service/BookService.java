@@ -2,6 +2,8 @@ package edu.zut.bookrider.service;
 
 import edu.zut.bookrider.dto.BookRequestDto;
 import edu.zut.bookrider.dto.BookResponseDto;
+import edu.zut.bookrider.dto.FilterResponseDTO;
+import edu.zut.bookrider.dto.PageResponseDTO;
 import edu.zut.bookrider.exception.*;
 import edu.zut.bookrider.mapper.book.BookReadMapper;
 import edu.zut.bookrider.model.*;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,14 +40,68 @@ public class BookService {
     private final LanguageRepository languageRepository;
 
     @Transactional(readOnly = true)
-    public List<BookResponseDto> getFilteredBooks(Integer libraryId, Integer categoryId,
-                                                  String authorName, Integer releaseYearFrom, Integer releaseYearTo, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
-        Page<Book> filteredBooksPage = bookRepository.findAllByFilters(libraryId, categoryId, authorName, releaseYearFrom, releaseYearTo, pageable);
+    public PageResponseDTO<BookResponseDto> searchBooks(
+            String title,
+            String library,
+            String category,
+            String language,
+            String publisher,
+            List<String> authorNames,
+            Integer releaseYearFrom,
+            Integer releaseYearTo,
+            int page,
+            int size,
+            String sort) {
 
-        return filteredBooksPage.getContent().stream()
+        Pageable pageable;
+
+        if (sort == null || sort.isBlank()) {
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        } else {
+            pageable = createPageableWithSort(sort, page, size);
+        }
+
+        Page<Book> filteredBooksPage = bookRepository.findAllByFilters(
+                title,
+                library,
+                category,
+                language,
+                publisher,
+                authorNames,
+                releaseYearFrom,
+                releaseYearTo,
+                pageable
+        );
+
+        List<BookResponseDto> bookDtos = filteredBooksPage.getContent().stream()
                 .map(bookReadMapper::map)
                 .toList();
+
+        return new PageResponseDTO<>(
+                bookDtos,
+                filteredBooksPage.getNumber(),
+                filteredBooksPage.getSize(),
+                filteredBooksPage.getTotalElements(),
+                filteredBooksPage.getTotalPages()
+        );
+    }
+
+    private Pageable createPageableWithSort(String sort, int page, int size) {
+        Sort sortObject;
+
+        if ("title-asc".equalsIgnoreCase(sort)) {
+            sortObject = Sort.by(Sort.Direction.ASC, "title");
+        } else if ("title-desc".equalsIgnoreCase(sort)) {
+            sortObject = Sort.by(Sort.Direction.DESC, "title");
+        } else if ("release-year-asc".equalsIgnoreCase(sort)) {
+            sortObject = Sort.by(Sort.Direction.ASC, "releaseYear");
+        } else if ("release-year-desc".equalsIgnoreCase(sort)) {
+            sortObject = Sort.by(Sort.Direction.DESC, "releaseYear");
+        } else {
+            sortObject = Sort.by(Sort.Direction.ASC, "title");
+        }
+
+        return PageRequest.of(page, size, sortObject);
     }
 
     @Transactional
@@ -189,5 +246,15 @@ public class BookService {
     public Book getBookById(Integer bookId) {
         return bookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found"));
+    }
+
+    public List<FilterResponseDTO> searchBookTitles(String name, Pageable pageable) {
+        Pageable sortedByTitle = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("title").ascending());
+
+        List<Book> bookTitles = bookRepository.findByTitleLike(name, sortedByTitle);
+
+        return bookTitles.stream()
+                .map(book -> new FilterResponseDTO(book.getTitle()))
+                .collect(Collectors.toList());
     }
 }
