@@ -17,7 +17,7 @@ import java.util.List;
 public class Book extends BaseEntity<Integer> {
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -25,7 +25,7 @@ public class Book extends BaseEntity<Integer> {
     private Language language;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "publisher_id")
+    @JoinColumn(name = "publisher_id", nullable = false)
     private Publisher publisher;
 
     @Column(nullable = false)
@@ -34,7 +34,7 @@ public class Book extends BaseEntity<Integer> {
     @Column(nullable = false, unique = true)
     private String isbn;
 
-    @Column(name = "release_year")
+    @Column(name = "release_year", nullable = false)
     private Integer releaseYear;
 
     @Builder.Default
@@ -49,6 +49,6 @@ public class Book extends BaseEntity<Integer> {
     @ManyToMany(mappedBy = "books", fetch = FetchType.LAZY)
     private List<Library> libraries = new ArrayList<>();
 
-    @Column(name = "cover_image_url")
+    @Column(name = "cover_image_url", nullable = false)
     private String coverImageUrl;
 }
