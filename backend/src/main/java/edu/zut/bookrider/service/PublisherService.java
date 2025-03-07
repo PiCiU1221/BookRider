@@ -1,5 +1,6 @@
 package edu.zut.bookrider.service;
 
+import edu.zut.bookrider.dto.FilterResponseDTO;
 import edu.zut.bookrider.dto.PublisherRequestDto;
 import edu.zut.bookrider.dto.PublisherResponseDto;
 import edu.zut.bookrider.exception.PublisherNotFoundException;
@@ -9,10 +10,12 @@ import edu.zut.bookrider.repository.BookRepository;
 import edu.zut.bookrider.repository.PublisherRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -74,5 +77,13 @@ public class PublisherService {
                 .forEach(bookRepository::delete);
 
         publisherRepository.delete(publisher);
+    }
+
+    public List<FilterResponseDTO> searchPublishers(String name, Pageable pageable) {
+        List <Publisher> publishers = publisherRepository.findByNameLike(name, pageable);
+
+        return publishers.stream()
+                .map(publisher -> new FilterResponseDTO(publisher.getName()))
+                .collect(Collectors.toList());
     }
 }
