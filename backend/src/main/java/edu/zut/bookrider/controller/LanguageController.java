@@ -1,12 +1,14 @@
 package edu.zut.bookrider.controller;
 
+import edu.zut.bookrider.dto.AttributeAddRequestDto;
 import edu.zut.bookrider.dto.FilterResponseDTO;
 import edu.zut.bookrider.service.LanguageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,5 +22,14 @@ public class LanguageController {
     @GetMapping
     public ResponseEntity<List<FilterResponseDTO>> getLanguages() {
         return ResponseEntity.ok(languageService.getAllLanguages());
+    }
+
+    @PreAuthorize("hasRole('librarian')")
+    @PostMapping
+    public ResponseEntity<FilterResponseDTO> addLanguage(
+            @RequestBody @Valid AttributeAddRequestDto attributeAddRequestDto) {
+
+        FilterResponseDTO addedLanguage = languageService.addLanguage(attributeAddRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedLanguage);
     }
 }
