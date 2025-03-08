@@ -1,4 +1,4 @@
-package edu.zut.bookrider.integration.controller;
+package edu.zut.bookrider.controller;
 
 import edu.zut.bookrider.dto.FilterResponseDTO;
 import edu.zut.bookrider.service.CategoryService;

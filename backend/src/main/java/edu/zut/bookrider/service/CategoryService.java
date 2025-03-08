@@ -4,6 +4,7 @@ import edu.zut.bookrider.dto.FilterResponseDTO;
 import edu.zut.bookrider.model.Category;
 import edu.zut.bookrider.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     public List<FilterResponseDTO> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findAll(Sort.by(Sort.Order.asc("name")));
 
         return categories.stream()
                 .map(category -> new FilterResponseDTO(category.getName()))
