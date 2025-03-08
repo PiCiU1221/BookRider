@@ -1,75 +1,66 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import './App.css';
+import './index.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
+import LandingPage from './LandingPage';
+import LibrarianLogin from './Librarian/LibrarianLogin.tsx';
+import LibraryAdminLogin from './LibraryAdmin/LibraryAdminLogin.tsx';
+import SysAdminLogin from "./SystemAdmin/SystemAdminLogin.tsx";
+import RegistrationForm from './LibraryAdmin/LibraryAdminRegisterForm.tsx';
+import ProcessingPage from './Utils/ProcessingInfoPage.tsx';
+import SystemAdminDashboard from './SystemAdmin/SystemAdminHomePage';
+import LibraryAdminAddLibrary from './LibraryAdmin/LibraryAdminAddLibrary';
+import LibraryAdminHomePage from './LibraryAdmin/LibraryAdminHomePage.tsx';
+import SubmissionDetailsLibrary from './SystemAdmin/SubmissionDetailsLibrary.tsx';
+import SubmissionDetailsDriver from './SystemAdmin/SubmissionDetailsDriver.tsx';
+import LibrarianHomePage from './Librarian/LibrarianHomePage';
+import UserInfoPage from './Utils/UserInfoPage.tsx';
+import ContactInfoPage from './Utils/ContactInfoPage.tsx';
+import LegalInfoPage from './Utils/LegalInfoPage.tsx';
+
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
-
-import RegistrationForm from './Register/LibAdminRegisterForm.tsx';
-import LoginPage from './Login/LibAdminLoginForm.tsx';
-import ProcessingPage from './ProcessingInfo.tsx';
-import SystemAdminDashboard from './SystemAdmin/SystemAdminHomePage.tsx';
-import LibraryAdminAddLibrary from './LibraryAdmin/LibraryAdminAddLibrary';
-import SubmissionDetails from './SystemAdmin/SubmissionDetails.tsx';
-import LibrarianHomePage from './Librarian/LibrarianHomePage.tsx';
 
 const App: React.FC = () => {
     return (
         <Router>
-            <div className="app-container">
-                <div className="logo-container">
-                    <img
-                        src="/book-rider-high-resolution-logo.png"
-                        alt="Logo"
-                        className="logo"
-                    />
-                </div>
-
-                <Routes>
-                    <Route
-                        path="/"
-                        element={
-                            <div className="button-container">
-                                <Link to="/login">
-                                    <button className="action-button">Logowanie</button>
-                                </Link>
-                                <Link to="/register">
-                                    <button className="action-button">Rejestracja</button>
-                                </Link>
-                            </div>
-                        }
-                    />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegistrationForm />} />
-                    <Route path="/processing-info" element={<ProcessingPage />} />
-                    <Route path="/sys-admin-dashboard" element={<SystemAdminDashboard />} />
-                    <Route path="/submission/:submissionType/:submissionId" element={<SubmissionDetails />} />
-                    <Route path="/add-library" element={<LibraryAdminAddLibrary />} />
-                    <Route path="/librarian-dashboard" element={<LibrarianHomePage />} />
-                    <Route
-                        path="/api-docs"
-                        element={
-                            <div style={{ margin: '20px' }}>
-                                <SwaggerUI
-                                    url="https://bookrider.onrender.com/v3/api-docs"
-                                    docExpansion="none"
-                                    deepLinking={true}
-                                    layout="BaseLayout"
-                                    requestInterceptor={(request) => {
-                                        const token = localStorage.getItem('access_token');
-                                        if (token) {
-                                            request.headers['Authorization'] = `Bearer ${token}`;
-                                            console.log("Interceptor added token:", token);
-                                        } else {
-                                            console.log("No token found");
-                                        }
-                                        return request;
-                                    }}
-                                />
-                            </div>
-                        }
-                    />
-                </Routes>
-            </div>
+            <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/librarian-login" element={<LibrarianLogin />} />
+                <Route path="/library-admin-login" element={<LibraryAdminLogin />} />
+                <Route path="/system-admin-login" element={<SysAdminLogin />} />
+                <Route path="/register" element={<RegistrationForm />} />
+                <Route path="/processing-info" element={<ProcessingPage />} />
+                <Route path="/system-admin-dashboard" element={<SystemAdminDashboard />} />
+                <Route path="/submissionDetailsLibrary/:submissionId" element={<SubmissionDetailsLibrary />} />
+                <Route path="/submissionDetailsDriver/:submissionId" element={<SubmissionDetailsDriver />} />
+                <Route path="/add-library" element={<LibraryAdminAddLibrary />} />
+                <Route path="/librarian-dashboard" element={<LibrarianHomePage />} />
+                <Route path="/info-page" element={<UserInfoPage />} />
+                <Route path="/contact" element={<ContactInfoPage />} />
+                <Route path="/legal-info" element={<LegalInfoPage />} />
+                <Route path="/library-admin-dashboard" element={<LibraryAdminHomePage />} />
+                <Route
+                    path="/api-docs"
+                    element={
+                        <div style={{ margin: '20px' }}>
+                            <SwaggerUI
+                                url="https://bookrider.pl/v3/api-docs"
+                                docExpansion="none"
+                                deepLinking={true}
+                                layout="BaseLayout"
+                                requestInterceptor={(request) => {
+                                    const token = localStorage.getItem('access_token');
+                                    if (token) {
+                                        request.headers['Authorization'] = `Bearer ${token}`;
+                                    }
+                                    return request;
+                                }}
+                            />
+                        </div>
+                    }
+                />
+            </Routes>
         </Router>
     );
 };

@@ -1,218 +1,283 @@
-import React, { useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+interface DriverApplication {
+    id: number;
+    driverEmail: string;
+    status: string;
+    submittedAt: string;
+}
+
+interface LibraryRequest {
+    id: number;
+    creatorEmail: string;
+    libraryName: string;
+    status: string;
+    submittedAt: string;
+}
+
+const formatDate = (isoString: string) => {
+    return new Date(isoString).toLocaleString('pl-PL', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+};
+
 const SystemAdminDashboard: React.FC = () => {
+    const [email, setEmail] = useState<string | null>(null);
     const [activeSection, setActiveSection] = useState<string>('librarySubmissions');
+    const [driverApplications, setDriverApplications] = useState<DriverApplication[]>([]);
+    const [libraryRequests, setLibraryRequests] = useState<LibraryRequest[]>([]);
+    const [driverPage, setDriverPage] = useState(0);
+    const [driverHasMore, setDriverHasMore] = useState(true);
+    const [libraryPage, setLibraryPage] = useState(0);
+    const [libraryHasMore, setLibraryHasMore] = useState(true);
     const navigate = useNavigate();
-    const sysAdminUsername = 'admin123';
 
-    const handleSectionChange = (section: string) => {
-        setActiveSection(section);
-    };
+    const firstLoad = useRef(true);
 
-    const handleSettings = () => {
-        alert('Ustawienia');
-    };
+    const getEmail = () => {
+        const email = localStorage.getItem('email');
+        return email;
+    }
 
     const handleLogout = () => {
-        alert('Wylogowywanie');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('role');
+
+        navigate('/');
     };
 
-    const handleExpand = (submissionType: string, submissionId: number) => {
-        navigate(`/submission/${submissionType}/${submissionId}`);
+    useEffect(() => {
+        if (firstLoad.current) {
+            firstLoad.current = false;
+            return;
+        }
+
+        const userEmail = getEmail();
+        if (userEmail) {
+            setEmail(userEmail);
+        }
+
+        if (activeSection === 'driverSubmissions') {
+            setDriverApplications([]);
+            setDriverPage(0);
+            fetchDriverApplications(0);
+        } else if (activeSection === 'librarySubmissions') {
+            setLibraryRequests([]);
+            setLibraryPage(0);
+            fetchLibraryRequests(0);
+        }
+    }, [activeSection]);
+
+    const fetchDriverApplications = async (page: number = 0) => {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            console.error("No token found");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/driver-applications?statuses=PENDING,UNDER_REVIEW&page=${page}&size=1`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error fetching data: ${response.statusText}`);
+            }
+
+            const data: DriverApplication[] = await response.json();
+
+            if (data.length > 0) {
+                setDriverApplications((prev) => [...prev, ...data]);
+                setDriverPage(page + 1);
+            } else {
+                setDriverHasMore(false);
+            }
+        } catch (error) {
+            console.error('Error during API call:', error);
+            setDriverHasMore(false);
+        }
+    };
+
+    const fetchLibraryRequests = async (page: number) => {
+        const token = localStorage.getItem('access_token');
+        if (!token) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/library-requests?statuses=PENDING,UNDER_REVIEW&page=${page}&size=1`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) throw new Error(`Error fetching data: ${response.statusText}`);
+
+            const data: LibraryRequest[] = await response.json();
+
+            if (data.length > 0) {
+                setLibraryRequests((prev) => [...prev, ...data]);
+                setLibraryPage(page + 1);
+            } else {
+                setLibraryHasMore(false);
+            }
+        } catch (error) {
+            console.error('Error during API call:', error);
+            setLibraryHasMore(false);
+        }
+    };
+
+    const updateStatusAndNavigate = async (id: number, type: 'driver' | 'library') => {
+        const token = localStorage.getItem('access_token');
+        if (!token) return;
+
+        const endpoint = type === 'driver' ? `/api/driver-applications/${id}/status?status=UNDER_REVIEW` : `/api/library-requests/${id}/status?status=UNDER_REVIEW`;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) throw new Error(`Error updating status: ${response.statusText}`);
+
+            navigate(type === 'driver' ? `/submissionDetailsDriver/${id}` : `/submissionDetailsLibrary/${id}`);
+        } catch (error) {
+            console.error('Error updating status:', error);
+        }
     };
 
     return (
-        <div style={pageStyle}>
-            <div style={headerStyle}>
-                <div style={greetingStyle}>
-                    <strong>Witaj, {sysAdminUsername}</strong>
-                </div>
+        <div className="bg-[#314757] min-h-screen">
+            <header
+                className="flex justify-between items-center w-screen bg-[#3B576C] text-white sticky top-0 z-50 shadow-md">
                 <div>
-                    <button onClick={handleSettings} style={buttonStyle}>Ustawienia</button>
-                    <button onClick={handleLogout} style={buttonStyle}>Wyloguj się</button>
+                    <img
+                        className="relative w-[7%] h-auto object-cover left-[1%]"
+                        alt="Book Rider Logo"
+                        src="/book-rider-high-resolution-logo.png"
+                    />
                 </div>
-            </div>
+                <div className="text-white p-4 flex justify-end">
 
-            <header style={navHeaderStyle}>
+                    <div className="flex items-center">
+                        {email && (
+                            <span className="mr-4">{email}</span>
+                        )}
+                        <button onClick={handleLogout} className="bg-gray-700 text-white px-6 py-2 rounded ml-4 whitespace-nowrap">
+                            Wyloguj się
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <header className="bg-[#314757] text-white flex justify-center p-3 text-xl">
                 <button
-                    onClick={() => handleSectionChange('librarySubmissions')}
-                    style={getNavButtonStyle1('librarySubmissions', activeSection)}
+                    onClick={() => setActiveSection('librarySubmissions')}
+                    className={`px-12 py-3 rounded ${activeSection === 'librarySubmissions' ? 'bg-[#3B576C]' : 'bg-[#314757]'}`}
                 >
                     Podania o zatwierdzenie bibliotek
                 </button>
                 <button
-                    onClick={() => handleSectionChange('driverSubmissions')}
-                    style={getNavButtonStyle2('driverSubmissions', activeSection)}
+                    onClick={() => setActiveSection('driverSubmissions')}
+                    className={`px-12 py-3 rounded ml-4 ${activeSection === 'driverSubmissions' ? 'bg-[#3B576C]' : 'bg-[#314757]'}`}
                 >
                     Podania o zatwierdzenie kierowców
                 </button>
             </header>
 
-            <main style={mainBodyStyle}>
-                {activeSection === 'librarySubmissions' && (
-                    <section style={sectionStyle}>
-                        <h2 style={sectionTitleStyle}>Podania o zatwierdzenie bibliotek</h2>
-                        <div style={submissionListStyle}>
-                            {[1, 2, 3].map((id) => (
-                                <div key={id} style={submissionStyle}>
-                                    <h3 style={submissionTitleStyle}>Library Submission {id}</h3>
-                                    <p style={submissionDetailStyle}>Details of library submission {id} go here.</p>
-                                    <button
-                                        onClick={() => handleExpand('Library', id)}
-                                        style={actionButtonStyle}
-                                    >
-                                        Otwórz
-                                    </button>
-                                </div>
-                            ))}
+
+            <main className="p-0 max-w-4xl mx-auto">
+                {activeSection === 'driverSubmissions' && (
+                    <section>
+                        <div className="space-y-4">
+                            {driverApplications.length > 0 ? (
+                                driverApplications.map((application) => (
+                                    <div key={application.id} className="bg-white p-4 rounded shadow-md">
+                                        <h3 className="text-lg font-semibold text-gray-800">ID
+                                            podania: {application.id}</h3>
+                                        <p className="text-gray-600">Data
+                                            wysłania: {formatDate(application.submittedAt)}</p>
+                                        <p className="text-gray-600">Utworzone przez: {application.driverEmail}</p>
+                                        <button
+                                            onClick={() => updateStatusAndNavigate(application.id, 'driver')}
+                                            className="mt-2 bg-[#4B6477] text-white px-4 py-2 rounded border-2 border-[#314757]"
+                                        >
+                                            Otwórz
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>Brak podań.</p>
+                            )}
                         </div>
+                        {driverHasMore ? (
+                            <button
+                                onClick={() => fetchDriverApplications(driverPage)}
+                                className="mt-4 bg-[#314757] text-gray-400 px-4 py-2 rounded w-full"
+                            >
+                                Załaduj więcej
+                            </button>
+                        ) : (
+                            <p className="mt-4 text-gray-400 text-center">Brak więcej podań do wyświetlenia.</p>
+                        )}
                     </section>
                 )}
-                {activeSection === 'driverSubmissions' && (
-                    <section style={sectionStyle}>
-                        <h2 style={sectionTitleStyle}>Podania o zatwierdzenie kierowców</h2>
-                        <div style={submissionListStyle}>
-                            {[1, 2, 3].map((id) => (
-                                <div key={id} style={submissionStyle}>
-                                    <h3 style={submissionTitleStyle}>Driver Submission {id}</h3>
-                                    <p style={submissionDetailStyle}>Details of driver submission {id} go here.</p>
-                                    <button
-                                        onClick={() => handleExpand('Driver', id)}
-                                        style={actionButtonStyle}
-                                    >
-                                        Otwórz
-                                    </button>
-                                </div>
-                            ))}
+
+                {activeSection === 'librarySubmissions' && (
+                    <section>
+                        <div className="space-y-4">
+                            {libraryRequests.length > 0 ? (
+                                libraryRequests.map((request) => (
+                                    <div key={request.id} className="bg-white p-4 rounded shadow-md">
+                                        <h3 className="text-lg font-semibold text-gray-800">ID
+                                            podania: {request.id}</h3>
+                                        <p className="text-gray-600">Data
+                                            wysłania: {formatDate(request.submittedAt)}</p>
+                                        <p className="text-gray-600">Utworzone przez: {request.creatorEmail}</p>
+                                        <p className="text-gray-600">Nazwa biblioteki: {request.libraryName}</p>
+                                        <button
+                                            onClick={() => updateStatusAndNavigate(request.id, 'library')}
+                                            className="mt-2 bg-[#4B6477] text-white px-4 py-2 rounded border-2 border-[#314757]"
+                                        >
+                                            Otwórz
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>Brak podań.</p>
+                            )}
                         </div>
+                        {libraryHasMore ? (
+                            <button
+                                onClick={() => fetchLibraryRequests(libraryPage)}
+                                className="mt-4 bg-[#314757] text-gray-400 px-4 py-2 rounded w-full"
+                            >
+                                Załaduj więcej
+                            </button>
+                        ) : (
+                            <p className="mt-4 text-gray-400 text-center">Brak więcej podań do wyświetlenia.</p>
+                        )}
                     </section>
                 )}
             </main>
         </div>
     );
-};
-
-// Styles
-const pageStyle = {
-    backgroundColor: '#f4f4f4',
-    margin: '0',
-    padding: '0',
-};
-
-const headerStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '15px 30px',
-    backgroundColor: '#314757',
-    color: '#fff',
-    position: 'sticky',
-    top: 0,
-    zIndex: 1100,
-    marginTop: "-30px",
-    marginBottom: "-10px",
-};
-
-const greetingStyle = {
-    fontSize: '20px',
-};
-
-const buttonStyle = {
-    marginLeft: '18px',
-    marginRight: '-5px',
-    padding: '10px 20px',
-    backgroundColor: '#2d343a',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-};
-
-const navHeaderStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '10px 50px',
-    backgroundColor: '#314757',
-    color: '#fff',
-    position: 'sticky',
-    zIndex: 1000,
-};
-
-
-const getNavButtonStyle1 = (section: string, activeSection: string) => ({
-    padding: '12px 65px',
-    backgroundColor: section === activeSection ? '#3B576C' : '#2d343a',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    marginLeft: "-30px",
-});
-
-const getNavButtonStyle2 = (section: string, activeSection: string) => ({
-    padding: '12px 65px',
-    backgroundColor: section === activeSection ? '#3B576C' : '#2d343a',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    marginRight: "-30px",
-});
-
-const mainBodyStyle: React.CSSProperties = {
-    padding: '20px',
-    display: 'flex',
-    justifyContent: 'center',
-    flexDirection: 'column',
-    gap: '15px',
-    maxWidth: '1100px',
-    margin: '0 auto',
-};
-
-const sectionStyle = {
-    padding: '20px',
-};
-
-const sectionTitleStyle = {
-    color: '#314757',
-    fontSize: '22px',
-    marginBottom: '15px',
-    display: 'flex',
-    justifyContent: 'center',
-    marginTop: '10px',
-};
-
-const submissionListStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px',
-    textAlign: 'center',
-};
-
-const submissionStyle = {
-    backgroundColor: '#ffff',
-    padding: '15px',
-    borderRadius: '6px',
-    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
-};
-
-const submissionTitleStyle = {
-    fontSize: '18px',
-    color: '#2d343a',
-};
-
-const submissionDetailStyle = {
-    color: '#2d343a',
-};
-
-const actionButtonStyle = {
-    padding: '8px 20px',
-    backgroundColor: '#3B576C',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
 };
 
 export default SystemAdminDashboard;
