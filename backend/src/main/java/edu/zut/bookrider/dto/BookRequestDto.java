@@ -17,15 +17,15 @@ public class BookRequestDto {
     @NotNull(message = "Category cannot be null")
     String categoryName;
 
-    @NotEmpty(message = "AuthorIds list cannot be empty")
-    List<Integer> authorIds;
+    @NotEmpty(message = "Author list cannot be empty")
+    List<String> authors;
 
     @NotNull(message = "Release year cannot be null")
     @Positive(message = "Release year must be a positive number")
     Integer releaseYear;
 
-    @NotNull(message = "PublisherId cannot be null")
-    Integer publisherId;
+    @NotNull(message = "Publisher cannot be null")
+    String publisher;
 
     @NotNull(message = "ISBN cannot be null")
     String isbn;

@@ -80,9 +80,9 @@ class BookControllerTest {
         bookRequestDto = new BookRequestDto(
                 "Test Title",
                 category.getName(),
-                List.of(author.getId()),
+                List.of(author.getName()),
                 2022,
-                publisher.getId(),
+                publisher.getName(),
                 "1234567891234",
                 language.getName(),
                 "imageByte64String"
@@ -208,9 +208,9 @@ class BookControllerTest {
         BookRequestDto bookPutRequestDto = new BookRequestDto(
                 "Updated Book Title",
                 updatedCategory.getName(),
-                List.of(author.getId()),
+                List.of(author.getName()),
                 2023,
-                updatedPublisher.getId(),
+                updatedPublisher.getName(),
                 "09871231231233",
                 updatedLanguage.getName(),
                 "updatedImageByte64"
