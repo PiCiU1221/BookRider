@@ -117,7 +117,7 @@ public class BookService {
         Category category = categoryRepository.findByName(bookRequestDto.getCategoryName())
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
 
-        Publisher publisher = publisherRepository.findById(bookRequestDto.getPublisherId())
+        Publisher publisher = publisherRepository.findByName(bookRequestDto.getPublisher())
                 .orElseThrow(() -> new PublisherNotFoundException("Publisher not found"));
 
         Language language = languageRepository.findByName(bookRequestDto.getLanguage())
@@ -125,9 +125,9 @@ public class BookService {
 
         List<Author> authors = new ArrayList<>();
 
-        for (Integer authorId : bookRequestDto.getAuthorIds()) {
-            Author author = authorRepository.findById(authorId)
-                    .orElseThrow(() -> new AuthorNotFoundException("Author not found"));
+        for (String authorName : bookRequestDto.getAuthors()) {
+            Author author = authorRepository.findByName(authorName)
+                    .orElseThrow(() -> new AuthorNotFoundException("Author '" + authorName + "' not found"));
 
             authors.add(author);
         }
@@ -188,14 +188,14 @@ public class BookService {
         Category category = categoryRepository.findByName(bookRequestDto.getCategoryName())
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
 
-        Publisher publisher = publisherRepository.findById(bookRequestDto.getPublisherId())
+        Publisher publisher = publisherRepository.findByName(bookRequestDto.getPublisher())
                 .orElseThrow(() -> new PublisherNotFoundException("Publisher not found"));
 
         List<Author> authors = new ArrayList<>();
 
-        for (Integer authorId : bookRequestDto.getAuthorIds()) {
-            Author author = authorRepository.findById(authorId)
-                    .orElseThrow(() -> new AuthorNotFoundException("Author not found"));
+        for (String authorName : bookRequestDto.getAuthors()) {
+            Author author = authorRepository.findByName(authorName)
+                    .orElseThrow(() -> new AuthorNotFoundException("Author '" + authorName + "' not found"));
 
             authors.add(author);
         }

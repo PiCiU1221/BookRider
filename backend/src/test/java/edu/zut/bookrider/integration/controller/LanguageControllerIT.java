@@ -1,9 +1,13 @@
 package edu.zut.bookrider.integration.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.zut.bookrider.dto.AttributeAddRequestDto;
 import edu.zut.bookrider.model.Language;
+import edu.zut.bookrider.model.Library;
 import edu.zut.bookrider.model.Role;
 import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.repository.LanguageRepository;
+import edu.zut.bookrider.repository.LibraryRepository;
 import edu.zut.bookrider.repository.RoleRepository;
 import edu.zut.bookrider.repository.UserRepository;
 import edu.zut.bookrider.service.UserIdGeneratorService;
@@ -42,6 +46,10 @@ public class LanguageControllerIT {
     private UserRepository userRepository;
     @Autowired
     private LanguageRepository languageRepository;
+    @Autowired
+    private LibraryRepository libraryRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private Language createLanguage(String languageName) {
         Optional<Language> optionalLanguage = languageRepository.findByName(languageName);
@@ -64,6 +72,16 @@ public class LanguageControllerIT {
         user.setPassword(passwordEncoder.encode("password"));
         user.setRole(userRole);
         userRepository.save(user);
+
+        Library library = libraryRepository.findById(1).orElseThrow();
+        Role librarianRole = roleRepository.findByName("librarian").orElseThrow();
+        User librarian = new User();
+        librarian.setId(userIdGeneratorService.generateUniqueId());
+        librarian.setUsername("lcit_librarian");
+        librarian.setRole(librarianRole);
+        librarian.setLibrary(library);
+        librarian.setPassword(passwordEncoder.encode("password"));
+        userRepository.save(librarian);
     }
 
     @Test
@@ -79,5 +97,19 @@ public class LanguageControllerIT {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.hasSize(Matchers.greaterThanOrEqualTo(3))));
+    }
+
+    @Test
+    @WithMockUser(username = "lcit_librarian:1", roles = {"librarian"})
+    void whenLibrarianAddsAuthor_thenReturnCreatedAuthor() throws Exception {
+
+        AttributeAddRequestDto attributeAddRequestDto = new AttributeAddRequestDto("lcit_language");
+        String jsonBody = objectMapper.writeValueAsString(attributeAddRequestDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/languages")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody)
+                )
+                .andExpect(status().isCreated());
     }
 }

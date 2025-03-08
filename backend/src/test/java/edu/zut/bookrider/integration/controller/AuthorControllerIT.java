@@ -1,9 +1,13 @@
 package edu.zut.bookrider.integration.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.zut.bookrider.dto.AttributeAddRequestDto;
 import edu.zut.bookrider.model.Author;
+import edu.zut.bookrider.model.Library;
 import edu.zut.bookrider.model.Role;
 import edu.zut.bookrider.model.User;
 import edu.zut.bookrider.repository.AuthorRepository;
+import edu.zut.bookrider.repository.LibraryRepository;
 import edu.zut.bookrider.repository.RoleRepository;
 import edu.zut.bookrider.repository.UserRepository;
 import edu.zut.bookrider.service.UserIdGeneratorService;
@@ -40,6 +44,10 @@ public class AuthorControllerIT {
     private UserRepository userRepository;
     @Autowired
     private AuthorRepository authorRepository;
+    @Autowired
+    private LibraryRepository libraryRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     void createAuthor(String name) {
         Author author = new Author();
@@ -56,6 +64,16 @@ public class AuthorControllerIT {
         user.setRole(userRole);
         user.setPassword(passwordEncoder.encode("password"));
         userRepository.save(user);
+
+        Library library = libraryRepository.findById(1).orElseThrow();
+        Role librarianRole = roleRepository.findByName("librarian").orElseThrow();
+        User librarian = new User();
+        librarian.setId(userIdGeneratorService.generateUniqueId());
+        librarian.setUsername("acit_librarian");
+        librarian.setRole(librarianRole);
+        librarian.setLibrary(library);
+        librarian.setPassword(passwordEncoder.encode("password"));
+        userRepository.save(librarian);
     }
 
     @Test
@@ -91,18 +109,16 @@ public class AuthorControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "example_user@acit.com", roles = {"user"})
-    void whenUserGetsAuthorsWithInputFromMiddle_thenReturnOnlySelectedAuthors() throws Exception {
+    @WithMockUser(username = "acit_librarian:1", roles = {"librarian"})
+    void whenLibrarianAddsAuthor_thenReturnCreatedAuthor() throws Exception {
 
-        createAuthor("author_acit1");
-        createAuthor("author_acit2");
-        createAuthor("author_acit3");
+        AttributeAddRequestDto attributeAddRequestDto = new AttributeAddRequestDto("acit_author");
+        String jsonBody = objectMapper.writeValueAsString(attributeAddRequestDto);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/authors/search")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/authors")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("name", "_acit")
+                        .content(jsonBody)
                 )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", Matchers.hasSize(Matchers.greaterThanOrEqualTo(3))));
+                .andExpect(status().isCreated());
     }
 }

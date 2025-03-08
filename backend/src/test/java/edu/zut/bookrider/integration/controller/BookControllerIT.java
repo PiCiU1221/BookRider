@@ -181,12 +181,17 @@ public class BookControllerIT {
         File exampleImage = new ClassPathResource("bookControllerTest/cat-2605502_1280.jpg").getFile();
         String bookCoverString = Base64.getEncoder().encodeToString(java.nio.file.Files.readAllBytes(exampleImage.toPath()));
 
+        List<String> authors = new ArrayList<>(List.of("bcit_author1", "bcit_author2"));
+        createAuthors(authors);
+        createPublisher("bcit_publisher");
+
+
         BookRequestDto bookRequestDto = new BookRequestDto(
                 "testTitle",
                 "Poezja",
-                List.of(1, 2),
+                authors,
                 2024,
-                1,
+                "bcit_publisher",
                 "1235437651243",
                 "Polski",
                 bookCoverString

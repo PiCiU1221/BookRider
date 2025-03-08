@@ -11,7 +11,8 @@ import java.util.Optional;
 
 public interface AuthorRepository extends JpaRepository<Author, Integer> {
     Optional<Author> findByName(String authorName);
+    boolean existsByName(String name);
 
-    @Query("SELECT a FROM Author a WHERE LOWER(a.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    @Query("SELECT a FROM Author a WHERE LOWER(a.name) LIKE LOWER(CONCAT(:name, '%'))")
     List<Author> findByNameLike(@Param("name") String name, Pageable pageable);
 }

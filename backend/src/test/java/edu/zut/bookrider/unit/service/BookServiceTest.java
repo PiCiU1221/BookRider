@@ -114,9 +114,9 @@ public class BookServiceTest {
         bookRequestDto = new BookRequestDto(
                 "Test Title",
                 category.getName(),
-                List.of(author1.getId(), author2.getId()),
+                List.of(author1.getName(), author2.getName()),
                 2022,
-                publisher.getId(),
+                publisher.getName(),
                 "1234567891234",
                 language.getName(),
                 base64Image
@@ -142,9 +142,9 @@ public class BookServiceTest {
         when(bookReadMapper.map(any(Book.class))).thenReturn(bookResponseDto);
         when(libraryRepository.findById(any())).thenReturn(Optional.of(library));
         when(categoryRepository.findByName(any())).thenReturn(Optional.of(category));
-        when(publisherRepository.findById(any())).thenReturn(Optional.of(publisher));
-        when(authorRepository.findById(1)).thenReturn(Optional.of(author1));
-        when(authorRepository.findById(2)).thenReturn(Optional.of(author2));
+        when(publisherRepository.findByName(publisher.getName())).thenReturn(Optional.of(publisher));
+        when(authorRepository.findByName(author1.getName())).thenReturn(Optional.of(author1));
+        when(authorRepository.findByName(author2.getName())).thenReturn(Optional.of(author2));
         when(languageRepository.findByName(any())).thenReturn(Optional.of(language));
 
         Authentication authentication = mock(Authentication.class);
@@ -199,9 +199,9 @@ public class BookServiceTest {
         when(bookRepository.save(any(Book.class))).thenReturn(book);
         when(bookReadMapper.map(any(Book.class))).thenReturn(bookResponseDto);
         when(categoryRepository.findByName(any())).thenReturn(Optional.of(category));
-        when(publisherRepository.findById(any())).thenReturn(Optional.of(publisher));
-        when(authorRepository.findById(1)).thenReturn(Optional.of(author1));
-        when(authorRepository.findById(2)).thenReturn(Optional.of(author2));
+        when(publisherRepository.findByName(publisher.getName())).thenReturn(Optional.of(publisher));
+        when(authorRepository.findByName(author1.getName())).thenReturn(Optional.of(author1));
+        when(authorRepository.findByName(author2.getName())).thenReturn(Optional.of(author2));
 
         BookResponseDto result = bookService.updateBook(1, bookRequestDto);
 
