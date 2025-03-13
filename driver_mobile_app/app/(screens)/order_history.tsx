@@ -94,7 +94,7 @@ export default function OrderHistory() {
     return (
         <View className="flex-1 p-4 bg-theme_background">
             <StatusBar style="light" />
-            <Text className="text-2xl font-bold text-white mt-10 mb-4">Order History</Text>
+            <Text className="text-2xl font-bold text-white mt-10 mb-4">Historia zamówień</Text>
 
             <FlatList
                 data={orders}
@@ -103,12 +103,12 @@ export default function OrderHistory() {
                     <TouchableOpacity onPress={() => handleOrderPress(item)}>
                         <View className="bg-black/10 p-4 mb-4 rounded-lg border border-gray-300 flex-row justify-between items-center">
                             <View className="flex-1">
-                                <Text className="text-lg font-semibold text-white">Order ID: {item.orderId}</Text>
-                                <Text className="text-white">Pickup: {item.pickupAddress}</Text>
-                                <Text className="text-white">Destination: {item.destinationAddress}</Text>
-                                <Text className="text-white">Library: {item.libraryName}</Text>
+                                <Text className="text-lg font-semibold text-white">Numer zamówienia: {item.orderId}</Text>
+                                <Text className="text-white">Odbiór: {item.pickupAddress}</Text>
+                                <Text className="text-white">Dostawa: {item.destinationAddress}</Text>
+                                <Text className="text-white">Biblioteka: {item.libraryName}</Text>
                                 <Text className="text-white">
-                                    Delivered At: {new Date(item.deliveredAt).toLocaleString()}
+                                    Dostarczono: {new Date(item.deliveredAt).toLocaleString()}
                                 </Text>
                             </View>
                             <Text className="text-3xl font-bold text-green-500">{item.amount} zł</Text>
@@ -117,14 +117,14 @@ export default function OrderHistory() {
                 )}
                 ListEmptyComponent={
                     <View className="items-center justify-center">
-                        <Text className="text-white">You currently have no order history. Please assign new orders in the Deliveries tab to get started.</Text>
+                        <Text className="text-white">Nie masz jeszcze historii zamówień. Przypisz nowe zamówienia w zakładce Dostawy, aby rozpocząć.</Text>
                     </View>
                 }
             />
 
             <CustomModal
                 isVisible={modalVisible}
-                title={showImage ? "Delivery Image" : selectedOrder ? "Order Details" : "Loading..."}
+                title={showImage ? "Zdjęcie dostawy" : selectedOrder ? "Szczegóły zamówienia" : "Ładowanie..."}
                 onClose={() => {
                     if (showImage) {
                         setShowImage(false);
@@ -139,11 +139,11 @@ export default function OrderHistory() {
                     <View className="space-y-4">
                         <View className="flex-row items-center">
                             <Feather name="hash" size={20} color="#f7ca65" />
-                            <Text className="text-white text-2xl font-semibold ml-2">Order ID: {selectedOrder.orderId}</Text>
+                            <Text className="text-white text-2xl font-semibold ml-2">Numer zamówienia: {selectedOrder.orderId}</Text>
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="dollar-sign" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Amount: {selectedOrder.amount} zł</Text>
+                            <Text className="text-white text-lg ml-2">Zarobki: {selectedOrder.amount} zł</Text>
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="info" size={20} color="#f7ca65" />
@@ -151,60 +151,60 @@ export default function OrderHistory() {
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="credit-card" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Payment Status: {selectedOrder.paymentStatus}</Text>
+                            <Text className="text-white text-lg ml-2">Status płatności: {selectedOrder.paymentStatus}</Text>
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="message-square" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Note to Driver: {selectedOrder.noteToDriver || "None"}</Text>
+                            <Text className="text-white text-lg ml-2">Wiadomość dla kierowcy: {selectedOrder.noteToDriver || "Brak"}</Text>
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="book" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Library Name: {selectedOrder.libraryName}</Text>
+                            <Text className="text-white text-lg ml-2">Nazwa biblioteki: {selectedOrder.libraryName}</Text>
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="map-pin" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Pickup Address: {selectedOrder.pickupAddress}</Text>
+                            <Text className="text-white text-lg ml-2">Adres odbioru: {selectedOrder.pickupAddress}</Text>
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="map-pin" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Destination Address: {selectedOrder.destinationAddress}</Text>
+                            <Text className="text-white text-lg ml-2">Adres dostawy: {selectedOrder.destinationAddress}</Text>
                         </View>
 
                         {selectedOrder.isReturn ? (
                             <>
                                 <View className="flex-row items-center mt-2">
                                     <Feather name="refresh-cw" size={20} color="#ff5555" />
-                                    <Text className="text-red-400 text-lg font-bold ml-2">Return Order</Text>
+                                    <Text className="text-red-400 text-lg font-bold ml-2">Zamówienie zwrotne</Text>
                                 </View>
 
                                 <View className="flex-row items-center mt-2">
                                     <Feather name="calendar" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Created At: {new Date(selectedOrder.createdAt).toLocaleString()}
+                                        Utworzono: {new Date(selectedOrder.createdAt).toLocaleString()}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="user-check" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Driver Assigned At: {new Date(selectedOrder.driverAssignedAt).toLocaleString()}
+                                        Kierowca przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString()}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="package" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Picked Up At: {new Date(selectedOrder.pickedUpAt).toLocaleString()}
+                                        Odebrano: {new Date(selectedOrder.pickedUpAt).toLocaleString()}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="check-circle" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Delivered At: {new Date(selectedOrder.deliveredAt).toLocaleString()}
+                                        Dostarczono: {new Date(selectedOrder.deliveredAt).toLocaleString()}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="clock" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Accepted At: {new Date(selectedOrder.acceptedAt).toLocaleString()}
+                                        Zaakceptowano: {new Date(selectedOrder.acceptedAt).toLocaleString()}
                                     </Text>
                                 </View>
                             </>
@@ -213,42 +213,42 @@ export default function OrderHistory() {
                                 <View className="flex-row items-center mt-4">
                                     <Feather name="calendar" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Created At: {new Date(selectedOrder.createdAt).toLocaleString()}
+                                        Utworzono: {new Date(selectedOrder.createdAt).toLocaleString()}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="clock" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Accepted At: {new Date(selectedOrder.acceptedAt).toLocaleString()}
+                                        Zaakceptowano: {new Date(selectedOrder.acceptedAt).toLocaleString()}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="user-check" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Driver Assigned At: {new Date(selectedOrder.driverAssignedAt).toLocaleString()}
+                                        Kierowca przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString()}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="package" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Picked Up At: {new Date(selectedOrder.pickedUpAt).toLocaleString()}
+                                        Odebrano: {new Date(selectedOrder.pickedUpAt).toLocaleString()}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="check-circle" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Delivered At: {new Date(selectedOrder.deliveredAt).toLocaleString()}
+                                        Dostarczono: {new Date(selectedOrder.deliveredAt).toLocaleString()}
                                     </Text>
                                 </View>
                             </>
                         )}
 
-                        <Text className="text-white text-xl font-semibold mt-4 mb-2">Order Items:</Text>
+                        <Text className="text-white text-xl font-semibold mt-4 mb-2">Pozycje zamówienia:</Text>
                         <View className="bg-black/10 p-4 rounded-lg space-y-2 border border-gray-300">
                             <View className="flex-row justify-between border-gray-300 pb-2">
-                                <Text className="text-white font-semibold">Book Title</Text>
-                                <Text className="text-white font-semibold">Authors</Text>
-                                <Text className="text-white font-semibold">Quantity</Text>
+                                <Text className="text-white font-semibold">Tytuł</Text>
+                                <Text className="text-white font-semibold">Autorzy</Text>
+                                <Text className="text-white font-semibold">Ilość</Text>
                             </View>
 
                             {selectedOrder.orderItems.map((item, index) => (
@@ -265,7 +265,7 @@ export default function OrderHistory() {
                             className="bg-blue-600 rounded-lg p-3 flex-row items-center justify-center mt-4"
                         >
                             <Feather name="image" size={20} color="white" />
-                            <Text className="text-white text-lg font-semibold ml-2">Show Delivery Image</Text>
+                            <Text className="text-white text-lg font-semibold ml-2">Pokaż zdjęcie dostawy</Text>
                         </TouchableOpacity>
                     </View>
                 ) : (

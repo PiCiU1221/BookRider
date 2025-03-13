@@ -60,9 +60,9 @@ export default function AccountPage() {
     return (
         <View className="flex-1 bg-theme_background p-4">
             <StatusBar style="light" />
-            <Text className="text-2xl font-bold text-white mt-10 mb-4">Account Information</Text>
+            <Text className="text-2xl font-bold text-white mt-10 mb-4">Dane konta</Text>
 
-            <CustomModal isVisible={loading} title="Loading..." loading={true} onClose={() => {}} />
+            <CustomModal isVisible={loading} title="Ładowanie..." loading={true} onClose={() => {}} />
             {!loading && (
                 <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
                     {profile ? (
@@ -76,31 +76,31 @@ export default function AccountPage() {
                             <View className="flex-row items-center mb-4">
                                 <Feather name="user" size={20} color="#f7ca65" />
                                 <Text className="text-white text-lg ml-2">
-                                    <Text className="font-bold">First Name:</Text> {profile.firstName}
+                                    <Text className="font-bold">Imię:</Text> {profile.firstName}
                                 </Text>
                             </View>
                             <View className="flex-row items-center mb-4">
                                 <Feather name="user-check" size={20} color="#f7ca65" />
                                 <Text className="text-white text-lg ml-2">
-                                    <Text className="font-bold">Last Name:</Text> {profile.lastName}
+                                    <Text className="font-bold">Nazwisko:</Text> {profile.lastName}
                                 </Text>
                             </View>
                             <View className="flex-row items-center mb-4">
                                 <Feather name="dollar-sign" size={20} color="#f7ca65" />
                                 <Text className="text-white text-lg ml-2">
-                                    <Text className="font-bold">Balance:</Text> {profile.balance.toFixed(2)} zł
+                                    <Text className="font-bold">Stan konta:</Text> {profile.balance.toFixed(2)} zł
                                 </Text>
                             </View>
                             <View className="flex-row items-center">
                                 <Feather name="calendar" size={20} color="#f7ca65" />
                                 <Text className="text-white text-lg ml-2">
-                                    <Text className="font-bold">Joined At:</Text> {new Date(profile.createdAt).toLocaleDateString()}
+                                    <Text className="font-bold">Dołączono:</Text> {new Date(profile.createdAt).toLocaleDateString()}
                                 </Text>
                             </View>
                         </View>
                     ) : (
                         <Text className="text-white text-lg text-center">
-                            Unable to load profile information.
+                            Nie można załadować informacji o profilu.
                         </Text>
                     )}
                 </ScrollView>
@@ -111,7 +111,7 @@ export default function AccountPage() {
                 className="mt-auto bg-red-500 p-4 rounded-2xl shadow-md"
                 style={{ elevation: 5 }}
             >
-                <Text className="text-white text-center font-bold text-lg">Logout</Text>
+                <Text className="text-white text-center font-bold text-lg">Wyloguj się</Text>
             </TouchableOpacity>
         </View>
     );

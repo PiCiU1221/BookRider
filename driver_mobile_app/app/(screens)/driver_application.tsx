@@ -105,12 +105,12 @@ export default function DriverApplication() {
     return (
         <View className="flex-1 p-4 bg-theme_background">
             <StatusBar style="light" />
-            <Text className="text-2xl font-bold text-white mt-10 mb-4">Driver Applications</Text>
+            <Text className="text-2xl font-bold text-white mt-10 mb-4">Wnioski kierowców</Text>
 
             {(applications.length === 0 ? (
                 <View className="flex-1 justify-center items-center">
                     <Text className="text-white text-center text-lg mb-4">
-                        You have no applications. Create one to get started!
+                        Nie masz żadnych wniosków. Stwórz jeden, aby zacząć!
                     </Text>
                 </View>
             ) : (
@@ -122,7 +122,7 @@ export default function DriverApplication() {
                             <View className="bg-black/10 p-4 mb-4 rounded-lg border border-gray-300">
                                 <Text className="text-lg font-semibold text-white">Status: {item.status}</Text>
                                 <Text className="text-white">
-                                    Submitted At: {new Date(item.submittedAt).toLocaleString()}
+                                    Złożono: {new Date(item.submittedAt).toLocaleString()}
                                 </Text>
                             </View>
                         </TouchableOpacity>
@@ -150,7 +150,7 @@ export default function DriverApplication() {
 
             <CustomModal
                 isVisible={detailsModalVisible}
-                title={selectedApplication ? "Application Details" : "Loading..."}
+                title={selectedApplication ? "Szczegóły wniosku" : "Ładowanie..."}
                 onClose={() => {
                     setDetailsModalVisible(false);
                     setSelectedApplication(null);
@@ -161,7 +161,7 @@ export default function DriverApplication() {
                     <View className="space-y-4">
                         <View className="flex-row items-center">
                             <Feather name="hash" size={20} color="#f7ca65" />
-                            <Text className="text-white text-2xl font-semibold ml-2">ID: <Text className="font-normal">{selectedApplication.id}</Text></Text>
+                            <Text className="text-white text-2xl font-semibold ml-2">Numer wniosku: <Text className="font-normal">{selectedApplication.id}</Text></Text>
                         </View>
 
                         <View className="flex-row items-center">
@@ -172,30 +172,30 @@ export default function DriverApplication() {
                         <View className="flex-row items-center">
                             <Feather name="calendar" size={20} color="#f7ca65" />
                             <Text className="text-white text-lg ml-2">
-                                Submitted At: <Text className="font-normal">{new Date(selectedApplication.submittedAt).toLocaleString()}</Text>
+                                Złożono: <Text className="font-normal">{new Date(selectedApplication.submittedAt).toLocaleString()}</Text>
                             </Text>
                         </View>
 
                         <View className="flex-row items-center">
                             <Feather name="calendar" size={20} color="#f7ca65" />
                             <Text className="text-white text-lg ml-2">
-                                Reviewed At: <Text className="font-normal">{selectedApplication.reviewedAt ? new Date(selectedApplication.reviewedAt).toLocaleString() : "N/A"}</Text>
+                                Przejrzano: <Text className="font-normal">{selectedApplication.reviewedAt ? new Date(selectedApplication.reviewedAt).toLocaleString() : "Brak"}</Text>
                             </Text>
                         </View>
 
                         <View className="flex-row items-center">
                             <Feather name="x-circle" size={20} color="#f7ca65" />
                             <Text className="text-white text-lg ml-2">
-                                Rejection Reason: <Text className="font-normal">{selectedApplication.rejectionReason || "N/A"}</Text>
+                                Powód odrzucenia: <Text className="font-normal">{selectedApplication.rejectionReason || "Nie dotyczy"}</Text>
                             </Text>
                         </View>
 
                         <View className="mt-6">
-                            <Text className="text-white text-xl font-semibold mb-2">Driver Documents:</Text>
+                            <Text className="text-white text-xl font-semibold mb-2">Dokumenty:</Text>
                             {selectedApplication.driverDocuments.map((doc, index) => (
                                 <View key={index} className="bg-black/10 p-4 rounded-lg mb-4">
-                                    <Text className="text-white text-lg font-medium">Type: <Text className="font-normal">{doc.documentType}</Text></Text>
-                                    <Text className="text-white text-lg font-medium">Expiry Date: <Text className="font-normal">{new Date(doc.expiryDate).toLocaleDateString()}</Text></Text>
+                                    <Text className="text-white text-lg font-medium">Rodzaj: <Text className="font-normal">{doc.documentType}</Text></Text>
+                                    <Text className="text-white text-lg font-medium">Termin ważności: <Text className="font-normal">{new Date(doc.expiryDate).toLocaleDateString()}</Text></Text>
                                     <View className="mt-4">
                                         <Image
                                             source={{ uri: doc.documentPhotoUrl }}

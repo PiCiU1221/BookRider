@@ -81,7 +81,7 @@ export default function Index() {
 
             <View className="flex items-center mb-64">
                 <ActivityIndicator size={100} color="#f7ca65" />
-                <Text className="mt-8 text-white text-xl">Initializing...</Text>
+                <Text className="mt-8 text-white text-xl">Inicjalizowanie...</Text>
             </View>
         </View>
     );
