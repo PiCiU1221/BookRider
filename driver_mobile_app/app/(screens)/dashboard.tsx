@@ -90,7 +90,7 @@ export default function Dashboard() {
             {loading ? (
                 <View className="flex-1 justify-center items-center bg-gray-800">
                     <ActivityIndicator size="large" color="#fff" />
-                    <Text className="text-white mt-4">Loading your location...</Text>
+                    <Text className="text-white mt-4">"Wczytywanie twojej lokalizacji...</Text>
                 </View>
             ) : (
                 <>
@@ -134,11 +134,11 @@ export default function Dashboard() {
                         <>
                             <View className="absolute top-16 right-3 p-4 bg-theme_background rounded-lg shadow-md z-50">
                                 <Text className="text-white text-sm">
-                                    <Text className="font-bold">Distance: </Text>
+                                    <Text className="font-bold">Odległość: </Text>
                                     {totalDistance?.toFixed(2)} km
                                 </Text>
                                 <Text className="text-white text-sm">
-                                    <Text className="font-bold">Duration: </Text>
+                                    <Text className="font-bold">Czas podróży: </Text>
                                     {totalDuration ? `${(totalDuration / 60).toFixed(0)} min` : "N/A"}
                                 </Text>
                             </View>
@@ -155,56 +155,52 @@ export default function Dashboard() {
                     )}
 
                     <View className="absolute bottom-0 left-0 w-full bg-theme_background flex-row">
-                        <View className="w-1/5" />
-
-                        <View className="w-1/5" />
-
                         <TouchableOpacity
-                            className="w-1/5 p-3 items-center justify-center bg-theme_accent"
-                            onPress={() => {
-                                router.push("/deliveries");
-                            }}
-                        >
-                            <Icon name="car" size={30} color="white" />
-                            <Text className="text-white text-sm">Deliveries</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            className="w-1/5 p-3 items-center justify-center"
+                            className="w-1/3 p-3 items-center justify-center"
                             onPress={() => {
                                 router.push("/order_history");
                             }}
                         >
                             <Icon name="document-text" size={30} color="white" />
-                            <Text className="text-white text-sm text-center">Orders</Text>
+                            <Text className="text-white text-sm text-center">Zamówienia</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            className="w-1/5 p-3 rounded-full items-center justify-center"
+                            className="w-1/3 p-3 items-center justify-center bg-theme_accent"
+                            onPress={() => {
+                                router.push("/deliveries");
+                            }}
+                        >
+                            <Icon name="car" size={30} color="white" />
+                            <Text className="text-white text-sm">Dostawy</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            className="w-1/3 p-3 rounded-full items-center justify-center"
                             onPress={() => {
                                 router.push("/account");
                             }}
                         >
                             <Icon name="person" size={30} color="white" />
-                            <Text className="text-white text-sm">Account</Text>
+                            <Text className="text-white text-sm">Konto</Text>
                         </TouchableOpacity>
                     </View>
 
                     <CustomModal
                         isVisible={modalVisible}
-                        title="Confirm Navigation Removal"
+                        title="Potwierdź usunięcie nawigacji"
                         onClose={() => setModalVisible(false)}
                         loading={loading}
                     >
                         <Text className="text-lg text-center mb-4 text-white">
-                            Are you sure you want to remove the navigation?
+                            Czy na pewno chcesz usunąć nawigację?
                         </Text>
                         <TouchableOpacity
                             onPress={handleClearDirections}
                             className="bg-red-600 rounded-xl w-full py-3"
                         >
                             <Text className="text-xl text-white text-center font-semibold">
-                                Confirm
+                                Potwierdź
                             </Text>
                         </TouchableOpacity>
                     </CustomModal>

@@ -14,6 +14,11 @@ enum DocumentType {
     DRIVER_LICENSE = "DRIVER_LICENSE",
 }
 
+const documentTypes: Record<string, string> = {
+    ID: "Dowód osobisty",
+    DRIVER_LICENSE: "Prawo jazdy",
+};
+
 interface Document {
     documentType: string;
     expirationDate: string;
@@ -80,7 +85,7 @@ export default function CreateDriverApplication() {
             if (response.ok) {
                 setApiResponse({
                     status: 'success',
-                    message: 'Your application has been submitted successfully!',
+                    message: 'Twój wniosek został pomyślnie złożony!',
                 });
                 setDocuments([
                     { documentType: '', expirationDate: '', base64Image: '', imageUri: null, imageSaved: false },
@@ -153,10 +158,10 @@ export default function CreateDriverApplication() {
             <StatusBar style="light" />
 
             <Text className="text-2xl font-bold text-white mt-10 mb-4">
-                Create Driver Application
+                Stwórz wniosek
             </Text>
             <Text className="text-white text-sm mb-6">
-                Please upload your required documents (e.g., ID, Driving License) to complete your application.
+                Proszę przesłać wymagane dokumenty (np. dowód osobisty, prawo jazdy), aby wypełnić wniosek.
             </Text>
 
             {documents.map((document, index) => (
@@ -171,14 +176,14 @@ export default function CreateDriverApplication() {
                     )}
 
                     <Text className="text-lg font-semibold text-white mb-2">
-                        Document {index + 1}
+                        Dokument {index + 1}
                     </Text>
 
                     <Text
                         className="text-base font-semibold mb-1"
                         style={{ color: '#C8C8C8'}}
                     >
-                        Document type:
+                        Typ dokumentu:
                     </Text>
                     <View className="border border-gray-300 rounded-lg mb-2 h-12 flex justify-center">
                         <Picker
@@ -187,11 +192,11 @@ export default function CreateDriverApplication() {
                             className="bg-black/5 p-2 text-sm text-white border border-gray-300"
                             dropdownIconColor="#C8C8C8"
                         >
-                            {Object.values(DocumentType).map((type) => (
+                            {Object.values(DocumentType).map((key) => (
                                 <Picker.Item
-                                    key={type}
-                                    label={type.replace("_", " ")}
-                                    value={type}
+                                    key={key}
+                                    label={documentTypes[key]}
+                                    value={key}
                                     color="#C8C8C8"
                                 />
                             ))}
@@ -202,11 +207,11 @@ export default function CreateDriverApplication() {
                         className="text-base font-semibold mb-1"
                         style={{ color: '#C8C8C8'}}
                     >
-                        Expiration date:
+                        Termin ważności:
                     </Text>
                     <TextInput
                         className="bg-black/5 p-3 rounded-lg mb-2 text-base text-white border border-gray-300"
-                        placeholder="Expiration Date (YYYY-MM-DD)"
+                        placeholder="Termin ważności (RRRR-MM-DD)"
                         placeholderTextColor="#C8C8C8"
                         value={document.expirationDate}
                         onChangeText={(text) => {
@@ -226,7 +231,7 @@ export default function CreateDriverApplication() {
                                 className="ml-2 bg-red-700 p-2 rounded-lg"
                                 onPress={() => removeImage(index)}
                             >
-                                <Text className="text-white">Remove picture</Text>
+                                <Text className="text-white">Usuń zdjęcie</Text>
                             </TouchableOpacity>
                         </View>
                     )}
@@ -237,7 +242,7 @@ export default function CreateDriverApplication() {
                             onPress={() => pickImage(index)}
                         >
                             <Feather name="camera" size={20} color="white" className="mr-2" />
-                            <Text className="text-white">Take a Picture</Text>
+                            <Text className="text-white">Zrób zdjęcie</Text>
                         </TouchableOpacity>
                     )}
                 </View>
@@ -255,12 +260,12 @@ export default function CreateDriverApplication() {
                 onPress={handleSubmit}
                 disabled={isSubmitting}
             >
-                <Text className="text-xl font-bold text-white text-center">Submit application</Text>
+                <Text className="text-xl font-bold text-white text-center">Złóż wniosek</Text>
             </TouchableOpacity>
 
             <CustomModal
                 isVisible={modalVisible}
-                title={apiResponse?.status === 'success' ? 'Submission Successful!' : 'Error'}
+                title={apiResponse?.status === 'success' ? 'Złożenie wniosku zakończone sukcesem!' : 'Error'}
                 message={apiResponse?.message}
                 onClose={() => {
                     if (apiResponse?.status === 'success') {

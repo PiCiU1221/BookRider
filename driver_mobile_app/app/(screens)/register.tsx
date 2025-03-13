@@ -28,12 +28,12 @@ export default function Register() {
 
         if (!emailRegex.test(email)) {
             setModalVisible(true);
-            setApiResponse({ status: "error", message: "Email is not a valid email address." });
+            setApiResponse({ status: "error", message: "Podany email nie jest prawidłowym adresem email." });
             return;
         }
 
         if (password !== confirmPassword) {
-            setApiResponse({ status: "error", message: "Passwords do not match." });
+            setApiResponse({ status: "error", message: "Podane hasła nie są identyczne." });
             setModalVisible(true);
             return;
         }
@@ -103,7 +103,7 @@ export default function Register() {
 
                 <View className="flex-1 justify-center mb-10 mx-8">
                     <Text className="text-theme_accent text-3xl font-bold tracking-wide text-left ml-2 mb-8">
-                        Register
+                        Rejestracja
                     </Text>
 
                     <Animated.View entering={FadeInDown.duration(1000).springify()}
@@ -125,7 +125,7 @@ export default function Register() {
                         <View className="bg-black/10 px-2 rounded-xl flex-1 mr-2 h-14 justify-center">
                             <TextInput
                                 className="text-base text-white"
-                                placeholder="First Name"
+                                placeholder="Imię"
                                 placeholderTextColor={"#C8C8C8"}
                                 value={firstName}
                                 onChangeText={setFirstName}
@@ -134,7 +134,7 @@ export default function Register() {
                         <View className="bg-black/10 px-2 rounded-xl flex-1 ml-2 h-14 justify-center">
                             <TextInput
                                 className="text-base text-white"
-                                placeholder="Last Name"
+                                placeholder="Nazwisko"
                                 placeholderTextColor={"#C8C8C8"}
                                 value={lastName}
                                 onChangeText={setLastName}
@@ -149,7 +149,7 @@ export default function Register() {
                         <View className="bg-black/10 px-2 rounded-xl w-full h-14 justify-center flex-1 mr-2">
                             <TextInput
                                 className="text-base text-white"
-                                placeholder="Password"
+                                placeholder="Hasło"
                                 placeholderTextColor={"#C8C8C8"}
                                 secureTextEntry={true}
                                 value={password}
@@ -161,7 +161,7 @@ export default function Register() {
                         <View className="bg-black/10 px-2 rounded-xl w-full h-14 justify-center flex-1 ml-2">
                             <TextInput
                                 className="text-base text-white"
-                                placeholder="Confirm Password"
+                                placeholder="Powtórz hasło"
                                 placeholderTextColor={"#C8C8C8"}
                                 secureTextEntry={true}
                                 value={confirmPassword}
@@ -177,20 +177,20 @@ export default function Register() {
                             onPress={handleRegister}
                             disabled={loading}
                         >
-                            <Text className="text-2xl font-bold text-white text-center">Register</Text>
+                            <Text className="text-2xl font-bold text-white text-center">Załóż konto</Text>
                         </TouchableOpacity>
                     </Animated.View>
 
                     <Animated.View entering={FadeInDown.delay(800).duration(1000).springify()} className="flex-row justify-center">
-                        <Text className="text-white text-base">Already have an account? </Text>
+                        <Text className="text-white text-base">Masz już konto? </Text>
                         <Link replace href="/login">
-                            <Text className="text-theme_accent text-base">Log in</Text>
+                            <Text className="text-theme_accent text-base">Zaloguj się</Text>
                         </Link>
                     </Animated.View>
 
                     <CustomModal
                         isVisible={modalVisible}
-                        title={apiResponse?.status === "success" ? "Registration Successful!" : "Error"}
+                        title={apiResponse?.status === "success" ? "Pomyślnie utworzono nowe konto!" : "Błąd"}
                         message={apiResponse?.message}
                         onClose={onCloseAction}
                         loading={loading}

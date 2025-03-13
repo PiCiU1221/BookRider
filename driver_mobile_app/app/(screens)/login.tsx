@@ -115,7 +115,7 @@ export default function Login() {
 
                 <View className="flex-1 justify-center mb-10 mx-8">
                     <Text className="text-theme_accent text-3xl font-bold tracking-wide text-left ml-2 mb-8">
-                        Login
+                        Logowanie
                     </Text>
 
                     <Animated.View
@@ -138,7 +138,7 @@ export default function Login() {
                     >
                         <TextInput
                             className="text-base text-white"
-                            placeholder="Password"
+                            placeholder="Hasło"
                             placeholderTextColor="#C8C8C8"
                             secureTextEntry={true}
                             value={password}
@@ -156,7 +156,7 @@ export default function Login() {
                             onPress={handleLogin}
                             disabled={loading}
                         >
-                            <Text className="text-2xl font-bold text-white text-center">Login</Text>
+                            <Text className="text-2xl font-bold text-white text-center">Zaloguj się</Text>
                         </TouchableOpacity>
                     </Animated.View>
 
@@ -164,15 +164,15 @@ export default function Login() {
                         entering={FadeInDown.delay(600).duration(1000).springify()}
                         className="flex-row justify-center"
                     >
-                        <Text className="text-white text-base">Don't have an account? </Text>
+                        <Text className="text-white text-base">Nie masz konta? </Text>
                         <Link replace href="/register">
-                            <Text className="text-theme_accent text-base">Sign up</Text>
+                            <Text className="text-theme_accent text-base">Zarejestruj się</Text>
                         </Link>
                     </Animated.View>
 
                     <CustomModal
                         isVisible={modalVisible}
-                        title={apiResponse?.status === "success" ? "Login Successful!" : "Error"
+                        title={apiResponse?.status === "success" ? "Pomyślnie zalogowano!" : "Błąd"
                         }
                         message={apiResponse?.message}
                         onClose={() => setModalVisible(false)}
