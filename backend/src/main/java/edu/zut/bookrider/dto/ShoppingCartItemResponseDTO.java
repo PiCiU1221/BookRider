@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ShoppingCartItemResponseDTO {
-    private Integer libraryId;
+    private String libraryName;
     private BigDecimal totalItemDeliveryCost;
     private List<ShoppingCartSubItemResponseDTO> books;
 }

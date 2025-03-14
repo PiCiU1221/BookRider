@@ -24,7 +24,7 @@ public class ShoppingCartItemMapper implements Mapper<ShoppingCartItem, Shopping
                 .toList();
 
         return new ShoppingCartItemResponseDTO(
-                shoppingCartItem.getLibrary().getId(),
+                shoppingCartItem.getLibrary().getName(),
                 shoppingCartItem.getTotalItemDeliveryCost(),
                 subItemResponseDTOs
         );
