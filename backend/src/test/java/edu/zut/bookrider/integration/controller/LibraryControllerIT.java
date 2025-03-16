@@ -48,6 +48,7 @@ public class LibraryControllerIT {
     private LibraryRepository libraryRepository;
 
     private Address addressReference;
+    private Library libraryReference;
 
     void createLibrary(String name) {
         Library library = new Library();
@@ -73,6 +74,19 @@ public class LibraryControllerIT {
         address.setLatitude(BigDecimal.valueOf(10.0));
         address.setLongitude(BigDecimal.valueOf(10.0));
         addressReference = addressRepository.save(address);
+
+        libraryReference = libraryRepository.findById(1).orElseThrow();
+
+        Role librarianRole = roleRepository.findByName("librarian").orElseThrow();
+        User librarian = new User();
+        librarian.setId(userIdGeneratorService.generateUniqueId());
+        librarian.setFirstName("Adam");
+        librarian.setLastName("Smith");
+        librarian.setUsername("example_librarian");
+        librarian.setRole(librarianRole);
+        librarian.setLibrary(libraryReference);
+        librarian.setPassword(passwordEncoder.encode("password"));
+        userRepository.save(librarian);
     }
 
     @Test
@@ -121,5 +135,18 @@ public class LibraryControllerIT {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.hasSize(Matchers.greaterThanOrEqualTo(3))));
+    }
+
+    @Test
+    @WithMockUser(username = "example_librarian:1", roles = {"librarian"})
+    void whenLibrarianRequestsAssignedLibrary_thenReturnAssignedLibrary() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/libraries/assigned")
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", Matchers.is(1)))
+                .andExpect(jsonPath("$.name", Matchers.is(libraryReference.getName())));
+
     }
 }
