@@ -16,6 +16,8 @@ public interface LibraryRepository extends JpaRepository<Library, Integer> {
     @Query("SELECT COUNT(l) > 0 FROM Library l WHERE l.name = :libraryName AND l.address.city = :city")
     boolean existsByNameAndCity(@Param("libraryName") String libraryName, @Param("city") String city);
 
+    boolean existsByName(@Param("libraryName") String libraryName);
+
     @Query(value = """
         SELECT l.*
         FROM libraries l
