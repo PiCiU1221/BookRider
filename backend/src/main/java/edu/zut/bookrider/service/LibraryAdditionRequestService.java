@@ -48,10 +48,18 @@ public class LibraryAdditionRequestService {
         User user = userRepository.findByEmailAndRoleName(libraryAdminEmail, "library_administrator")
                 .orElseThrow(() -> new IllegalArgumentException("User with the provided email and 'library_administrator' role doesn't exist"));
 
+        if (libraryAdditionRequestRepository.existsByCreatedByAndPendingStatus(user)) {
+            throw new IllegalArgumentException("User already has a pending library addition request.");
+        }
+
         if (libraryRepository.existsByAddress(createLibraryAdditionDTO.getStreet(),
                 createLibraryAdditionDTO.getCity(),
                 createLibraryAdditionDTO.getPostalCode())) {
             throw new IllegalArgumentException("A library with the same address already exists.");
+        }
+
+        if (libraryRepository.existsByName(createLibraryAdditionDTO.getLibraryName())) {
+            throw new IllegalArgumentException("A library with this name already exists");
         }
 
         if (libraryRepository.existsByNameAndCity(createLibraryAdditionDTO.getLibraryName(), createLibraryAdditionDTO.getCity())) {

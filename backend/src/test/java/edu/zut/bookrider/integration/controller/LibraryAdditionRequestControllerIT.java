@@ -57,8 +57,8 @@ public class LibraryAdditionRequestControllerIT {
     @Autowired
     private LibraryAdditionRequestRepository libraryAdditionRequestRepository;
 
-    private Integer requestId;
     private User userReference;
+    private Address addressReference;
 
     @BeforeEach
     void setUp() {
@@ -84,16 +84,7 @@ public class LibraryAdditionRequestControllerIT {
         address.setStreet("Wyszynskiego 10");
         address.setLatitude(BigDecimal.valueOf(10.0));
         address.setLongitude(BigDecimal.valueOf(10.0));
-        addressRepository.save(address);
-
-        LibraryAdditionRequest request = new LibraryAdditionRequest();
-        request.setCreatedBy(user);
-        request.setAddress(address);
-        request.setLibraryName("Biblioteka 234231");
-        request.setStatus(LibraryAdditionStatus.PENDING);
-        LibraryAdditionRequest savedRequest = libraryAdditionRequestRepository.save(request);
-
-        requestId = savedRequest.getId();
+        addressReference = addressRepository.save(address);
     }
 
     @Test
@@ -119,6 +110,16 @@ public class LibraryAdditionRequestControllerIT {
     @Test
     @WithMockUser(username = "system_administator@gmail.com", roles = {"system_administrator"})
     void whenWrongStatus_thenReturnBadRequest() throws Exception {
+
+        LibraryAdditionRequest request = new LibraryAdditionRequest();
+        request.setCreatedBy(userReference);
+        request.setAddress(addressReference);
+        request.setLibraryName("Biblioteka 234231");
+        request.setStatus(LibraryAdditionStatus.PENDING);
+        LibraryAdditionRequest savedRequest = libraryAdditionRequestRepository.save(request);
+
+        int requestId = savedRequest.getId();
+
         mockMvc.perform(MockMvcRequestBuilders.put("/api/library-requests/{id}/status", requestId)
                         .param("status", "PENDING")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -128,6 +129,15 @@ public class LibraryAdditionRequestControllerIT {
     @Test
     @WithMockUser(username = "system_administator@gmail.com", roles = {"system_administrator"})
     void whenValidInput_thenReturnNoContentAndUpdateStatus() throws Exception {
+
+        LibraryAdditionRequest request = new LibraryAdditionRequest();
+        request.setCreatedBy(userReference);
+        request.setAddress(addressReference);
+        request.setLibraryName("Biblioteka 234231");
+        request.setStatus(LibraryAdditionStatus.PENDING);
+        LibraryAdditionRequest savedRequest = libraryAdditionRequestRepository.save(request);
+
+        int requestId = savedRequest.getId();
 
         LibraryAdditionRequest beforeUpdate = libraryAdditionRequestRepository.findById(requestId)
                 .orElseThrow(() -> new LibraryRequestNotFoundException("Request not found"));
@@ -148,6 +158,15 @@ public class LibraryAdditionRequestControllerIT {
     @Test
     @WithMockUser(username = "system_administator@gmail.com", roles = {"system_administrator"})
     void whenValidInput_thenReturnNoContentAndSetReviewedByAndUpdateStatus() throws Exception {
+
+        LibraryAdditionRequest request = new LibraryAdditionRequest();
+        request.setCreatedBy(userReference);
+        request.setAddress(addressReference);
+        request.setLibraryName("Biblioteka 234231");
+        request.setStatus(LibraryAdditionStatus.PENDING);
+        LibraryAdditionRequest savedRequest = libraryAdditionRequestRepository.save(request);
+
+        int requestId = savedRequest.getId();
 
         LibraryAdditionRequest beforeUpdate = libraryAdditionRequestRepository.findById(requestId)
                 .orElseThrow(() -> new LibraryRequestNotFoundException("Request not found"));
@@ -172,6 +191,15 @@ public class LibraryAdditionRequestControllerIT {
     @Test
     @WithMockUser(username = "system_administator@gmail.com", roles = {"system_administrator"})
     void whenValidInput_thenSetReviewedByAndUpdateStatusAndUpdateUserLibrary() throws Exception {
+
+        LibraryAdditionRequest request = new LibraryAdditionRequest();
+        request.setCreatedBy(userReference);
+        request.setAddress(addressReference);
+        request.setLibraryName("Biblioteka 234231");
+        request.setStatus(LibraryAdditionStatus.PENDING);
+        LibraryAdditionRequest savedRequest = libraryAdditionRequestRepository.save(request);
+
+        int requestId = savedRequest.getId();
 
         LibraryAdditionRequest beforeUpdate = libraryAdditionRequestRepository.findById(requestId)
                 .orElseThrow(() -> new LibraryRequestNotFoundException("Request not found"));

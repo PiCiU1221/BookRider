@@ -22,7 +22,7 @@ public class Library extends BaseEntity<Integer> {
     @JoinColumn(name = "address_id", nullable = false)
     private Address address;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(name = "phone_number")
