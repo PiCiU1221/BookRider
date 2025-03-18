@@ -42,7 +42,7 @@ public class LibraryAdditionRequestController {
     }
 
     @GetMapping("/me")
-    @PreAuthorize("hasRole('driver')")
+    @PreAuthorize("hasRole('library_administrator')")
     public ResponseEntity<List<LibraryAdditionSummaryDTO>> listMyApplications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -52,7 +52,7 @@ public class LibraryAdditionRequestController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('system_administrator', 'driver')")
+    @PreAuthorize("hasAnyRole('system_administrator', 'library_administrator')")
     public ResponseEntity<LibraryRequestDetailsDTO> getApplicationDetails(
             @PathVariable Integer id,
             Authentication authentication) {
