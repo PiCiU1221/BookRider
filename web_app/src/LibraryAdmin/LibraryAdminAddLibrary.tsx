@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const LibraryAdminAddLibrary: React.FC = () => {
     const navigate = useNavigate();
 
@@ -22,6 +24,13 @@ const LibraryAdminAddLibrary: React.FC = () => {
         emailAddress: '',
     });
 
+    const handleLogout = () => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('role');
+
+        navigate('/');
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -34,16 +43,16 @@ const LibraryAdminAddLibrary: React.FC = () => {
         const requestBody = {
             street: formData.addressLine,
             city: formData.city,
-            postalCode: formData.postalCode,
+            postalCode: formData.postalCode.toString(),
             libraryName: formData.libraryName,
             phoneNumber: formData.phoneNumber,
             libraryEmail: formData.emailAddress,
         };
 
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('access_token');
 
         try {
-            const response = await fetch('https://bookrider.pl/api/library-requests', {
+            const response = await fetch(`${API_BASE_URL}/api/library-requests`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -53,22 +62,17 @@ const LibraryAdminAddLibrary: React.FC = () => {
             });
 
             if (response.ok) {
-                console.log('Library addition request submitted successfully');
                 navigate('/processing-info');
             } else {
                 console.error('Error submitting request', response.statusText);
             }
         } catch (error) {
-            console.error('Error during API call:', error);
+            console.error('Error:', error);
         }
     };
 
     const handleSettings = () => {
-        alert('Settings clicked');
-    };
-
-    const handleLogout = () => {
-        alert('Logging out');
+        alert('Settings');
     };
 
     return (
@@ -105,10 +109,10 @@ const LibraryAdminAddLibrary: React.FC = () => {
                 {[
                     {label: 'Nazwa biblioteki:', name: 'libraryName', maxLength: 70, required: true },
                             { label: 'Ulica i nr budynku:', name: 'addressLine', maxLength: 70, required: true },
-                            { label: 'Miasto:', name: 'city', maxLength: 25, required: true },
+                            { label: 'Miasto:', name: 'city', maxLength: 50, required: true },
                             { label: 'Kod pocztowy:', name: 'postalCode', maxLength: 6, required: true, pattern: '\\d{2}-\\d{3}', title: 'XX-XXX' },
                             { label: 'Numer telefonu:', name: 'phoneNumber', maxLength: 9, required: true, pattern: '\\d{9}', title: 'Podaj prawidłowy numer telefonu bez numeru kierunkowego' },
-                            { label: 'Adres e-mail:', name: 'emailAddress', maxLength: 25, required: true, type: 'email' },
+                            { label: 'Adres e-mail:', name: 'emailAddress', maxLength: 50, required: true, type: 'email' },
                         ].map((field, index) => (
                             <div key={index} className="mb-4">
                                 <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -26,19 +26,48 @@ interface LibraryRequest {
     rejectionReason: string;
 }
 
+const formatDate = (isoString: string) => {
+    return new Date(isoString).toLocaleString('pl-PL', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+};
+
 const SubmissionDetailsLibrary: React.FC = () => {
-    const { submissionType, submissionId } = useParams();
+    const [email, setEmail] = useState<string | null>(null);
+    const { submissionId } = useParams();
     const [libraryRequest, setLibraryRequest] = useState<LibraryRequest | null>(null);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>('');
     const [showRejectionInput, setShowRejectionInput] = useState(false);
     const [rejectionReason, setRejectionReason] = useState('');
     const [selectedReason, setSelectedReason] = useState<string>('');
+    const [validationError, setValidationError] = useState<string>('');
+    const navigate = useNavigate();
+
+    const getEmail = () => {
+        return localStorage.getItem('email');
+    }
+
+    const handleLogout = () => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('role');
+
+        navigate('/');
+    };
 
     useEffect(() => {
         const fetchLibraryRequest = async () => {
             const token = localStorage.getItem('access_token');
             if (!token) return;
+
+            const userEmail = getEmail();
+            if (userEmail) {
+                setEmail(userEmail);
+            }
 
             try {
                 const response = await fetch(`${API_BASE_URL}/api/library-requests/${submissionId}`, {
@@ -56,8 +85,6 @@ const SubmissionDetailsLibrary: React.FC = () => {
                 setLibraryRequest(data);
             } catch (error) {
                 setError(error instanceof Error ? error.message : 'Unknown error');
-            } finally {
-                setLoading(false);
             }
         };
 
@@ -81,8 +108,9 @@ const SubmissionDetailsLibrary: React.FC = () => {
                 throw new Error('Failed to accept the library request');
             }
 
-            alert('Podanie zostało zaakceptowane!');
             setLibraryRequest((prev) => prev ? { ...prev, status: 'APPROVED' } : prev);
+
+            navigate('/system-admin-dashboard');
         } catch (error) {
             setError(error instanceof Error ? error.message : 'Unknown error');
         }
@@ -107,12 +135,12 @@ const SubmissionDetailsLibrary: React.FC = () => {
 
     const handleConfirmRejection = async () => {
         if (!selectedReason) {
-            alert('Wybierz powód odrzucenia.');
+            setValidationError('Proszę podać powód odrzucenia.');
             return;
         }
 
         if (selectedReason === 'Inne' && !rejectionReason.trim()) {
-            alert('Podaj przyczynę odmowy.');
+            setValidationError('Podaj przyczynę odmowy.');
             return;
         }
 
@@ -132,106 +160,144 @@ const SubmissionDetailsLibrary: React.FC = () => {
                 throw new Error('Failed to reject the library request');
             }
 
-            alert(`Podanie zostało odrzucone: ${rejectionReason}`);
             setLibraryRequest((prev) => prev ? { ...prev, status: 'REJECTED', rejectionReason } : prev);
             setShowRejectionInput(false);
             setSelectedReason('');
             setRejectionReason('');
+            setValidationError('');
+
+            navigate('/system-admin-dashboard');
         } catch (error) {
             setError(error instanceof Error ? error.message : 'Unknown error');
         }
     };
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
 
     if (error) {
         return <div>Error: {error}</div>;
     }
 
     return (
-        <section className="submission-details-container">
-            <h1 className="submission-title">
-                Szczegóły podania ({submissionType}) nr: {submissionId}
-            </h1>
-
-            <div className="submission-card">
-                <div className="submission-info">
-                    <p><strong>Typ:</strong> {submissionType}</p>
-                    <p><strong>ID:</strong> {submissionId}</p>
-                    <p><strong>Opis:</strong> {libraryRequest?.libraryName || 'Brak opisu'}</p>
-                    <p><strong>Status:</strong> {libraryRequest?.status}</p>
-                    <p><strong>Data złożenia:</strong> {libraryRequest?.submittedAt}</p>
-                    <p><strong>Data przeglądu:</strong> {libraryRequest?.reviewedAt}</p>
+        <div className="bg-[#314757] min-h-screen flex flex-col items-center">
+            <header
+                className="flex justify-between items-center w-screen bg-[#3B576C] text-white sticky top-0 z-50 shadow-md px-2">
+                <div>
+                    <img
+                        className="relative w-[7%] h-auto object-cover left-[1%]"
+                        alt="Book Rider Logo"
+                        src="/book-rider-high-resolution-logo.png"
+                    />
                 </div>
-
-                <div className="button-container">
-                    <button onClick={handleAccept} className="accept-button">
-                        Zatwierdź
-                    </button>
-                    <button onClick={handleDecline} className="decline-button">
-                        Odrzuć
-                    </button>
-                </div>
-
-                {showRejectionInput && (
-                    <div className="rejection-input-container">
-                        <p>Wybierz powód odrzucenia:</p>
-                        <label>
-                            <input
-                                type="radio"
-                                name="rejectionReason"
-                                value="Wprowadzono niepoprawne dane (nie możemy potwierdzić istnienia biblioteki)"
-                                onChange={handleReasonChange}
-                            />
-                            Wprowadzono niepoprawne dane (nie możemy potwierdzić istnienia biblioteki)
-                        </label>
-                        <label>
-                            <input
-                                type="radio"
-                                name="rejectionReason"
-                                value="Biblioteka została już dodana do systemu"
-                                onChange={handleReasonChange}
-                            />
-                            Biblioteka została już dodana do systemu
-                        </label>
-                        <label>
-                            <input
-                                type="radio"
-                                name="rejectionReason"
-                                value="Inne"
-                                onChange={handleReasonChange}
-                            />
-                            Inne
-                        </label>
-
-                        {selectedReason === 'Inne' && (
-                            <input
-                                type="text"
-                                placeholder="Podaj przyczynę odmowy realizacji podania"
-                                value={rejectionReason}
-                                onChange={handleInputChange}
-                                className="rejection-input"
-                                maxLength={100}
-                            />
-                        )}
-
-                        <button
-                            onClick={handleConfirmRejection}
-                            className="confirm-rejection-button"
-                        >
-                            Wyślij
+                <div className="text-white p-4 flex justify-end">
+                    <div className="flex items-center">
+                        {email && <span className="mr-4">{email}</span>}
+                        <button onClick={handleLogout}
+                                className="bg-gray-700 text-white px-6 py-2 rounded ml-4 whitespace-nowrap">
+                            Wyloguj się
                         </button>
                     </div>
-                )}
+                </div>
+            </header>
+
+            <div className="flex justify-center items-center w-full mt-10">
+                <div className="bg-white shadow-lg p-8 rounded-lg w-[90%] max-w-3xl">
+                    <h1 className="text-2xl font-bold text-center mb-12">
+                        Szczegóły podania nr: {submissionId}
+                    </h1>
+
+                    <div className="submission-info space-y-2 text-lg">
+                        <p><strong>Nazwa biblioteki:</strong> {libraryRequest?.libraryName || 'Brak nazwy'}</p>
+                        <p><strong>Email twórcy:</strong> {libraryRequest?.creatorEmail}</p>
+                        <p>
+                            <strong>Adres:</strong> {libraryRequest?.address ? `${libraryRequest.address.street}, ${libraryRequest.address.city}, ${libraryRequest.address.postalCode}` : "Brak adresu"}
+                        </p>
+                        <p><strong>Szerokość geograficzna:</strong> {libraryRequest?.address?.latitude || "Brak danych"}
+                        </p>
+                        <p><strong>Długość geograficzna:</strong> {libraryRequest?.address?.longitude || "Brak danych"}
+                        </p>
+                        <p><strong>Numer telefonu:</strong> {libraryRequest?.phoneNumber || "Brak numeru"}</p>
+                        <p><strong>Email biblioteki:</strong> {libraryRequest?.libraryEmail || "Brak adresu e-mail"}</p>
+                        <p><strong>Status:</strong> {libraryRequest?.status}</p>
+                        <p><strong>Data
+                            złożenia:</strong> {libraryRequest?.submittedAt ? formatDate(libraryRequest.submittedAt) : "Brak danych"}
+                        </p>
+                        {libraryRequest?.status === "Odrzucone" && (
+                            <p><strong>Powód odrzucenia:</strong> {libraryRequest?.rejectionReason || "Brak powodu"}</p>
+                        )}
+                    </div>
+
+                    {!showRejectionInput && (
+                        <div className="button-container flex justify-center gap-6 mt-6">
+                            <button onClick={handleAccept}
+                                    className="mt-2 bg-[#3B576C] text-white px-3 py-2 rounded-md border-2 border-[#314757]">
+                                Zatwierdź
+                            </button>
+                            <button onClick={handleDecline}
+                                    className="mt-2 bg-white text-[#2D343A] px-5 py-2 rounded-md border-2 border-[#314757]">
+                                Odrzuć
+                            </button>
+                        </div>
+                    )}
+
+                    {showRejectionInput && (
+                        <div className="rejection-input-container mt-12">
+
+                            <div className="border-t border-gray-300 mt-12 mb-6"></div>
+
+                            <p className="font-semibold py-5 text-xl">Wybierz powód odrzucenia:</p>
+                            <div className="space-y-3">
+                                {["Wprowadzono niepoprawne dane (nie możemy potwierdzić istnienia biblioteki)",
+                                    "Biblioteka została już dodana do systemu",
+                                    "Inne"].map((reason) => (
+                                    <label key={reason} className="block">
+                                        <input
+                                            type="radio"
+                                            name="rejectionReason"
+                                            value={reason}
+                                            onChange={handleReasonChange}
+                                            className="mr-2"
+                                        />
+                                        {reason}
+                                    </label>
+                                ))}
+
+                                {selectedReason === 'Inne' && (
+                                    <input
+                                        type="text"
+                                        placeholder="Podaj przyczynę odmowy akceptacji podania"
+                                        value={rejectionReason}
+                                        onChange={handleInputChange}
+                                        className="border p-2 rounded w-full"
+                                        maxLength={150}
+                                    />
+                                )}
+
+                                {validationError && (
+                                    <div className="text-red-600 font-semibold text-base mb-4">{validationError}</div>
+                                )}
+
+                                <div className="flex justify-center gap-6 mt-6">
+                                    <button onClick={handleConfirmRejection}
+                                            className="mt-2 bg-[#3B576C] text-white px-10 py-2 rounded-md border-2 border-[#314757]">
+                                        Wyślij
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="border-t border-gray-300 mt-12 mb-6"></div>
+
+                    <div className="text-center mt-6">
+                        <Link to="/system-admin-dashboard">
+                            <button
+                                className="bg-white text-[#3B576C] text-base font-thin hover:text-[#2D343A] transition-all duration-[0.3s] text-center tracking-[0] leading-[normal]">Powrót
+                                do strony głównej
+                            </button>
+                        </Link>
+                    </div>
+                </div>
             </div>
-            <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                <Link to="/system-admin-dashboard">
-                    <button className="back-button">Powrót do strony głównej</button>
-                </Link>
-            </div>
-        </section>
+        </div>
     );
 };
 

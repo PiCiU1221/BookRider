@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -43,11 +43,11 @@ const SystemAdminDashboard: React.FC = () => {
     const firstLoad = useRef(true);
 
     const getEmail = () => {
-        const email = localStorage.getItem('email');
-        return email;
+        return localStorage.getItem('email');
     }
 
     const handleLogout = () => {
+        localStorage.removeItem('email');
         localStorage.removeItem('access_token');
         localStorage.removeItem('role');
 
@@ -68,10 +68,12 @@ const SystemAdminDashboard: React.FC = () => {
         if (activeSection === 'driverSubmissions') {
             setDriverApplications([]);
             setDriverPage(0);
+            setDriverHasMore(true);
             fetchDriverApplications(0);
         } else if (activeSection === 'librarySubmissions') {
             setLibraryRequests([]);
             setLibraryPage(0);
+            setLibraryHasMore(true);
             fetchLibraryRequests(0);
         }
     }, [activeSection]);
@@ -79,7 +81,7 @@ const SystemAdminDashboard: React.FC = () => {
     const fetchDriverApplications = async (page: number = 0) => {
         const token = localStorage.getItem('access_token');
         if (!token) {
-            console.error("No token found");
+            console.error("No token found.");
             return;
         }
 
@@ -93,7 +95,7 @@ const SystemAdminDashboard: React.FC = () => {
             });
 
             if (!response.ok) {
-                throw new Error(`Error fetching data: ${response.statusText}`);
+                throw new Error(`Error: ${response.statusText}`);
             }
 
             const data: DriverApplication[] = await response.json();
@@ -105,7 +107,7 @@ const SystemAdminDashboard: React.FC = () => {
                 setDriverHasMore(false);
             }
         } catch (error) {
-            console.error('Error during API call:', error);
+            console.error('Error:', error);
             setDriverHasMore(false);
         }
     };
@@ -123,7 +125,7 @@ const SystemAdminDashboard: React.FC = () => {
                 },
             });
 
-            if (!response.ok) throw new Error(`Error fetching data: ${response.statusText}`);
+            if (!response.ok) throw new Error(`Error:: ${response.statusText}`);
 
             const data: LibraryRequest[] = await response.json();
 
@@ -134,7 +136,7 @@ const SystemAdminDashboard: React.FC = () => {
                 setLibraryHasMore(false);
             }
         } catch (error) {
-            console.error('Error during API call:', error);
+            console.error('Error:', error);
             setLibraryHasMore(false);
         }
     };
@@ -154,11 +156,11 @@ const SystemAdminDashboard: React.FC = () => {
                 },
             });
 
-            if (!response.ok) throw new Error(`Error updating status: ${response.statusText}`);
+            if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
             navigate(type === 'driver' ? `/submissionDetailsDriver/${id}` : `/submissionDetailsLibrary/${id}`);
         } catch (error) {
-            console.error('Error updating status:', error);
+            console.error('Error:', error);
         }
     };
 
@@ -179,7 +181,7 @@ const SystemAdminDashboard: React.FC = () => {
                         {email && (
                             <span className="mr-4">{email}</span>
                         )}
-                        <button onClick={handleLogout} className="bg-gray-700 text-white px-6 py-2 rounded ml-4 whitespace-nowrap">
+                        <button onClick={handleLogout} className="bg-gray-700 text-white px-6 py-2 rounded-md ml-4 whitespace-nowrap">
                             Wyloguj się
                         </button>
                     </div>
@@ -189,13 +191,13 @@ const SystemAdminDashboard: React.FC = () => {
             <header className="bg-[#314757] text-white flex justify-center p-3 text-xl">
                 <button
                     onClick={() => setActiveSection('librarySubmissions')}
-                    className={`px-12 py-3 rounded ${activeSection === 'librarySubmissions' ? 'bg-[#3B576C]' : 'bg-[#314757]'}`}
+                    className={`px-12 py-3 rounded-md ${activeSection === 'librarySubmissions' ? 'bg-[#3B576C]' : 'bg-[#314757]'}`}
                 >
                     Podania o zatwierdzenie bibliotek
                 </button>
                 <button
                     onClick={() => setActiveSection('driverSubmissions')}
-                    className={`px-12 py-3 rounded ml-4 ${activeSection === 'driverSubmissions' ? 'bg-[#3B576C]' : 'bg-[#314757]'}`}
+                    className={`px-12 py-3 rounded-md ml-4 ${activeSection === 'driverSubmissions' ? 'bg-[#3B576C]' : 'bg-[#314757]'}`}
                 >
                     Podania o zatwierdzenie kierowców
                 </button>
@@ -205,25 +207,23 @@ const SystemAdminDashboard: React.FC = () => {
             <main className="p-0 max-w-4xl mx-auto">
                 {activeSection === 'driverSubmissions' && (
                     <section>
-                        <div className="space-y-4">
+                        <div className="space-y-5">
                             {driverApplications.length > 0 ? (
                                 driverApplications.map((application) => (
-                                    <div key={application.id} className="bg-white p-4 rounded shadow-md">
-                                        <h3 className="text-lg font-semibold text-gray-800">ID
-                                            podania: {application.id}</h3>
-                                        <p className="text-gray-600">Data
-                                            wysłania: {formatDate(application.submittedAt)}</p>
-                                        <p className="text-gray-600">Utworzone przez: {application.driverEmail}</p>
+                                    <div key={application.id} className="bg-white p-4 rounded-xl shadow-md">
+                                        <h3 className="text-xl font-semibold mb-5 mt-1 text-gray-800">ID podania: {application.id}</h3>
+                                        <p className="text-lg text-gray-600">Data wysłania: {formatDate(application.submittedAt)}</p>
+                                        <p className="text-lg text-gray-600">Utworzone przez: {application.driverEmail}</p>
                                         <button
                                             onClick={() => updateStatusAndNavigate(application.id, 'driver')}
-                                            className="mt-2 bg-[#4B6477] text-white px-4 py-2 rounded border-2 border-[#314757]"
+                                            className="mt-5 mb-1 text-lg font-semibold bg-[#F5BE3D] text-gray-700 px-4 py-2 rounded-md border-2 border-[#E7B33A]"
                                         >
                                             Otwórz
                                         </button>
                                     </div>
                                 ))
                             ) : (
-                                <p>Brak podań.</p>
+                                <p className="text-gray-400 text-center text-2xl">Brak podań.</p>
                             )}
                         </div>
                         {driverHasMore ? (
@@ -241,26 +241,24 @@ const SystemAdminDashboard: React.FC = () => {
 
                 {activeSection === 'librarySubmissions' && (
                     <section>
-                        <div className="space-y-4">
+                        <div className="space-y-5">
                             {libraryRequests.length > 0 ? (
                                 libraryRequests.map((request) => (
-                                    <div key={request.id} className="bg-white p-4 rounded shadow-md">
-                                        <h3 className="text-lg font-semibold text-gray-800">ID
-                                            podania: {request.id}</h3>
-                                        <p className="text-gray-600">Data
-                                            wysłania: {formatDate(request.submittedAt)}</p>
-                                        <p className="text-gray-600">Utworzone przez: {request.creatorEmail}</p>
-                                        <p className="text-gray-600">Nazwa biblioteki: {request.libraryName}</p>
+                                    <div key={request.id} className="bg-white p-4 rounded-xl shadow-md">
+                                        <h3 className="text-xl font-semibold mb-5 mt-1 text-gray-800">ID podania: {request.id}</h3>
+                                        <p className="text-lg text-gray-600">Data wysłania: {formatDate(request.submittedAt)}</p>
+                                        <p className="text-lg text-gray-600">Utworzone przez: {request.creatorEmail}</p>
+                                        <p className="text-lg text-gray-600">Nazwa biblioteki: {request.libraryName}</p>
                                         <button
                                             onClick={() => updateStatusAndNavigate(request.id, 'library')}
-                                            className="mt-2 bg-[#4B6477] text-white px-4 py-2 rounded border-2 border-[#314757]"
+                                            className="mt-5 mb-1 text-lg font-semibold bg-[#F5BE3D] text-gray-700 px-4 py-2 rounded-md border-2 border-[#E7B33A]"
                                         >
                                             Otwórz
                                         </button>
                                     </div>
                                 ))
                             ) : (
-                                <p>Brak podań.</p>
+                                <p className="text-gray-400 text-center text-2xl">Brak podań.</p>
                             )}
                         </div>
                         {libraryHasMore ? (

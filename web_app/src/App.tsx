@@ -17,6 +17,7 @@ import LibrarianHomePage from './Librarian/LibrarianHomePage';
 import UserInfoPage from './Utils/UserInfoPage.tsx';
 import ContactInfoPage from './Utils/ContactInfoPage.tsx';
 import LegalInfoPage from './Utils/LegalInfoPage.tsx';
+import AddBook from './Librarian/AddBook.tsx';
 
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
@@ -40,6 +41,7 @@ const App: React.FC = () => {
                 <Route path="/contact" element={<ContactInfoPage />} />
                 <Route path="/legal-info" element={<LegalInfoPage />} />
                 <Route path="/library-admin-dashboard" element={<LibraryAdminHomePage />} />
+                <Route path="/add-book" element={<AddBook />} />
                 <Route
                     path="/api-docs"
                     element={
