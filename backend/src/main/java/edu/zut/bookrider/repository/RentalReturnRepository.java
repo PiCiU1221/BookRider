@@ -16,12 +16,18 @@ public interface RentalReturnRepository extends JpaRepository<RentalReturn, Inte
     Optional<RentalReturn> findFirstByReturnOrderOrderByReturnedAtDesc(Order returnOrder);
 
     @Query("""
-    SELECT rr FROM RentalReturn rr
-    JOIN RentalReturnItem rri ON rri.rentalReturn = rr
-    JOIN Rental r ON rri.rental = r
-    WHERE r.user = :user
-    GROUP BY rr
-    ORDER BY rr.status, rr.createdAt DESC
-    """)
+           SELECT rr FROM RentalReturn rr
+           JOIN RentalReturnItem rri ON rri.rentalReturn = rr
+           JOIN Rental r ON rri.rental = r
+           WHERE r.user = :user
+           GROUP BY rr
+           ORDER BY
+             CASE rr.status
+               WHEN 'IN_PROGRESS' THEN 1
+               WHEN 'IN_PERSON'   THEN 2
+               WHEN 'COMPLETED'   THEN 3
+             END ASC,
+             rr.createdAt DESC
+           """)
     Page<RentalReturn> findRentalReturnsByUser(@Param("user") User user, Pageable pageable);
 }
