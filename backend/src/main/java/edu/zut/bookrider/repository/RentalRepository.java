@@ -15,9 +15,16 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
     Optional<Rental> findByOrderIdAndBookId(Integer orderId, Integer bookId);
 
     @Query("""
-        SELECT r FROM Rental r
-        WHERE r.user = :user
-        ORDER BY r.rentedAt DESC
+    SELECT r FROM Rental r
+    WHERE r.user = :user
+    ORDER BY 
+        CASE r.status
+            WHEN 'RENTED' THEN 1
+            WHEN 'PARTIALLY_RETURNED' THEN 2
+            WHEN 'RETURN_IN_PROGRESS' THEN 3
+            WHEN 'RETURNED' THEN 4
+        END,
+        r.rentedAt DESC
     """)
     Page<Rental> findAllByUser(@Param("user") User user, Pageable pageable);
 }
