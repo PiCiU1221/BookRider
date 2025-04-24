@@ -8,6 +8,7 @@ const LibrarianLogin: React.FC = () => {
     const [password, setPassword] = useState('');
     const [libraryId, setLibraryId] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [role, setRole] = useState<string>('librarian');
     const navigate = useNavigate();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,6 +20,8 @@ const LibrarianLogin: React.FC = () => {
             setPassword(value);
         } else if (name === 'libraryId') {
             setLibraryId(value);
+         } else if (name === 'role') {
+        setRole(value);
         }
     };
 
@@ -27,15 +30,15 @@ const LibrarianLogin: React.FC = () => {
         setError(null);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/login/librarian`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/login/${role}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    identifier: username,
+                    username,
+                    libraryId: Number(libraryId),
                     password,
-                    libraryId,
                 }),
             });
 
@@ -45,6 +48,8 @@ const LibrarianLogin: React.FC = () => {
                     const token = authHeader.split(' ')[1];
 
                     localStorage.setItem('access_token', token);
+                    localStorage.setItem('role', role);
+                    localStorage.setItem('username', username);
 
                     navigate('/librarian-dashboard');
 

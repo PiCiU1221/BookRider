@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface FormData {
     firstName: string;
@@ -19,6 +21,7 @@ const RegistrationForm: React.FC = () => {
     });
 
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = e.target;
@@ -47,20 +50,20 @@ const RegistrationForm: React.FC = () => {
 
         setError(null);
 
-        const finalFormData = {
-            ...formData,
-            role: 'library_administrator'
+        const requestBody = {
+            email: formData.email,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            password: formData.password,
         };
 
-        console.log('Form Data:', finalFormData);
-
         try {
-            const response = await fetch(`https://bookrider.onrender.com/api/auth/register/library_administrator`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/register/library_administrator`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(finalFormData),
+                body: JSON.stringify(requestBody),
             });
 
             console.log(response.status);
@@ -69,15 +72,16 @@ const RegistrationForm: React.FC = () => {
                 throw new Error('Registration failed');
             }
 
-            console.log('Registration successful');
+            navigate('/add-library');
         } catch (error) {
-            setError('An error occurred while registering the account.');
+            setError('Podczas rejestracji nastąpił błąd.');
             console.error('Registration Error:', error);
         }
     };
 
+
     return (
-        <div className="bg-[#3b576c] flex flex-row justify-center w-full h-screen overflow-hidden">
+        <div className="bg-[#3b576c] flex flex-row justify-center w-full h-[57vw]">
 
             {/* Top Bar */}
                     <button>
@@ -91,7 +95,7 @@ const RegistrationForm: React.FC = () => {
                     </button>
 
                     <div className="absolute w-[17%] top-[5%] left-[18%]">
-                        <Link to="/sys-admin-login">
+                        <Link to="/system-admin-login">
                             <button
                                 className="w-full hover:text-[#2D343A] transition-all duration-[0.3s] font-normal text-white text-[1.2vw] text-center tracking-[0] leading-[normal]">
                                 Administrator systemów
@@ -100,7 +104,7 @@ const RegistrationForm: React.FC = () => {
                     </div>
 
                     <div className="absolute w-[15%] top-[5%] left-[35%]">
-                        <Link to="/lib-admin-login">
+                        <Link to="/library-admin-login">
                             <button
                                 className="w-full hover:text-[#2D343A] transition-all duration-[0.3s] ease-[ease] font-normal text-white text-[1.2vw] text-center tracking-[0] leading-[normal]">
                                 Administrator biblioteki
@@ -135,7 +139,7 @@ const RegistrationForm: React.FC = () => {
                         </Link>
                     </div>
 
-            <div className="absolute max-w-lg p-10 top-[12%] bg-white rounded-lg shadow-lg w-full h-[87%] overflow-hidden">
+            <div className="absolute max-w-lg p-10 top-[8vw] bg-white rounded-lg shadow-lg w-full h-fit">
                 <h2 className="text-center text-2xl font-bold text-gray-800 mb-5">Rejestracja <br /> administratora biblioteki</h2>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div>
@@ -208,16 +212,16 @@ const RegistrationForm: React.FC = () => {
 
                     <button
                         type="submit"
-                        className="py-3 px-0 border-none rounded-lg bg-[#3B576C] text-white text-lg cursor-pointer transition-all duration-300 hover:bg-[#314757]"
+                        className="mt-6 py-3 px-0 border-none rounded-lg bg-[#3B576C] text-white text-lg cursor-pointer transition-all duration-300 hover:bg-[#314757]"
                     >
                         Rejestracja
                     </button>
                 </form>
 
                 <div className="text-center mt-5">
-                    <Link to="/login">
+                    <Link to="/library-admin-login">
                         <button
-                            className="absolute left-[1%] top-[94%] py-3 px-8 w-full hover:text-[#7c92a3] transition-all duration-[0.3s] font-normal text-[#3B576C] text-[0.8vw] text-center tracking-[0] leading-[normal]">
+                            className="absolute text-base mb-8 mt-[-2%] left-[1%] py-3 px-8 w-full hover:text-[#7c92a3] transition-all duration-[0.3s] font-normal text-[#3B576C] text-[0.8vw] text-center tracking-[0] leading-[normal]">
                             Jesteś już zarejestrowany?
                         </button>
                     </Link>

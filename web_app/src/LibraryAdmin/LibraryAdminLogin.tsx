@@ -60,6 +60,7 @@ const LibraryAdminLogin: React.FC = () => {
 
                     localStorage.setItem('access_token', token);
                     localStorage.setItem('role', role);
+                    localStorage.setItem('email', email);
 
                     navigate('/add-library');
 
