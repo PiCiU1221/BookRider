@@ -64,6 +64,9 @@ jobs:
             docker stop backend-container || true
             docker rm backend-container || true
             docker rmi backend-image || true
+
+            docker system prune -af --volumes
+            
             docker build -t backend-image .
             docker run -d -p 8080:8080 --env-file .env --name backend-container backend-image
           EOF
