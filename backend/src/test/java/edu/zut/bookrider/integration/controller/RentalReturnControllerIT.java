@@ -263,7 +263,7 @@ public class RentalReturnControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
 
-        assertEquals(BigDecimal.valueOf(9976.35).setScale(2, RoundingMode.CEILING), user.getBalance());
+        assertEquals(BigDecimal.valueOf(9976.30).setScale(2, RoundingMode.CEILING), user.getBalance());
     }
 
     @Test
@@ -292,7 +292,7 @@ public class RentalReturnControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
 
-        assertEquals(BigDecimal.valueOf(9916.35).setScale(2, RoundingMode.CEILING), user.getBalance());
+        assertEquals(BigDecimal.valueOf(9916.30).setScale(2, RoundingMode.CEILING), user.getBalance());
     }
 
     @Test
@@ -349,8 +349,8 @@ public class RentalReturnControllerIT {
                         .content(new ObjectMapper().writeValueAsString(generalRentalReturnRequestDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalPrice").value(22.65))
-                .andExpect(jsonPath("$.deliveryCost").value(22.65))
+                .andExpect(jsonPath("$.totalPrice").value(22.70))
+                .andExpect(jsonPath("$.deliveryCost").value(22.70))
                 .andExpect(jsonPath("$.totalLateFees").value(0.00))
                 .andExpect(jsonPath("$.lateFees.length()").value(0));
     }
@@ -379,8 +379,8 @@ public class RentalReturnControllerIT {
                         .content(new ObjectMapper().writeValueAsString(generalRentalReturnRequestDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalPrice").value(82.65))
-                .andExpect(jsonPath("$.deliveryCost").value(22.65))
+                .andExpect(jsonPath("$.totalPrice").value(82.70))
+                .andExpect(jsonPath("$.deliveryCost").value(22.70))
                 .andExpect(jsonPath("$.totalLateFees").value(60.0))
                 .andExpect(jsonPath("$.lateFees.length()").value(2));
     }
