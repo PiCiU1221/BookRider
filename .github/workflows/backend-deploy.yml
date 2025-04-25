@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Deploy Backend to EC2
 
 on:
   pull_request:
