@@ -152,11 +152,16 @@ const SysAdminLogin: React.FC = () => {
                             </button>
                         </Link>
                     </div>
-                    <div style={formContainerStyle}>
-                        <h2 style={headerStyle}>Logowanie <br /> administratora systemów</h2>
-                        <form onSubmit={handleSubmit} style={formStyle}>
-                            <div style={formGroupStyle}>
-                                <label htmlFor="email" style={labelStyle}>Adres email:</label>
+                    <div
+                        className="absolute top-[25%] left-1/2 transform -translate-x-1/2 bg-white p-10 rounded-xl shadow-2xl w-[clamp(280px,30vw,400px)] h-[clamp(430px,48vh,90vh)]">
+                        <h2 className="text-center text-3xl font-semibold text-[#2c3e50] mb-6 w-[100%]">
+                            Logowanie <br/> administratora systemów
+                        </h2>
+                        <form onSubmit={handleSubmit} className="flex flex-col">
+                            <div className="mb-5">
+                                <label htmlFor="email" className="text-base text-[#34495e] mb-2 block">
+                                    Adres email:
+                                </label>
                                 <input
                                     type="text"
                                     id="email"
@@ -165,12 +170,16 @@ const SysAdminLogin: React.FC = () => {
                                     onChange={handleInputChange}
                                     required
                                     maxLength={25}
-                                    className={`peer p-2 border rounded-md w-full ${!emailValid ? 'border-red-500' : 'border-gray-300'}`}
+                                    className={`peer p-2 border rounded-md w-full ${
+                                        !emailValid ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 />
                             </div>
 
-                            <div style={formGroupStyle}>
-                                <label htmlFor="password" style={labelStyle}>Hasło:</label>
+                            <div className="mb-5">
+                                <label htmlFor="password" className="text-base text-[#34495e] mb-2 block">
+                                    Hasło:
+                                </label>
                                 <input
                                     type="password"
                                     id="password"
@@ -179,31 +188,27 @@ const SysAdminLogin: React.FC = () => {
                                     onChange={handleInputChange}
                                     required
                                     maxLength={25}
-                                    className="peer p-2 border rounded-md w-full"
+                                    className="peer p-2 border border-gray-300 rounded-md w-full"
                                 />
                             </div>
 
-                            <div style={errorStyle} className="flex items-center gap-2">
-                                {error && (
-                                    <>
-                                        <svg
-                                            className="flex-shrink-0 w-4 h-4"
-                                            aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path
-                                                d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-                                        </svg>
-                                        <p className="m-0">{error}</p>
-                                    </>
-                                )}
-                            </div>
+                            {error && (
+                                <div className="text-red-600 text-sm mb-4 flex items-center gap-2">
+                                    <svg
+                                        className="w-4 h-4"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                                    </svg>
+                                    <p className="m-0">{error}</p>
+                                </div>
+                            )}
 
                             <button
                                 type="submit"
-                                className="py-3 px-0 border-none rounded-lg bg-[#3B576C] text-white text-lg cursor-pointer transition-all duration-300 hover:bg-[#314757]"
+                                className="py-3 px-0 rounded-lg bg-[#3B576C] text-white text-lg transition duration-300 hover:bg-[#314757]"
                             >
                                 Logowanie
                             </button>
@@ -213,51 +218,6 @@ const SysAdminLogin: React.FC = () => {
             </div>
         </div>
     );
-};
-
-const formContainerStyle: React.CSSProperties = {
-    backgroundColor: '#fff',
-    padding: '40px',
-    borderRadius: '8px',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)',
-    width: 'clamp(280px, 30vw, 400px)',
-    height: 'clamp(430px, 48vh, 90vh)',
-    position: 'absolute',
-    top: '25%',
-    left: '50%',
-    transform: 'translateX(-50%)',
-};
-
-const headerStyle: React.CSSProperties = {
-    textAlign: 'center',
-    marginBottom: '25px',
-    fontSize: '28px',
-    fontWeight: '600',
-    color: '#2c3e50',
-    width: '120%',
-    marginLeft: '-9%',
-};
-
-const formStyle = {
-    display: 'flex',
-    flexDirection: 'column' as const,
-};
-
-const formGroupStyle = {
-    marginBottom: '20px',
-};
-
-const labelStyle: React.CSSProperties = {
-    fontSize: '16px',
-    color: '#34495e',
-    marginBottom: '8px',
-};
-
-const errorStyle: React.CSSProperties = {
-    color: 'red',
-    marginBottom: '2%',
-    fontSize: '14px',
-    marginTop: '-3%',
 };
 
 export default SysAdminLogin;
