@@ -165,7 +165,7 @@ const LibraryAdminLogin: React.FC = () => {
                                     onChange={handleInputChange}
                                     required
                                     maxLength={25}
-                                    className={`peer p-2 border rounded-md w-full ${!emailValid ? 'border-red-500' : 'border-gray-300'}`}
+                                    className={`peer p-2 border rounded-md w-full ${!emailValid ? 'border-red-600' : 'border-gray-300'}`}
                                 />
                             </div>
 
