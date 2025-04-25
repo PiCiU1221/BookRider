@@ -7,7 +7,7 @@ on:
     types:
       - closed
     paths:
-      - 'web-app/**'
+      - 'web_app/**'
 
 jobs:
   build:
@@ -22,22 +22,22 @@ jobs:
           node-version: 20
 
       - name: Create .env file
-        working-directory: web-app
+        working-directory: web_app
         run: echo "VITE_API_BASE_URL=${{ secrets.API_BASE_URL }}" > .env
 
       - name: Install dependencies
-        working-directory: web-app
+        working-directory: web_app
         run: npm install
 
       - name: Build frontend
-        working-directory: web-app
+        working-directory: web_app
         run: npm run build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: webapp-build
-          path: web-app/dist
+          path: web_app/dist
 
   deploy:
     runs-on: ubuntu-latest
