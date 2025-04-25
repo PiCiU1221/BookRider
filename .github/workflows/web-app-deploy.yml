@@ -73,6 +73,7 @@ jobs:
           chmod 600 private_key.pem
 
           ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
+            sudo mkdir -p /var/www/myreactapp
             sudo rm -rf /var/www/myreactapp/*
             
             sudo cp -r /tmp/webapp/* /var/www/myreactapp/
