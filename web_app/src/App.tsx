@@ -14,7 +14,7 @@ import LibraryAdminHomePage from './LibraryAdmin/LibraryAdminHomePage.tsx';
 import SubmissionDetailsLibrary from './SystemAdmin/SubmissionDetailsLibrary.tsx';
 import SubmissionDetailsDriver from './SystemAdmin/SubmissionDetailsDriver.tsx';
 import LibrarianHomePage from './Librarian/LibrarianHomePage';
-import UserInfoPage from './Utils/UserInfoPage.tsx';
+import UserManualPage from './Utils/UserManualPage.tsx';
 import ContactInfoPage from './Utils/ContactInfoPage.tsx';
 import LegalInfoPage from './Utils/LegalInfoPage.tsx';
 import AddBook from './Librarian/AddBook.tsx';
@@ -37,7 +37,7 @@ const App: React.FC = () => {
                 <Route path="/submissionDetailsDriver/:submissionId" element={<SubmissionDetailsDriver />} />
                 <Route path="/add-library" element={<LibraryAdminAddLibrary />} />
                 <Route path="/librarian-dashboard" element={<LibrarianHomePage />} />
-                <Route path="/info-page" element={<UserInfoPage />} />
+                <Route path="/info-page" element={<UserManualPage />} />
                 <Route path="/contact" element={<ContactInfoPage />} />
                 <Route path="/legal-info" element={<LegalInfoPage />} />
                 <Route path="/library-admin-dashboard" element={<LibraryAdminHomePage />} />

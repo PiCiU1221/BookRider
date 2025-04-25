@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 
-export const UserInfoPage: React.FC = () => {
+export const UserManualPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#314757] flex items-center justify-center text-white">
             <div className="text-center space-y-10 px-4">
@@ -22,4 +22,4 @@ export const UserInfoPage: React.FC = () => {
     );
 };
 
-export default UserInfoPage;
+export default UserManualPage;

@@ -39,7 +39,6 @@ const LibraryAdminAddLibrary: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-
         const requestBody = {
             street: formData.addressLine,
             city: formData.city,
@@ -72,7 +71,7 @@ const LibraryAdminAddLibrary: React.FC = () => {
     };
 
     const handleSettings = () => {
-        alert('Settings');
+        alert('Ustawienia');
     };
 
     return (

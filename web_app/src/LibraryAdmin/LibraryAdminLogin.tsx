@@ -62,7 +62,26 @@ const LibraryAdminLogin: React.FC = () => {
                     localStorage.setItem('role', role);
                     localStorage.setItem('email', email);
 
-                    navigate('/add-library');
+                    const statusResponse = await fetch(`${API_BASE_URL}/api/library-requests/me?page=0&size=1`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    });
+
+                    if (statusResponse.ok) {
+                        const requests = await statusResponse.json();
+                        const status = requests[0]?.status;
+
+                        if (status === 'PENDING') {
+                            navigate('/processing-info');
+                        } else if (status === 'APPROVED') {
+                            navigate('/library-admin-dashboard');
+                        } else {
+                            navigate('/add-library');
+                        }
+                    } else {
+                        navigate('/'); // Landing page
+                    }
 
                 } else {
                     setError('Authorization header missing');
