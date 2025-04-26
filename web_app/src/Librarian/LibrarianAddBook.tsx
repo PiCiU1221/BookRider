@@ -30,7 +30,7 @@ interface Publisher {
     name: string;
 }
 
-const AddBook: React.FC = () => {
+const LibrarianAddBook: React.FC = () => {
     const [title, setTitle] = useState('');
     const [categoryName, setCategoryName] = useState('');
     const [releaseYear, setReleaseYear] = useState('');
@@ -406,4 +406,4 @@ const AddBook: React.FC = () => {
             );
         };
 
-export default AddBook;
+export default LibrarianAddBook;
