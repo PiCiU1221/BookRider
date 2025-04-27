@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RentalReturnDTO {
     private Integer id;
+    private String libraryName;
     private Integer orderId;
     private LocalDateTime returnedAt;
     private RentalReturnStatus status;
