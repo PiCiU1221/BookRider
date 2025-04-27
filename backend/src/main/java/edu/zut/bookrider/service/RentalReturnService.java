@@ -108,6 +108,8 @@ public class RentalReturnService {
         RentalReturn rentalReturn = rentalReturnRepository.findById(rentalReturnId)
                 .orElseThrow(() -> new RentalReturnNotFoundException("Rental return not found with ID: " + rentalReturnId));
 
+        checkIfCorrectLibrary(rentalReturn);
+
         if (rentalReturn.getStatus() != RentalReturnStatus.IN_PROGRESS) {
             throw new IllegalStateException("This rental return doesn't have the correct status.");
         }
@@ -130,10 +132,21 @@ public class RentalReturnService {
             throw new IllegalStateException("This rental return doesn't have the correct status.");
         }
 
+        checkIfCorrectLibrary(rentalReturn);
+
         rentalService.updateRentalQuantities(rentalReturn.getRentalReturnItems());
         rentalReturn.setStatus(RentalReturnStatus.COMPLETED);
 
         rentalReturnRepository.save(rentalReturn);
+    }
+
+    public void checkIfCorrectLibrary(RentalReturn rentalReturn) {
+        User librarian = userService.getUser();
+        Library librarianLibrary = librarian.getLibrary();
+        Library rentalReturnLibrary = rentalReturn.getRentalReturnItems().get(0).getRental().getLibrary();
+        if (rentalReturnLibrary != librarianLibrary) {
+            throw new IllegalStateException("This rental return is for a different library.");
+        }
     }
 
     @Transactional
