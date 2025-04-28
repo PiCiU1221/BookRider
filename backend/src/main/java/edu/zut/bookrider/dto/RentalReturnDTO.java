@@ -16,6 +16,7 @@ public class RentalReturnDTO {
     private String libraryName;
     private Integer orderId;
     private LocalDateTime returnedAt;
+    private LocalDateTime createdAt;
     private RentalReturnStatus status;
     private List<RentalReturnItemDTO> rentalReturnItems;
 }

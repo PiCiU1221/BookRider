@@ -24,6 +24,7 @@ public class RentalReturnMapper implements Mapper<RentalReturn, RentalReturnDTO>
                 rentalReturn.getRentalReturnItems().get(0).getRental().getLibrary().getName(),
                 rentalReturn.getReturnOrder() != null ? rentalReturn.getReturnOrder().getId() : null,
                 rentalReturn.getReturnedAt(),
+                rentalReturn.getCreatedAt(),
                 rentalReturn.getStatus(),
                 rentalReturn.getRentalReturnItems().stream()
                         .map(this::mapItem)
