@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +115,7 @@ public class RentalReturnService {
 
         rentalService.updateRentalQuantities(rentalReturn.getRentalReturnItems());
         rentalReturn.setStatus(RentalReturnStatus.COMPLETED);
+        rentalReturn.setReturnedAt(LocalDateTime.now());
 
         Order returnOrder = rentalReturn.getReturnOrder();
         orderService.completeReturnOrder(returnOrder);
@@ -132,6 +134,7 @@ public class RentalReturnService {
 
         rentalService.updateRentalQuantities(rentalReturn.getRentalReturnItems());
         rentalReturn.setStatus(RentalReturnStatus.COMPLETED);
+        rentalReturn.setReturnedAt(LocalDateTime.now());
 
         rentalReturnRepository.save(rentalReturn);
     }
