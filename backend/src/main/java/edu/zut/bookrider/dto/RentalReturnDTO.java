@@ -15,6 +15,7 @@ public class RentalReturnDTO {
     private Integer id;
     private Integer orderId;
     private LocalDateTime returnedAt;
+    private LocalDateTime createdAt;
     private RentalReturnStatus status;
     private List<RentalReturnItemDTO> rentalReturnItems;
 }
