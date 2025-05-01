@@ -4,7 +4,7 @@ import {Link, useNavigate} from 'react-router-dom';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const LibrarianReturns: React.FC = () => {
-    // Error messages
+    // Error utils
     const [message, setMessage] = useState<string | null>(null);
     const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
 
@@ -81,7 +81,7 @@ const LibrarianReturns: React.FC = () => {
                 setMessageType('error');
             }
         } catch (error) {
-            console.error('Error completing return:', error);
+            console.error('Error:', error);
             setMessage('Error completing the return.');
             setMessageType('error');
         }
@@ -100,7 +100,7 @@ const LibrarianReturns: React.FC = () => {
             const data = await response.json();
             setRentalReturnDetails(data);
         } catch (error) {
-            console.error('Error fetching rental return details by driver:', error);
+            console.error('Error:', error);
         }
     };
 
@@ -150,10 +150,20 @@ const LibrarianReturns: React.FC = () => {
     const handleCompleteReturn = async () => {
         if (!rentalReturnId) return;
 
-        if (returnType === 'inPerson') {
-            await completeInPersonReturn(rentalReturnId);
-        } else if (returnType === 'driver') {
-            await completeDriverReturn(rentalReturnId);
+        try {
+            if (returnType === 'inPerson') {
+                await completeInPersonReturn(rentalReturnId);
+                setMessage('Zwrot zakończony pomyślnie.');
+                setMessageType('success');
+            } else if (returnType === 'driver') {
+                await completeDriverReturn(rentalReturnId);
+                setMessage('Zwrot przez kierowcę zakończony pomyślnie.');
+                setMessageType('success');
+            }
+        } catch (error) {
+            console.error('Błąd podczas zatwierdzania zwrotu:', error);
+            setMessage('Nie udało się zakończyć zwrotu.');
+            setMessageType('error');
         }
     };
 
@@ -274,29 +284,27 @@ const LibrarianReturns: React.FC = () => {
                     </div>
 
                     {rentalReturnDetails && (
-                        <div className="mb-6 border border-gray-300 p-4 rounded-2xl">
-                            <h4 className="text-xl font-medium text-gray-700 mb-4">Szczegóły zwrotu</h4>
-                            <p><strong>ID zwrotu:</strong> {rentalReturnDetails.id}</p>
-                            <p><strong>Data zwrotu:</strong> {rentalReturnDetails.returnedAt}</p>
-                            <p><strong>Status:</strong> {rentalReturnDetails.status}</p>
+                        <div className="mt-6">
+                            <h4 className="text-xl font-semibold text-gray-700 mb-4">Szczegóły zwrotu:</h4>
 
-                            <div className="mt-4">
-                                <h5 className="text-lg font-medium text-gray-700">Zwrócone książki:</h5>
-                                <ul>
-                                    {rentalReturnDetails.rentalReturnItems.map((item) => (
-                                        <li key={item.id}>
-                                            <strong>{item.book.title}</strong> ({item.returnedQuantity} szt.)
-                                        </li>
-                                    ))}
-                                </ul>
+                            <div className="space-y-4">
+                                {rentalReturnDetails.rentalReturnItems.map((item) => (
+                                    <div key={item.id} className="border p-4 rounded shadow-sm bg-gray-100">
+                                        <p>{item.book.authorNames.join(', ')}</p>
+                                        <p><strong>{item.book.title}</strong></p>
+                                        <p>Ilość: {item.returnedQuantity}</p>
+                                        <p>ID książki: {item.book.id}</p>
+                                        <p>ISBN: {item.book.isbn}</p>
+                                    </div>
+                                ))}
                             </div>
 
-                            <div className="flex justify-center mt-4">
+                            <div className="flex justify-center mt-6">
                                 <button
                                     onClick={handleCompleteReturn}
-                                    className="w-[15vw] py-2 px-4 bg-[#3B576C] text-white rounded-md hover:bg-[#314757] ease-out duration-300"
+                                    className="w-[15vw] py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700"
                                 >
-                                    Zatwierdź
+                                    Zatwierdź zwrot
                                 </button>
                             </div>
                         </div>

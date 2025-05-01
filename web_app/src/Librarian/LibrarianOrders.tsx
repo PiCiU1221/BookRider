@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect } from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -56,6 +56,10 @@ const LibrarianOrders: React.FC = () => {
     const navigate = useNavigate();
 
     // Orders ----------------------------------------------------------------------------------------------------------
+    useEffect(() => {
+        fetchOrderDetails();
+    }, []);
+
     const fetchOrderDetails = async () => {
         const token = localStorage.getItem('access_token');
 
@@ -199,194 +203,195 @@ const LibrarianOrders: React.FC = () => {
                 </button>
             </header>
 
-                {/*{activeSection === 'settings' && (*/}
-                {/*    <section className="p-5 rounded-md mb-[400px] h-[80%] max-h-[90%] w-[65%]">*/}
-                {/*        <h2 className="text-center text-white">Ustawienia</h2>*/}
-                {/*    </section>*/}
-                {/*)}*/}
+            {/*{activeSection === 'settings' && (*/}
+            {/*    <section className="p-5 rounded-md mb-[400px] h-[80%] max-h-[90%] w-[65%]">*/}
+            {/*        <h2 className="text-center text-white">Ustawienia</h2>*/}
+            {/*    </section>*/}
+            {/*)}*/}
+            <div className="flex justify-center items-center w-full h-full">
+                <section className="p-5 rounded-md mb-12 h-[80%] max-h-[90%] w-[70%] overflow-y-auto">
+                    {orderDetails.length > 0 ? (
+                        orderDetails
+                            .filter((order) => order.status !== 'COMPLETED')
+                            .map((order) => (
+                                <div key={order.orderId} className="order-details-container mb-10">
+                                    <div
+                                        className={`p-10 rounded-2xl shadow-lg ${
+                                            order.displayStatus === 'IN_REALIZATION' ? 'bg-gray-300' : 'bg-white'
+                                        }`}
+                                    >
+                                        <div className="flex justify-between items-center mb-7">
+                                            <h1 className="text-3xl font-bold text-gray-700">
+                                                Zamówienie nr: {order.orderId}
+                                            </h1>
+                                            <p className="text-xl font-thin text-gray-600">
+                                                <strong>Status:</strong>{' '}
+                                                {order.displayStatus === 'PENDING'
+                                                    ? 'Oczekujące'
+                                                    : order.displayStatus === 'IN_REALIZATION'
+                                                        ? 'W realizacji'
+                                                        : 'Nieznany'}
+                                            </p>
+                                        </div>
 
-                    <section className="p-5 rounded-md mb-12 h-[80%] max-h-[90%] w-[70%] overflow-y-auto">
-                        {orderDetails.length > 0 ? (
-                            orderDetails
-                                .filter((order) => order.status !== 'COMPLETED')
-                                .map((order) => (
-                                    <div key={order.orderId} className="order-details-container mb-10">
-                                        <div
-                                            className={`p-10 rounded-2xl shadow-lg ${
-                                                order.displayStatus === 'IN_REALIZATION' ? 'bg-gray-300' : 'bg-white'
-                                            }`}
-                                        >
-                                            <div className="flex justify-between items-center mb-7">
-                                                <h1 className="text-3xl font-bold text-gray-700">
-                                                    Zamówienie nr: {order.orderId}
-                                                </h1>
-                                                <p className="text-xl font-thin text-gray-600">
-                                                    <strong>Status:</strong>{' '}
-                                                    {order.displayStatus === 'PENDING'
-                                                        ? 'Oczekujące'
-                                                        : order.displayStatus === 'IN_REALIZATION'
-                                                            ? 'W realizacji'
-                                                            : 'Nieznany'}
-                                                </p>
-                                            </div>
+                                        <p className="border-t text-lg border-gray-400 text-gray-700 pt-5 "><strong>ID
+                                            użytkownika:</strong> {order.userId}</p>
+                                        <p className="text-gray-700 text-lg"><strong>Data
+                                            utworzenia:</strong> {new Date(order.createdAt).toLocaleString()}</p>
 
-                                            <p className="border-t text-lg border-gray-400 text-gray-700 pt-5 "><strong>ID
-                                                użytkownika:</strong> {order.userId}</p>
-                                            <p className="text-gray-700 text-lg"><strong>Data
-                                                utworzenia:</strong> {new Date(order.createdAt).toLocaleString()}</p>
-
-                                            {order.orderItems.map((item, index) => (
-                                                <div key={index} className=" mt-4 pt-4">
-                                                    <div className="flex justify-center mb-4">
-                                                        <img
-                                                            src={item.book.image}
-                                                            alt={item.book.title}
-                                                            className="w-45 h-65 border-gray-400 border rounded-xl object-cover"
-                                                        />
-                                                    </div>
-
-                                                    <div className="space-y-1.5 ml-1">
-                                                        <h2 className="text-3xl mb-5 mt-12 font-semibold text-gray-800">{item.book.title}</h2>
-                                                        <p className="text-gray-600 text-lg">
-                                                            <strong>Autor:</strong> {item.book.authorNames.join(', ')}
-                                                        </p>
-                                                        <p className="text-gray-600 text-lg">
-                                                            <strong>ISBN:</strong> {item.book.isbn}</p>
-                                                        <p className="text-gray-600 text-lg">
-                                                            <strong>Kategoria:</strong> {item.book.categoryName}</p>
-                                                        <p className="text-gray-600 text-lg"><strong>Rok
-                                                            wydania:</strong> {item.book.releaseYear}</p>
-                                                        <p className="text-gray-600 text-lg">
-                                                            <strong>Wydawnictwo:</strong> {item.book.publisherName}</p>
-                                                        <p className="text-gray-600 text-lg">
-                                                            <strong>Język:</strong> {item.book.languageName}</p>
-                                                        <p className="text-gray-600 text-lg"><strong>ID
-                                                            książki:</strong> {item.book.id}</p>
-                                                        <p className="text-gray-600 text-lg"><strong>Zamówiona
-                                                            ilość:</strong> {item.quantity}</p>
-                                                    </div>
+                                        {order.orderItems.map((item, index) => (
+                                            <div key={index} className=" mt-4 pt-4">
+                                                <div className="flex justify-center mb-4">
+                                                    <img
+                                                        src={item.book.image}
+                                                        alt={item.book.title}
+                                                        className="w-45 h-65 border-gray-400 border rounded-xl object-cover"
+                                                    />
                                                 </div>
-                                            ))}
 
-                                            {order.displayStatus !== 'IN_REALIZATION' && (
-                                                <div className="flex justify-between mt-6">
+                                                <div className="space-y-1.5 ml-1">
+                                                    <h2 className="text-3xl mb-5 mt-12 font-semibold text-gray-800">{item.book.title}</h2>
+                                                    <p className="text-gray-600 text-lg">
+                                                        <strong>Autor:</strong> {item.book.authorNames.join(', ')}
+                                                    </p>
+                                                    <p className="text-gray-600 text-lg">
+                                                        <strong>ISBN:</strong> {item.book.isbn}</p>
+                                                    <p className="text-gray-600 text-lg">
+                                                        <strong>Kategoria:</strong> {item.book.categoryName}</p>
+                                                    <p className="text-gray-600 text-lg"><strong>Rok
+                                                        wydania:</strong> {item.book.releaseYear}</p>
+                                                    <p className="text-gray-600 text-lg">
+                                                        <strong>Wydawnictwo:</strong> {item.book.publisherName}</p>
+                                                    <p className="text-gray-600 text-lg">
+                                                        <strong>Język:</strong> {item.book.languageName}</p>
+                                                    <p className="text-gray-600 text-lg"><strong>ID
+                                                        książki:</strong> {item.book.id}</p>
+                                                    <p className="text-gray-600 text-lg"><strong>Zamówiona
+                                                        ilość:</strong> {item.quantity}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        {order.displayStatus !== 'IN_REALIZATION' && (
+                                            <div className="flex justify-between mt-6">
+                                                <button
+                                                    onClick={() => handleAccept(order.orderId)}
+                                                    className="bg-[#3E4851] text-white px-7 py-2 rounded-lg border-2 border-[#23292F]"
+                                                >
+                                                    Zatwierdź
+                                                </button>
+
+                                                {selectedOrderId !== order.orderId && (
                                                     <button
-                                                        onClick={() => handleAccept(order.orderId)}
-                                                        className="bg-[#3E4851] text-white px-7 py-2 rounded-lg border-2 border-[#23292F]"
+                                                        onClick={() => {
+                                                            setSelectedOrderId(order.orderId);
+                                                            setShowRejectionInput(true);
+                                                            setRejectionReason('');
+                                                            setCustomReason('');
+                                                        }}
+                                                        className="bg-gray-200 text-[#2D343A] px-5 py-2 rounded-lg border-2 border-[#314757]"
                                                     >
-                                                        Zatwierdź
+                                                        Odrzuć
                                                     </button>
+                                                )}
+                                            </div>
+                                        )}
 
-                                                    {selectedOrderId !== order.orderId && (
-                                                        <button
-                                                            onClick={() => {
-                                                                setSelectedOrderId(order.orderId);
-                                                                setShowRejectionInput(true);
-                                                                setRejectionReason('');
+                                        {showRejectionInput && selectedOrderId === order.orderId && (
+                                            <div className="mt-12">
+                                                <h3 className="text-gray-600 text-lg font-semibold">Wybierz
+                                                    przyczynę odmowy:</h3>
+                                                <form className="flex flex-col items-start gap-2 mt-2">
+                                                    <label className="flex text-lg items-center text-gray-600">
+                                                        <input
+                                                            type="radio"
+                                                            value="Brak w zbiorach biblioteki"
+                                                            checked={rejectionReason === 'Brak w zbiorach biblioteki'}
+                                                            onChange={(e) => setRejectionReason(e.target.value)}
+                                                            className="peer hidden"
+                                                        />
+                                                        <span
+                                                            className="w-5 h-5 border-2 rounded-full mr-2 inline-block bg-white
+                                                                 peer-checked:bg-[#3B576C] peer-checked:ring-1 peer-checked:ring-[#3B576C]"
+                                                        ></span>
+                                                        brak w zbiorach biblioteki
+                                                    </label>
+
+                                                    <label className="flex text-lg items-center text-gray-600">
+                                                        <input
+                                                            type="radio"
+                                                            value="Wszystkie egzemplarze zostały wypożyczone"
+                                                            checked={rejectionReason === 'Wszystkie egzemplarze zostały wypożyczone'}
+                                                            onChange={(e) => setRejectionReason(e.target.value)}
+                                                            className="peer hidden"
+                                                        />
+                                                        <span
+                                                            className="w-5 h-5 border-2 rounded-full mr-2 inline-block bg-white
+                                                                 peer-checked:bg-[#3B576C] peer-checked:ring-1 peer-checked:ring-[#3B576C]"
+                                                        ></span>
+                                                        wszystkie egzemplarze zostały wypożyczone
+                                                    </label>
+
+                                                    <label className="flex text-lg items-center text-gray-600">
+                                                        <input
+                                                            type="radio"
+                                                            value="Inne"
+                                                            checked={rejectionReason === 'Inne'}
+                                                            onChange={(e) => {
+                                                                setRejectionReason(e.target.value);
                                                                 setCustomReason('');
                                                             }}
-                                                            className="bg-gray-200 text-[#2D343A] px-5 py-2 rounded-lg border-2 border-[#314757]"
-                                                        >
-                                                            Odrzuć
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            )}
-
-                                            {showRejectionInput && selectedOrderId === order.orderId && (
-                                                <div className="mt-12">
-                                                    <h3 className="text-gray-600 text-lg font-semibold">Wybierz
-                                                        przyczynę odmowy:</h3>
-                                                    <form className="flex flex-col items-start gap-2 mt-2">
-                                                        <label className="flex text-lg items-center text-gray-600">
-                                                            <input
-                                                                type="radio"
-                                                                value="Brak w zbiorach biblioteki"
-                                                                checked={rejectionReason === 'Brak w zbiorach biblioteki'}
-                                                                onChange={(e) => setRejectionReason(e.target.value)}
-                                                                className="peer hidden"
-                                                            />
-                                                            <span
-                                                                className="w-5 h-5 border-2 rounded-full mr-2 inline-block bg-white
+                                                            className="peer hidden"
+                                                        />
+                                                        <span
+                                                            className="w-5 h-5 border-2 rounded-full mr-2 inline-block bg-white
                                                                  peer-checked:bg-[#3B576C] peer-checked:ring-1 peer-checked:ring-[#3B576C]"
-                                                            ></span>
-                                                            brak w zbiorach biblioteki
-                                                        </label>
+                                                        ></span>
+                                                        inne
+                                                    </label>
 
-                                                        <label className="flex text-lg items-center text-gray-600">
-                                                            <input
-                                                                type="radio"
-                                                                value="Wszystkie egzemplarze zostały wypożyczone"
-                                                                checked={rejectionReason === 'Wszystkie egzemplarze zostały wypożyczone'}
-                                                                onChange={(e) => setRejectionReason(e.target.value)}
-                                                                className="peer hidden"
-                                                            />
-                                                            <span
-                                                                className="w-5 h-5 border-2 rounded-full mr-2 inline-block bg-white
-                                                                 peer-checked:bg-[#3B576C] peer-checked:ring-1 peer-checked:ring-[#3B576C]"
-                                                            ></span>
-                                                            wszystkie egzemplarze zostały wypożyczone
-                                                        </label>
-
-                                                        <label className="flex text-lg items-center text-gray-600">
-                                                            <input
-                                                                type="radio"
-                                                                value="Inne"
-                                                                checked={rejectionReason === 'Inne'}
-                                                                onChange={(e) => {
-                                                                    setRejectionReason(e.target.value);
-                                                                    setCustomReason('');
-                                                                }}
-                                                                className="peer hidden"
-                                                            />
-                                                            <span
-                                                                className="w-5 h-5 border-2 rounded-full mr-2 inline-block bg-white
-                                                                 peer-checked:bg-[#3B576C] peer-checked:ring-1 peer-checked:ring-[#3B576C]"
-                                                            ></span>
-                                                            inne
-                                                        </label>
-
-                                                        {rejectionReason === 'Inne' && (
-                                                            <input
-                                                                type="text"
-                                                                className="border text-gray-600 border-gray-400 p-2 rounded-lg mt-2
+                                                    {rejectionReason === 'Inne' && (
+                                                        <input
+                                                            type="text"
+                                                            className="border text-gray-600 border-gray-400 p-2 rounded-lg mt-2
                                                                  w-full mb-2 focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
-                                                                placeholder="Podaj powód odrzucenia"
-                                                                value={customReason}
-                                                                onChange={(e) => setCustomReason(e.target.value)}
-                                                            />
-                                                        )}
-                                                    </form>
-
-                                                    {message && (
-                                                        <div
-                                                            className={`mb-4 mt-5 p-1 text-lg ${
-                                                                messageType === 'success' ? 'text-[#314757]' : 'text-red-600'
-                                                            }`}
-                                                        >
-                                                            {message}
-                                                        </div>
+                                                            placeholder="Podaj powód odrzucenia"
+                                                            value={customReason}
+                                                            onChange={(e) => setCustomReason(e.target.value)}
+                                                        />
                                                     )}
+                                                </form>
 
-                                                    <button
-                                                        className="bg-gray-200 text-[#2D343A] px-5 py-2 rounded-lg border-2 border-[#314757] mt-4"
-                                                        onClick={() => handleConfirmRejection(order.orderId)}
+                                                {message && (
+                                                    <div
+                                                        className={`mb-4 mt-5 p-1 text-lg ${
+                                                            messageType === 'success' ? 'text-[#314757]' : 'text-red-600'
+                                                        }`}
                                                     >
-                                                        Potwierdź odrzucenie
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
+                                                        {message}
+                                                    </div>
+                                                )}
+
+                                                <button
+                                                    className="bg-gray-200 text-[#2D343A] px-5 py-2 rounded-lg border-2 border-[#314757] mt-4"
+                                                    onClick={() => handleConfirmRejection(order.orderId)}
+                                                >
+                                                    Potwierdź odrzucenie
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                ))
-                        ) : (
-                            <div className="flex items-center ml-[40vw] mt-[1vw]">
-                                <p className="text-white">Brak zamówień do wyświetlenia.</p>
-                            </div>
-                            )}
-                    </section>
-                </div>
-    );
+                                </div>
+                            ))
+                    ) : (
+                        <div className="flex items-center">
+                            <p className="text-white">Brak zamówień do wyświetlenia.</p>
+                        </div>
+                    )}
+                </section>
+            </div>
+            </div>
+);
 };
 
 export default LibrarianOrders;
