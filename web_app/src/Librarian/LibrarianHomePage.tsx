@@ -79,6 +79,12 @@ const LibrarianHomePage: React.FC = () => {
     }, [isUserLibraryChecked, assignedLibrary]);
 
     useEffect(() => {
+        if (isUserLibraryChecked) {
+            setSelectedBooks([]);
+        }
+    }, [isUserLibraryChecked]);
+
+    useEffect(() => {
         if (addBooksMessage.type) {
             const handleClick = () => {
                 setAddBooksMessage({ text: "", type: null });
@@ -325,106 +331,188 @@ const LibrarianHomePage: React.FC = () => {
                 <section className="h-[80%] max-h-[90%] p-9 rounded-2xl mb-[400px] w-[65%] bg-white text-gray-600">
                     <h2 className="text-center p-4 mb-4 text-3xl font-semibold">Wyszukaj książkę</h2>
                     <div className="grid gap-4">
-                        <input
-                            type="text"
-                            list="bookTitles"
-                            placeholder="Tytuł"
-                            value={bookSearchInput}
-                            onChange={(e) => {
-                                setBookSearchInput(e.target.value);
-                                fetchBookTitles(e.target.value);
-                            }}
-                            className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
-                        />
+                        <div className="relative">
+                            <input
+                                type="text"
+                                list="bookTitles"
+                                placeholder="Tytuł"
+                                value={bookSearchInput}
+                                onChange={(e) => {
+                                    setBookSearchInput(e.target.value);
+                                    fetchBookTitles(e.target.value);
+                                }}
+                                className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
+                            />
+                            {bookSearchInput && (
+                                <button
+                                    onClick={() => setBookSearchInput('')}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-4xl"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
                         <datalist id="bookTitles">
                             {bookTitleOptions.map((option) => (
                                 <option key={option} value={option}/>
                             ))}
                         </datalist>
 
-                        <input
-                            type="text"
-                            list="publishers"
-                            placeholder="Wydawca"
-                            value={publisherInput}
-                            onChange={(e) => {
-                                setPublisherInput(e.target.value);
-                                fetchPublishers(e.target.value);
-                            }}
-                            className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
-                        />
+                        <div className="relative">
+                            <input
+                                type="text"
+                                list="publishers"
+                                placeholder="Wydawca"
+                                value={publisherInput}
+                                onChange={(e) => {
+                                    setPublisherInput(e.target.value);
+                                    fetchPublishers(e.target.value);
+                                }}
+                                className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
+                            />
+                            {publisherInput && (
+                                <button
+                                    onClick={() => setPublisherInput('')}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-4xl"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
                         <datalist id="publishers">
                             {publisherOptions.map((option) => (
                                 <option key={option} value={option}/>
                             ))}
                         </datalist>
 
-                        <input
-                            type="text"
-                            list="authors"
-                            placeholder="Autor"
-                            value={authorInput}
-                            onChange={(e) => {
-                                setAuthorInput(e.target.value);
-                                fetchAuthors(e.target.value);
-                            }}
-                            className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
-                        />
+                        <div className="relative">
+                            <input
+                                type="text"
+                                list="authors"
+                                placeholder="Autor"
+                                value={authorInput}
+                                onChange={(e) => {
+                                    setAuthorInput(e.target.value);
+                                    fetchAuthors(e.target.value);
+                                }}
+                                className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
+                            />
+                            {authorInput && (
+                                <button
+                                    onClick={() => setAuthorInput('')}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-4xl"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
                         <datalist id="authors">
                             {authorOptions.map((option) => (
                                 <option key={option} value={option}/>
                             ))}
                         </datalist>
 
-                        <input
-                            type="text"
-                            list="categories"
-                            placeholder="Kategoria"
-                            value={categoryInput}
-                            onChange={(e) => setCategoryInput(e.target.value)}
-                            className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
-                        />
+                        <div className="relative">
+                            <input
+                                type="text"
+                                list="categories"
+                                placeholder="Kategoria"
+                                value={categoryInput}
+                                onChange={(e) => setCategoryInput(e.target.value)}
+                                className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
+                            />
+                            {categoryInput && (
+                                <button
+                                    onClick={() => setCategoryInput('')}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-4xl"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
                         <datalist id="categories">
                             {categoryOptions.map((option) => (
                                 <option key={option} value={option}/>
                             ))}
                         </datalist>
 
-                        <input
-                            type="text"
-                            list="languages"
-                            placeholder="Język"
-                            value={languageInput}
-                            onChange={(e) => setLanguageInput(e.target.value)}
-                            className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
-                        />
+                        <div className="relative">
+                            <input
+                                type="text"
+                                list="languages"
+                                placeholder="Język"
+                                value={languageInput}
+                                onChange={(e) => setLanguageInput(e.target.value)}
+                                className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
+                            />
+                            {languageInput && (
+                                <button
+                                    onClick={() => setLanguageInput('')}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-4xl"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
                         <datalist id="languages">
                             {languageOptions.map((option) => (
                                 <option key={option} value={option}/>
                             ))}
                         </datalist>
 
-                        <input
-                            type="text"
-                            placeholder="ISBN"
-                            value={isbnInput}
-                            onChange={(e) => setIsbnInput(e.target.value)}
-                            className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
-                        />
-                        <input
-                            type="number"
-                            placeholder="Rok wydania (od)"
-                            value={releaseYearFrom}
-                            onChange={(e) => setReleaseYearFrom(e.target.value)}
-                            className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
-                        />
-                        <input
-                            type="number"
-                            placeholder="Rok wydania (do)"
-                            value={releaseYearTo}
-                            onChange={(e) => setReleaseYearTo(e.target.value)}
-                            className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
-                        />
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="ISBN"
+                                value={isbnInput}
+                                onChange={(e) => setIsbnInput(e.target.value)}
+                                className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
+                            />
+                            {isbnInput && (
+                                <button
+                                    onClick={() => setIsbnInput('')}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-4xl"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="Rok wydania (od)"
+                                value={releaseYearFrom}
+                                onChange={(e) => setReleaseYearFrom(e.target.value)}
+                                className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
+                            />
+                            {releaseYearFrom && (
+                                <button
+                                    onClick={() => setReleaseYearFrom('')}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-4xl"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="Rok wydania (do)"
+                                value={releaseYearTo}
+                                onChange={(e) => setReleaseYearTo(e.target.value)}
+                                className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
+                            />
+                            {releaseYearTo && (
+                                <button
+                                    onClick={() => setReleaseYearTo('')}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-4xl"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
 
                         <div className="flex items-center gap-2">
                             <input
@@ -450,10 +538,10 @@ const LibrarianHomePage: React.FC = () => {
                             {searchResults.map((book, index) => (
                                 <li
                                     key={index}
-                                    onClick={() => toggleBookSelection(book.id)}
+                                    onClick={() => !isUserLibraryChecked && toggleBookSelection(book.id)}
                                     className={`relative p-5 flex items-center gap-3 cursor-pointer rounded-lg ${
                                         selectedBooks.includes(book.id) ? "bg-gray-200" : "hover:bg-gray-100"
-                                    }`}
+                                    } ${isUserLibraryChecked ? 'cursor-default' : ''}`}
                                 >
                                     <img src={book.image} alt={book.title} className="w-[7vw] h-[10vw]"/>
                                     <div className="space-y-1 flex-1">
@@ -481,7 +569,7 @@ const LibrarianHomePage: React.FC = () => {
                         </div>
                     )}
 
-                    {selectedBooks.length > 0 && (
+                    {selectedBooks.length > 0 && !isUserLibraryChecked && (
                         <div className="mt-5 p-3 text-lg border-2 rounded-xl text-center space-y-3">
                             <p className="font-medium">
                                 Zaznaczone książki: {selectedBooks.length}
