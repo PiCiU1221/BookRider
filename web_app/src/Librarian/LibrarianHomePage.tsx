@@ -505,8 +505,8 @@ const LibrarianHomePage: React.FC = () => {
 
                     {addBooksMessage.type && (
                         <div
-                            className={`mt-5 p-3 text-lg rounded-xl text-center ${
-                                addBooksMessage.type === "success" ? "bg-green-100 text-green-800 border border-green-300" : "bg-red-100 text-red-800 border border-red-300"
+                            className={`mt-5 p-5 text-lg rounded-lg text-center border-2 ${
+                                addBooksMessage.type === "success" ? "bg-green-100 text-green-700 border border-green-300" : "bg-red-100 text-red-500 border border-red-300"
                             }`}
                         >
                             {addBooksMessage.text}
