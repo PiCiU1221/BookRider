@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const LibrarianReturns: React.FC = () => {
-    // Error utils
+    // Success and error messages
     const [message, setMessage] = useState<string | null>(null);
     const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
 
@@ -41,6 +41,21 @@ const LibrarianReturns: React.FC = () => {
     // const [returnStatus, setReturnStatus] = useState<'IN_PROGRESS' | 'COMPLETED'>('IN_PROGRESS');
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (messageType) {
+            const handleClick = () => {
+                setMessage(null);
+                setMessageType(null);
+            };
+
+            document.addEventListener("click", handleClick);
+
+            return () => {
+                document.removeEventListener("click", handleClick);
+            };
+        }
+    }, [messageType]);
 
     // Returns ---------------------------------------------------------------------------------------------------------
     const fetchRentalReturnDetailsInPerson = async (rentalReturnId: number) => {
@@ -125,7 +140,7 @@ const LibrarianReturns: React.FC = () => {
                 setMessageType('error');
             }
         } catch (error) {
-            console.error('Error completing return:', error);
+            console.error('Error:', error);
             setMessage('Error completing the return.');
             setMessageType('error');
         }
@@ -161,7 +176,7 @@ const LibrarianReturns: React.FC = () => {
                 setMessageType('success');
             }
         } catch (error) {
-            console.error('Błąd podczas zatwierdzania zwrotu:', error);
+            console.error('Error:', error);
             setMessage('Nie udało się zakończyć zwrotu.');
             setMessageType('error');
         }
