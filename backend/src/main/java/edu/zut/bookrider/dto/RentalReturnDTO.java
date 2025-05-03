@@ -14,9 +14,11 @@ import java.util.List;
 @AllArgsConstructor
 public class RentalReturnDTO {
     private Integer id;
+    private String libraryName;
     private Integer orderId;
     private OrderStatus orderStatus;
     private RentalReturnStatus status;
     private LocalDateTime returnedAt;
+    private LocalDateTime createdAt;
     private List<RentalReturnItemDTO> rentalReturnItems;
 }

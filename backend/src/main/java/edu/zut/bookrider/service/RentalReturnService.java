@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -108,12 +109,15 @@ public class RentalReturnService {
         RentalReturn rentalReturn = rentalReturnRepository.findById(rentalReturnId)
                 .orElseThrow(() -> new RentalReturnNotFoundException("Rental return not found with ID: " + rentalReturnId));
 
+        checkIfCorrectLibrary(rentalReturn);
+
         if (rentalReturn.getStatus() != RentalReturnStatus.IN_PROGRESS) {
             throw new IllegalStateException("This rental return doesn't have the correct status.");
         }
 
         rentalService.updateRentalQuantities(rentalReturn.getRentalReturnItems());
         rentalReturn.setStatus(RentalReturnStatus.COMPLETED);
+        rentalReturn.setReturnedAt(LocalDateTime.now());
 
         Order returnOrder = rentalReturn.getReturnOrder();
         orderService.completeReturnOrder(returnOrder);
@@ -130,10 +134,22 @@ public class RentalReturnService {
             throw new IllegalStateException("This rental return doesn't have the correct status.");
         }
 
+        checkIfCorrectLibrary(rentalReturn);
+
         rentalService.updateRentalQuantities(rentalReturn.getRentalReturnItems());
         rentalReturn.setStatus(RentalReturnStatus.COMPLETED);
+        rentalReturn.setReturnedAt(LocalDateTime.now());
 
         rentalReturnRepository.save(rentalReturn);
+    }
+
+    public void checkIfCorrectLibrary(RentalReturn rentalReturn) {
+        User librarian = userService.getUser();
+        Library librarianLibrary = librarian.getLibrary();
+        Library rentalReturnLibrary = rentalReturn.getRentalReturnItems().get(0).getRental().getLibrary();
+        if (rentalReturnLibrary != librarianLibrary) {
+            throw new IllegalStateException("This rental return is for a different library.");
+        }
     }
 
     @Transactional
