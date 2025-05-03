@@ -101,11 +101,19 @@ public class BookController {
         return ResponseEntity.ok(updatedBook);
     }
 
-    @PreAuthorize("hasRole('librarian')")
+    @PreAuthorize("hasRole('system_administrator')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBook(@PathVariable Integer id) {
 
         bookService.deleteBook(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('librarian')")
+    @DeleteMapping("/my-library/{id}")
+    public ResponseEntity<?> deleteBookFromMyLibrary(@PathVariable Integer id) {
+
+        bookService.deleteBookFromLibrary(id);
         return ResponseEntity.noContent().build();
     }
 
