@@ -1,5 +1,6 @@
 package edu.zut.bookrider.dto;
 
+import edu.zut.bookrider.model.enums.OrderStatus;
 import edu.zut.bookrider.model.enums.RentalReturnStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +15,8 @@ import java.util.List;
 public class RentalReturnDTO {
     private Integer id;
     private Integer orderId;
-    private LocalDateTime returnedAt;
+    private OrderStatus orderStatus;
     private RentalReturnStatus status;
+    private LocalDateTime returnedAt;
     private List<RentalReturnItemDTO> rentalReturnItems;
 }
