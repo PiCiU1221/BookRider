@@ -1,12 +1,21 @@
-import { Stack } from "expo-router";
-import {StyleSheet, Text, View} from "react-native"
-import React from "react";
+import {SplashScreen, Stack} from "expo-router";
+import * as SystemUI from "expo-system-ui";
 
+import "../global.css"
+import React, {useEffect} from "react";
 
 export default function RootLayout() {
-  return(
-      <Stack>
-        <Stack.Screen name="index" options={{headerShown: false}} />
-      </Stack>
-  );
+    useEffect(() => {
+        SystemUI.setBackgroundColorAsync("#3b576c");
+
+        SplashScreen.hide();
+    }, []);
+
+    return (
+        <Stack
+            screenOptions={{
+                headerShown: false,
+            }}
+        />
+    );
 }
