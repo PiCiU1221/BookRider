@@ -63,6 +63,9 @@ export default function Deliveries() {
     const [customMessage, setCustomMessage] = useState(null);
     const [hasSearched, setHasSearched] = useState(false);
 
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+
     const fetchInRealizationOrders = async (): Promise<void> => {
         setLoading(true);
         setModalVisible(true);
@@ -79,6 +82,8 @@ export default function Deliveries() {
 
             if (response.ok) {
                 const data = await response.json();
+                setCurrentPage(data.currentPage);
+                setTotalPages(data.totalPages);
                 setInRealizationOrders(data.content);
             } else {
                 const errorData = await response.json();
@@ -220,7 +225,7 @@ export default function Deliveries() {
         }
     };
 
-    const fetchPendingOrders = async (): Promise<void> => {
+    const fetchPendingOrders = async (page: number) => {
         setLoading(true);
         setModalVisible(true);
         setHasSearched(true);
@@ -236,7 +241,7 @@ export default function Deliveries() {
 
             const token = await AsyncStorage.getItem("jwtToken");
             const response = await fetch(
-                `${CONFIG.API_BASE_URL}/api/orders/driver/pending?page=0&size=10&locationString=${encodeURIComponent(locationString)}&maxDistanceInMeters=${maxDistance}`,
+                `${CONFIG.API_BASE_URL}/api/orders/driver/pending?page=${page}&size=10&locationString=${encodeURIComponent(locationString)}&maxDistanceInMeters=${maxDistance}`,
                 {
                 method: "GET",
                 headers: {
@@ -276,7 +281,7 @@ export default function Deliveries() {
             );
 
             if (response.ok) {
-                await fetchPendingOrders();
+                await fetchPendingOrders(currentPage);
                 await fetchInRealizationOrders();
             } else {
                 const errorData = await response.json();
@@ -400,7 +405,7 @@ export default function Deliveries() {
                         keyboardType="numeric"
                     />
                     <TouchableOpacity
-                        onPress={fetchPendingOrders}
+                        onPress={() => fetchPendingOrders(currentPage)}
                         className="bg-blue-500 px-3 py-2 rounded ml-2 flex-row items-center justify-center"
                     >
                         <Feather name="search" size={18} color="white" />
@@ -447,6 +452,31 @@ export default function Deliveries() {
                             Brak oczekujących zamówień w przeszukiwanym obszarze.
                         </Text>
                     ) : null
+                }
+                ListFooterComponent={
+                    <View className="flex-row items-center px-6 relative mt-2">
+                        <TouchableOpacity
+                            className="w-32 px-4 py-2 bg-theme_accent rounded-lg disabled:opacity-50 absolute left-0"
+                            onPress={() => fetchPendingOrders(currentPage - 1)}
+                            disabled={currentPage === 0}
+                        >
+                            <Text className="text-white text-lg font-semibold text-center">Poprzednia</Text>
+                        </TouchableOpacity>
+
+                        <View className="flex-1 items-center">
+                            <Text className="text-white text-lg font-bold">
+                                Strona {currentPage + 1} z {totalPages}
+                            </Text>
+                        </View>
+
+                        <TouchableOpacity
+                            className="w-32 px-4 py-2 bg-theme_accent rounded-lg disabled:opacity-50 absolute right-0"
+                            onPress={() => fetchPendingOrders(currentPage + 1)}
+                            disabled={currentPage >= totalPages - 1}
+                        >
+                            <Text className="text-white text-lg font-semibold text-center">Następna</Text>
+                        </TouchableOpacity>
+                    </View>
                 }
             />
 

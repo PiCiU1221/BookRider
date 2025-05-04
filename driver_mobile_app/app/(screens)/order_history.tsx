@@ -46,13 +46,16 @@ export default function OrderHistory() {
     const [apiResponse, setApiResponse] = useState<any>(null);
     const [showImage, setShowImage] = useState(false);
 
-    const fetchOrders = async (): Promise<void> => {
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+
+    const fetchOrders = async (page: number) => {
         setLoading(true);
         setModalVisible(true);
 
         try {
             const token = await AsyncStorage.getItem("jwtToken");
-            const response = await fetch(`${CONFIG.API_BASE_URL}/api/orders/driver/completed?page=0&size=10`, {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/orders/driver/completed?page=${page}&size=10`, {
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -62,6 +65,8 @@ export default function OrderHistory() {
 
             if (response.ok) {
                 const data = await response.json();
+                setCurrentPage(data.currentPage);
+                setTotalPages(data.totalPages);
                 setOrders(data.content);
                 setApiResponse({ status: "success" });
             } else {
@@ -83,8 +88,8 @@ export default function OrderHistory() {
     };
 
     useEffect(() => {
-        fetchOrders();
-    }, []);
+        fetchOrders(currentPage);
+    }, [currentPage]);
 
     const handleOrderPress = (order: OrderDriverDetailsDTO): void => {
         setSelectedOrder(order);
@@ -99,6 +104,7 @@ export default function OrderHistory() {
             <FlatList
                 data={orders}
                 keyExtractor={(item) => item.orderId.toString()}
+                contentContainerStyle={{ paddingBottom: 10 }}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleOrderPress(item)}>
                         <View className="bg-black/10 p-4 mb-4 rounded-lg border border-gray-300 flex-row justify-between items-center">
@@ -118,6 +124,31 @@ export default function OrderHistory() {
                 ListEmptyComponent={
                     <View className="items-center justify-center">
                         <Text className="text-white">Nie masz jeszcze historii zamówień. Przypisz nowe zamówienia w zakładce Dostawy, aby rozpocząć.</Text>
+                    </View>
+                }
+                ListFooterComponent={
+                    <View className="flex-row items-center px-6 relative mt-2">
+                        <TouchableOpacity
+                            className="w-32 px-4 py-2 bg-theme_accent rounded-lg disabled:opacity-50 absolute left-0"
+                            onPress={() => fetchOrders(currentPage - 1)}
+                            disabled={currentPage === 0}
+                        >
+                            <Text className="text-white text-lg font-semibold text-center">Poprzednia</Text>
+                        </TouchableOpacity>
+
+                        <View className="flex-1 items-center">
+                            <Text className="text-white text-lg font-bold">
+                                Strona {currentPage + 1} z {totalPages}
+                            </Text>
+                        </View>
+
+                        <TouchableOpacity
+                            className="w-32 px-4 py-2 bg-theme_accent rounded-lg disabled:opacity-50 absolute right-0"
+                            onPress={() => fetchOrders(currentPage + 1)}
+                            disabled={currentPage >= totalPages - 1}
+                        >
+                            <Text className="text-white text-lg font-semibold text-center">Następna</Text>
+                        </TouchableOpacity>
                     </View>
                 }
             />
