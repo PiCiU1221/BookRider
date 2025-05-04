@@ -379,7 +379,7 @@ public class OrderService {
     public void completeReturnOrder(Order order) {
 
         order.setStatus(OrderStatus.DELIVERED);
-        order.setAcceptedAt(LocalDateTime.now());
+        order.setDeliveredAt(LocalDateTime.now());
         orderRepository.save(order);
 
         User driver = order.getDriver();
