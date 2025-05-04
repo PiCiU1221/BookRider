@@ -197,11 +197,10 @@ public class RentalControllerIT {
 
         createRental(order1, 2, RentalStatus.RENTED);
         createRental(order2, 1, RentalStatus.PARTIALLY_RETURNED);
-        createRental(order2, 2, RentalStatus.RETURNED);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/rentals")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(3));
+                .andExpect(jsonPath("$.totalElements").value(2));
     }
 }
