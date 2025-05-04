@@ -85,8 +85,6 @@ export default function Deliveries() {
 
             if (response.ok) {
                 const data = await response.json();
-                setCurrentPage(data.currentPage);
-                setTotalPages(data.totalPages);
                 setInRealizationOrders(data.content);
             } else {
                 const errorData = await response.json();
@@ -255,6 +253,8 @@ export default function Deliveries() {
 
             if (response.ok) {
                 const data = await response.json();
+                setCurrentPage(data.currentPage);
+                setTotalPages(data.totalPages);
                 setPendingOrders(data.content);
             } else {
                 const errorData = await response.json();
@@ -457,7 +457,7 @@ export default function Deliveries() {
                 )}
                 ListEmptyComponent={
                     !loading && hasSearched ? (
-                        <Text className="text-white">
+                        <Text className="text-white text-lg mb-8 mt-4">
                             Brak oczekujących zamówień w przeszukiwanym obszarze.
                         </Text>
                     ) : null
