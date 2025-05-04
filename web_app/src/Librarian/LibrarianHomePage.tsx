@@ -64,6 +64,7 @@ const LibrarianHomePage: React.FC = () => {
     const [publisherOptions, setPublisherOptions] = useState<string[]>([]);
 
     const [addBooksMessage, setAddBooksMessage] = useState<{ text: string; type: "success" | "error" | null }>({ text: "", type: null });
+    const [deleteBooksMessage, setDeleteBooksMessage] = useState<{ text: string; type: "success" | "error" | null }>({ text: "", type: null });
 
     const navigate = useNavigate();
 
@@ -97,6 +98,20 @@ const LibrarianHomePage: React.FC = () => {
             };
         }
     }, [addBooksMessage]);
+
+    useEffect(() => {
+        if (deleteBooksMessage.type) {
+            const handleClick = () => {
+                setDeleteBooksMessage({ text: "", type: null });
+            };
+
+            document.addEventListener("click", handleClick);
+
+            return () => {
+                document.removeEventListener("click", handleClick);
+            };
+        }
+    }, [deleteBooksMessage]);
 
     const fetchDropdownData = async () => {
         const token = localStorage.getItem('access_token');
@@ -257,30 +272,77 @@ const LibrarianHomePage: React.FC = () => {
         }
 
         try {
-            const responses = await Promise.all(
-                selectedBooks.map(async (bookId) => {
-                    const response = await fetch(`${API_BASE_URL}/api/books/add-existing/${bookId}?libraryId=${assignedLibrary.id}`, {
-                        method: "POST",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-
-                    return response;
+            const addRequests = selectedBooks.map(id =>
+                fetch(`${API_BASE_URL}/api/books/add-existing/${id}?libraryId=${assignedLibrary.id}`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 })
             );
+
+            const responses = await Promise.all(addRequests);
 
             const allSuccessful = responses.every(response => response.ok);
 
             if (allSuccessful) {
-                setAddBooksMessage({ text: "Pomyślnie dodano książki do biblioteki.", type: "success" });
+                setAddBooksMessage({
+                    text: "Pomyślnie dodano książki do biblioteki.",
+                    type: "success"
+                });
             } else {
-                setAddBooksMessage({ text: "Niektóre z książek już wcześniej zostały przypisane do Twojej biblioteki.", type: "error" });
+                setAddBooksMessage({
+                    text: "Niektóre z książek już wcześniej zostały przypisane do Twojej biblioteki.",
+                    type: "error"
+                });
             }
 
             setSelectedBooks([]);
         } catch {
-            setAddBooksMessage({ text: "Wystąpił błąd podczas dodawania książek.", type: "error" });
+            setAddBooksMessage({
+                text: "Wystąpił błąd podczas dodawania książek.",
+                type: "error"
+            });
+        }
+    };
+
+    const handleDeleteSelectedBooks = async () => {
+        const token = localStorage.getItem('access_token');
+        if (!token) return;
+
+        try {
+            const deleteRequests = selectedBooks.map(id =>
+                fetch(`${API_BASE_URL}/api/books/my-library/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+            );
+
+            const responses = await Promise.all(deleteRequests);
+
+            const allSuccessful = responses.every(response => response.ok);
+
+            if (allSuccessful) {
+                setBookSearchResults(prev => prev.filter(book => !selectedBooks.includes(book.id)));
+
+                setSelectedBooks([]);
+                setDeleteBooksMessage({
+                    text: "Wybrane książki zostały usunięte z biblioteki.",
+                    type: "success"
+                });
+            } else {
+                setDeleteBooksMessage({
+                    text: "Niektórych książek nie udało się usunąć.",
+                    type: "error"
+                });
+            }
+        } catch {
+            setDeleteBooksMessage({
+                text: "Wystąpił błąd podczas usuwania książek.",
+                type: "error"
+            });
         }
     };
 
@@ -538,10 +600,10 @@ const LibrarianHomePage: React.FC = () => {
                             {searchResults.map((book, index) => (
                                 <li
                                     key={index}
-                                    onClick={() => !isUserLibraryChecked && toggleBookSelection(book.id)}
+                                    onClick={() => toggleBookSelection(book.id)}
                                     className={`relative p-5 flex items-center gap-3 cursor-pointer rounded-lg ${
                                         selectedBooks.includes(book.id) ? "bg-gray-200" : "hover:bg-gray-100"
-                                    } ${isUserLibraryChecked ? 'cursor-default' : ''}`}
+                                    }`}
                                 >
                                     <img src={book.image} alt={book.title} className="w-[7vw] h-[10vw]"/>
                                     <div className="space-y-1 flex-1">
@@ -569,7 +631,7 @@ const LibrarianHomePage: React.FC = () => {
                         </div>
                     )}
 
-                    {selectedBooks.length > 0 && !isUserLibraryChecked && (
+                    {selectedBooks.length > 0 && (
                         <div className="mt-5 p-3 text-lg border-2 rounded-xl text-center space-y-3">
                             <p className="font-medium">
                                 Zaznaczone książki: {selectedBooks.length}
@@ -582,12 +644,21 @@ const LibrarianHomePage: React.FC = () => {
                                 Odznacz wszystkie
                             </button>
 
-                            <button
-                                onClick={handleAddSelectedBooks}
-                                className="w-full mt-3 p-2 bg-gray-500 text-white rounded-md cursor-pointer hover:bg-gray-600 duration-200 ease-out"
-                            >
-                                Dodaj wybrane książki do biblioteki
-                            </button>
+                            {isUserLibraryChecked ? (
+                                <button
+                                    onClick={handleDeleteSelectedBooks}
+                                    className="w-full mt-3 p-2 bg-red-600 text-white rounded-md cursor-pointer hover:bg-red-700 duration-200 ease-out"
+                                >
+                                    Usuń wybrane książki
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleAddSelectedBooks}
+                                    className="w-full mt-3 p-2 bg-[#6589A4] text-white rounded-md cursor-pointer hover:bg-[#5B7F9A] duration-200 ease-out"
+                                >
+                                    Dodaj wybrane książki do biblioteki
+                                </button>
+                            )}
                         </div>
                     )}
 
@@ -601,11 +672,21 @@ const LibrarianHomePage: React.FC = () => {
                         </div>
                     )}
 
+                    {deleteBooksMessage.type && (
+                        <div
+                            className={`mt-5 p-5 text-lg rounded-lg text-center border-2 ${
+                                deleteBooksMessage.type === "success" ? "bg-green-100 text-green-700 border border-green-300" : "bg-red-100 text-red-500 border border-red-300"
+                            }`}
+                        >
+                            {deleteBooksMessage.text}
+                        </div>
+                    )}
+
                     <div className="mt-5 p-3 text-lg border-2 rounded-xl text-center">
                         <p>Nie możesz znaleźć tego, czego szukasz?</p>
                         <button
                             onClick={handleRedirectToAddBook}
-                            className="w-full mt-3 p-2 bg-[#3B576C] text-white rounded-md cursor-pointer hover:bg-[#314757] duration-200 ease-out">
+                            className="w-full mt-3 p-2 bg-[#3B576C] text-white rounded-md cursor-pointer hover:bg-[#334A5C] duration-200 ease-out">
                             Dodaj nową książkę
                         </button>
                     </div>
