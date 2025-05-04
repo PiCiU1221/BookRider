@@ -597,10 +597,10 @@ export default function Deliveries() {
                 )}
 
                 {!loading && userId && (
-                    <View className="justify-center mb-6">
+                    <View className="justify-center mb-6 w-full items-center">
                         <Barcode
                             value={userId}
-                            options={{ format: 'CODE128', lineColor: '#ffffff' }}
+                            options={{ format: 'CODE128', lineColor: '#000000', background: '#ffffff'}}
                         />
                     </View>
                 )}
