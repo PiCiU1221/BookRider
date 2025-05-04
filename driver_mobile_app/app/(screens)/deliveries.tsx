@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Text, TouchableOpacity, View, TextInput, Image, Alert } from "react-native";
+import { FlatList, Text, TouchableOpacity, View, Image, Alert } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomModal from "@/app/components/custom_modal";
@@ -11,6 +11,9 @@ import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import {Feather} from "@expo/vector-icons";
 
+import orderStatusLabels from "@/app/constants/orderStatusLabels";
+import paymentStatusLabels from "@/app/constants/paymentStatusLabels";
+
 interface OrderDetailsDTO {
     orderId: number;
     userId: string;
@@ -19,7 +22,7 @@ interface OrderDetailsDTO {
     destinationAddress: string;
     isReturn: boolean;
     status: string;
-    amount: string;
+    amount: number;
     paymentStatus: string;
     noteToDriver: string;
     createdAt: Date;
@@ -63,7 +66,10 @@ export default function Deliveries() {
     const [customMessage, setCustomMessage] = useState(null);
     const [hasSearched, setHasSearched] = useState(false);
 
-    const fetchInRealizationOrders = async (): Promise<void> => {
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+
+    const fetchInRealizationOrders = async () => {
         setLoading(true);
         setModalVisible(true);
 
@@ -79,6 +85,8 @@ export default function Deliveries() {
 
             if (response.ok) {
                 const data = await response.json();
+                setCurrentPage(data.currentPage);
+                setTotalPages(data.totalPages);
                 setInRealizationOrders(data.content);
             } else {
                 const errorData = await response.json();
@@ -220,7 +228,7 @@ export default function Deliveries() {
         }
     };
 
-    const fetchPendingOrders = async (): Promise<void> => {
+    const fetchPendingOrders = async (page: number, maxDistance: string) => {
         setLoading(true);
         setModalVisible(true);
         setHasSearched(true);
@@ -236,7 +244,7 @@ export default function Deliveries() {
 
             const token = await AsyncStorage.getItem("jwtToken");
             const response = await fetch(
-                `${CONFIG.API_BASE_URL}/api/orders/driver/pending?page=0&size=10&locationString=${encodeURIComponent(locationString)}&maxDistanceInMeters=${maxDistance}`,
+                `${CONFIG.API_BASE_URL}/api/orders/driver/pending?page=${page}&size=10&locationString=${encodeURIComponent(locationString)}&maxDistanceInMeters=${maxDistance}`,
                 {
                 method: "GET",
                 headers: {
@@ -276,7 +284,7 @@ export default function Deliveries() {
             );
 
             if (response.ok) {
-                await fetchPendingOrders();
+                await fetchPendingOrders(currentPage, maxDistance);
                 await fetchInRealizationOrders();
             } else {
                 const errorData = await response.json();
@@ -354,7 +362,10 @@ export default function Deliveries() {
     return (
         <View className="flex-1 p-4 bg-theme_background">
             <StatusBar style="light" />
-            <Text className="text-2xl font-bold text-white mt-10 mb-4">Dostawy</Text>
+            <View className="flex-row items-center justify-center mt-10 mb-4">
+                <Feather name="truck" size={24} color="#f7ca65" className="mr-2" />
+                <Text className="text-2xl font-bold text-white">Dostawy</Text>
+            </View>
 
             <Text className="text-xl font-bold text-white mb-2">W trakcie realizacji</Text>
             <View style={{ minHeight: 80 }}>
@@ -370,13 +381,13 @@ export default function Deliveries() {
                                     <Text className="text-white">Dostawa: {item.destinationAddress}</Text>
                                     <Text className="text-white">Biblioteka: {item.libraryName}</Text>
                                     <Text className="text-white">
-                                        Kierowca przypisany: {new Date(item.driverAssignedAt).toLocaleString()}
+                                        Przypisany: {new Date(item.driverAssignedAt).toLocaleString('pl-PL')}
                                     </Text>
                                     {item.isReturn && (
                                         <Text className="text-red-400 font-bold">Zamówienie zwrotne</Text>
                                     )}
                                 </View>
-                                <Text className="text-3xl font-bold text-green-500">{item.amount} zł</Text>
+                                <Text className="text-3xl font-bold text-green-500">{item.amount.toFixed(2)} zł</Text>
                             </View>
                         </TouchableOpacity>
                     )}
@@ -386,28 +397,31 @@ export default function Deliveries() {
                 />
             </View>
 
-            <Text className="text-xl font-bold text-white mb-2">Oczekujące zamówienia</Text>
+            <Text className="text-xl font-bold text-white mb-2 mt-2">Oczekujące zamówienia</Text>
             <View className="mb-4">
                 <Text className="text-white text-base mb-2">
-                    Wprowadź maksymalny dystans wyszukiwania (w metrach):
+                    Wybierz maksymalny dystans wyszukiwania:
                 </Text>
-                <View className="flex-row items-center">
-                    <TextInput
-                        className="p-2 bg-white rounded text-black flex-1"
-                        placeholder="Maksymalny dystans wyszukiwania"
-                        value={maxDistance}
-                        onChangeText={(text) => setMaxDistance(text)}
-                        keyboardType="numeric"
-                    />
-                    <TouchableOpacity
-                        onPress={fetchPendingOrders}
-                        className="bg-blue-500 px-3 py-2 rounded ml-2 flex-row items-center justify-center"
-                    >
-                        <Feather name="search" size={18} color="white" />
-                        <Text className="text-white font-semibold text-base ml-2">
-                            Szukaj
-                        </Text>
-                    </TouchableOpacity>
+                <View className="flex-row w-full gap-x-2">
+                    {[
+                        { label: "100m", value: 100 },
+                        { label: "200m", value: 200 },
+                        { label: "500m", value: 500 },
+                        { label: "1km", value: 1000 },
+                        { label: "2km", value: 2000 },
+                        { label: "5km", value: 5000 },
+                    ].map(({ label, value }) => (
+                        <TouchableOpacity
+                            key={value}
+                            onPress={() => {
+                                setMaxDistance(value.toString());
+                                fetchPendingOrders(currentPage, value.toString());
+                            }}
+                            className="flex-1 bg-blue-500 py-2 justify-center items-center rounded-lg"
+                        >
+                            <Text className="text-white font-semibold text-lg">{label}</Text>
+                        </TouchableOpacity>
+                    ))}
                 </View>
             </View>
 
@@ -425,11 +439,11 @@ export default function Deliveries() {
 
                                 {item.isReturn ? (
                                     <Text className="text-white">
-                                        Utworzono: {new Date(item.createdAt).toLocaleString()}
+                                        Utworzono: {new Date(item.createdAt).toLocaleString('pl-PL')}
                                     </Text>
                                 ) : (
                                     <Text className="text-white">
-                                        Zaakceptowano: {new Date(item.acceptedAt).toLocaleString()}
+                                        Zaakceptowano: {new Date(item.acceptedAt).toLocaleString('pl-PL')}
                                     </Text>
                                 )}
 
@@ -437,7 +451,7 @@ export default function Deliveries() {
                                     <Text className="text-red-400 font-bold">Zamówienie zwrotne</Text>
                                 )}
                             </View>
-                            <Text className="text-3xl font-bold text-green-500">{item.amount} zł</Text>
+                            <Text className="text-3xl font-bold text-green-500">{item.amount.toFixed(2)} zł</Text>
                         </View>
                     </TouchableOpacity>
                 )}
@@ -447,6 +461,31 @@ export default function Deliveries() {
                             Brak oczekujących zamówień w przeszukiwanym obszarze.
                         </Text>
                     ) : null
+                }
+                ListFooterComponent={
+                    <View className="flex-row items-center px-6 relative mt-2">
+                        <TouchableOpacity
+                            className="w-32 px-4 py-2 bg-theme_accent rounded-lg disabled:opacity-50 absolute left-0"
+                            onPress={() => fetchPendingOrders(currentPage - 1, maxDistance)}
+                            disabled={currentPage === 0}
+                        >
+                            <Text className="text-white text-lg font-semibold text-center">Poprzednia</Text>
+                        </TouchableOpacity>
+
+                        <View className="flex-1 items-center">
+                            <Text className="text-white text-lg font-bold">
+                                Strona {currentPage + 1} z {totalPages}
+                            </Text>
+                        </View>
+
+                        <TouchableOpacity
+                            className="w-32 px-4 py-2 bg-theme_accent rounded-lg disabled:opacity-50 absolute right-0"
+                            onPress={() => fetchPendingOrders(currentPage + 1, maxDistance)}
+                            disabled={currentPage >= totalPages - 1}
+                        >
+                            <Text className="text-white text-lg font-semibold text-center">Następna</Text>
+                        </TouchableOpacity>
+                    </View>
                 }
             />
 
@@ -488,15 +527,15 @@ export default function Deliveries() {
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="dollar-sign" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Zarobki: {selectedOrder.amount} zł</Text>
+                            <Text className="text-white text-lg ml-2">Zarobki: {selectedOrder.amount.toFixed(2)} zł</Text>
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="info" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Status: {selectedOrder.status}</Text>
+                            <Text className="text-white text-lg ml-2">Status: {orderStatusLabels[selectedOrder.status as keyof typeof orderStatusLabels]}</Text>
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="credit-card" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Status płatności: {selectedOrder.paymentStatus}</Text>
+                            <Text className="text-white text-lg ml-2">Status płatności: {paymentStatusLabels[selectedOrder.paymentStatus as keyof typeof paymentStatusLabels]}</Text>
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="message-square" size={20} color="#f7ca65" />
@@ -524,7 +563,7 @@ export default function Deliveries() {
                             <View className="flex-row items-center">
                                 <Feather name="user-check" size={20} color="#f7ca65" />
                                 <Text className="text-white text-lg ml-2 mt-2">
-                                    Kierowca przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString()}
+                                    Przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString('pl-PL')}
                                 </Text>
                             </View>
                         )}
@@ -539,8 +578,12 @@ export default function Deliveries() {
 
                             {selectedOrder.orderItems.map((item, index) => (
                                 <View key={index} className="flex-row justify-between py-2 border-t border-gray-300">
-                                    <Text className="text-white">{item.book.title}</Text>
-                                    <Text className="text-white">{item.book.authorNames.join(", ")}</Text>
+                                    <Text className="text-white" style={{ maxWidth: 120, flexWrap: 'wrap' }}>
+                                        {item.book.title}
+                                    </Text>
+                                    <Text className="text-white" style={{ maxWidth: 120, flexWrap: 'wrap' }}>
+                                        {item.book.authorNames.join(", ")}
+                                    </Text>
                                     <Text className="text-white">{item.quantity}</Text>
                                 </View>
                             ))}
@@ -552,19 +595,19 @@ export default function Deliveries() {
                                 onPress={() => assignDriverToOrder(selectedOrder.orderId)}
                                 className="bg-green-500 px-6 py-3 rounded-xl flex-1 mt-2"
                             >
-                                <Text className="text-white text-center font-semibold text-lg">PRZYPISZ</Text>
+                                <Text className="text-white text-center font-semibold text-lg">Przypisz zamówienie</Text>
                             </TouchableOpacity>
                         ) : (selectedOrder?.status === "IN_TRANSIT" || selectedOrder?.status === "DRIVER_ACCEPTED") ? (
                             <View className="flex-row justify-between mt-2">
                                 <TouchableOpacity
                                     onPress={handleNavigation}
-                                    className="bg-blue-500 px-6 py-1 rounded-lg flex-1 mr-2 justify-center"
+                                    className="bg-blue-500 px-6 py-3 rounded-lg flex-1 mr-2 justify-center"
                                 >
-                                    <Text className="text-white text-center font-semibold text-sm">
+                                    <Text className="text-white text-center font-semibold text-base">
                                         {(selectedOrder?.status === 'DRIVER_ACCEPTED' && !selectedOrder?.isReturn) ||
                                         (selectedOrder?.status === 'DRIVER_ACCEPTED' && selectedOrder?.isReturn)
                                             ? 'Nawiguj do adresu obioru'
-                                            : 'Nawiduj do adresu dostawy'}
+                                            : 'Nawiguj do adresu dostawy'}
                                     </Text>
                                 </TouchableOpacity>
 
@@ -597,10 +640,10 @@ export default function Deliveries() {
                 )}
 
                 {!loading && userId && (
-                    <View className="justify-center mb-6">
+                    <View className="justify-center mb-6 w-full items-center">
                         <Barcode
                             value={userId}
-                            options={{ format: 'CODE128', lineColor: '#ffffff' }}
+                            options={{ format: 'CODE128', lineColor: '#000000', background: '#ffffff'}}
                         />
                     </View>
                 )}

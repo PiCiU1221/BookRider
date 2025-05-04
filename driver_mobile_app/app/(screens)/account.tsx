@@ -60,7 +60,10 @@ export default function AccountPage() {
     return (
         <View className="flex-1 bg-theme_background p-4">
             <StatusBar style="light" />
-            <Text className="text-2xl font-bold text-white mt-10 mb-4">Dane konta</Text>
+            <View className="flex-row items-center justify-center mt-10 mb-4">
+                <Feather name="user" size={24} color="#f7ca65" className="mr-2" />
+                <Text className="text-2xl font-bold text-white">Konto</Text>
+            </View>
 
             <CustomModal isVisible={loading} title="Ładowanie..." loading={true} onClose={() => {}} />
             {!loading && (
@@ -94,7 +97,7 @@ export default function AccountPage() {
                             <View className="flex-row items-center">
                                 <Feather name="calendar" size={20} color="#f7ca65" />
                                 <Text className="text-white text-lg ml-2">
-                                    <Text className="font-bold">Dołączono:</Text> {new Date(profile.createdAt).toLocaleDateString()}
+                                    <Text className="font-bold">Dołączono:</Text> {new Date(profile.createdAt).toLocaleDateString('pl-PL')}
                                 </Text>
                             </View>
                         </View>
