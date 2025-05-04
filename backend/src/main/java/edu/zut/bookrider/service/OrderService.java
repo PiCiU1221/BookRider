@@ -87,18 +87,43 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public PageResponseDTO<OrderResponseDTO> getUserPendingOrders(int page, int size) {
-        return getUserOrdersByStatus(List.of(OrderStatus.PENDING), page, size);
+    private PageResponseDTO<UserOrderResponseDTO> mapToUserOrderResponseDTO(PageResponseDTO<OrderResponseDTO> orderPage) {
+        List<UserOrderResponseDTO> content = orderPage.getContent().stream()
+                .map(order -> {
+                    Integer orderId = order.getOrderId();
+                    BigDecimal lateFee = transactionService.getTransactionAmountByOrderIdAndType(orderId, TransactionType.LATE_FEE_PAYMENT);
+                    BigDecimal bookPayment = transactionService.getTransactionAmountByOrderIdAndType(orderId, TransactionType.BOOK_ORDER_PAYMENT);
+                    BigDecimal total = lateFee.add(bookPayment);
+
+                    return new UserOrderResponseDTO(total, order);
+                })
+                .toList();
+
+        return new PageResponseDTO<>(
+                content,
+                orderPage.getCurrentPage(),
+                orderPage.getPageSize(),
+                orderPage.getTotalElements(),
+                orderPage.getTotalPages()
+        );
     }
 
-    public PageResponseDTO<OrderResponseDTO> getUserInRealizationOrders(int page, int size) {
-        return getUserOrdersByStatus(
-                List.of(OrderStatus.ACCEPTED, OrderStatus.DRIVER_ACCEPTED, OrderStatus.IN_TRANSIT),
-                page, size);
+    public PageResponseDTO<UserOrderResponseDTO> getUserPendingOrders(int page, int size) {
+        return mapToUserOrderResponseDTO(
+                getUserOrdersByStatus(List.of(OrderStatus.PENDING), page, size)
+        );
     }
 
-    public PageResponseDTO<OrderResponseDTO> getUserCompletedOrders(int page, int size) {
-        return getUserOrdersByStatus(List.of(OrderStatus.DELIVERED, OrderStatus.DECLINED), page, size);
+    public PageResponseDTO<UserOrderResponseDTO> getUserInRealizationOrders(int page, int size) {
+        return mapToUserOrderResponseDTO(
+                getUserOrdersByStatus(List.of(OrderStatus.ACCEPTED, OrderStatus.DRIVER_ACCEPTED, OrderStatus.IN_TRANSIT), page, size)
+        );
+    }
+
+    public PageResponseDTO<UserOrderResponseDTO> getUserCompletedOrders(int page, int size) {
+        return mapToUserOrderResponseDTO(
+                getUserOrdersByStatus(List.of(OrderStatus.DELIVERED, OrderStatus.DECLINED), page, size)
+        );
     }
 
     private PageResponseDTO<OrderResponseDTO> getUserOrdersByStatus(
@@ -379,7 +404,7 @@ public class OrderService {
     public void completeReturnOrder(Order order) {
 
         order.setStatus(OrderStatus.DELIVERED);
-        order.setAcceptedAt(LocalDateTime.now());
+        order.setDeliveredAt(LocalDateTime.now());
         orderRepository.save(order);
 
         User driver = order.getDriver();

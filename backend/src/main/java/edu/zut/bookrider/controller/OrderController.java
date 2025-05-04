@@ -23,7 +23,7 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        PageResponseDTO<OrderResponseDTO> response = orderService.getUserPendingOrders(page, size);
+        PageResponseDTO<UserOrderResponseDTO> response = orderService.getUserPendingOrders(page, size);
         return ResponseEntity.ok(response);
     }
 
@@ -33,7 +33,7 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        PageResponseDTO<OrderResponseDTO> response = orderService.getUserInRealizationOrders(page, size);
+        PageResponseDTO<UserOrderResponseDTO> response = orderService.getUserInRealizationOrders(page, size);
         return ResponseEntity.ok(response);
     }
 
@@ -43,7 +43,7 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        PageResponseDTO<OrderResponseDTO> response = orderService.getUserCompletedOrders(page, size);
+        PageResponseDTO<UserOrderResponseDTO> response = orderService.getUserCompletedOrders(page, size);
         return ResponseEntity.ok(response);
     }
 
