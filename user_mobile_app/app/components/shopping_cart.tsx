@@ -147,8 +147,8 @@ const ShoppingCartComponent = forwardRef(
 
                 if (response.ok) {
                     setApiResponse({
-                        status: "Success",
-                        message: "Your order(s) were successfully created.",
+                        status: "Sukces",
+                        message: "Twoje zamówienie zostało pomyślnie utworzone",
                     });
                 } else {
                     const data = await response.json();
