@@ -91,7 +91,7 @@ public class OrderService {
         List<UserOrderResponseDTO> content = orderPage.getContent().stream()
                 .map(order -> {
                     Integer orderId = order.getOrderId();
-                    BigDecimal lateFee = transactionService.getTransactionAmountByOrderIdAndType(orderId, TransactionType.LATE_FEE_PAYMENT);
+                    BigDecimal lateFee = transactionService.getLateFeeTransactionAmountByOrderId(orderId);
                     BigDecimal bookPayment = transactionService.getTransactionAmountByOrderIdAndType(orderId, TransactionType.BOOK_ORDER_PAYMENT);
                     BigDecimal total = lateFee.add(bookPayment);
 
