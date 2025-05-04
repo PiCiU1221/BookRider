@@ -94,7 +94,7 @@ export default function AccountPage() {
                             <View className="flex-row items-center">
                                 <Feather name="calendar" size={20} color="#f7ca65" />
                                 <Text className="text-white text-lg ml-2">
-                                    <Text className="font-bold">Dołączono:</Text> {new Date(profile.createdAt).toLocaleDateString()}
+                                    <Text className="font-bold">Dołączono:</Text> {new Date(profile.createdAt).toLocaleDateString('pl-PL')}
                                 </Text>
                             </View>
                         </View>

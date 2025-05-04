@@ -370,7 +370,7 @@ export default function Deliveries() {
                                     <Text className="text-white">Dostawa: {item.destinationAddress}</Text>
                                     <Text className="text-white">Biblioteka: {item.libraryName}</Text>
                                     <Text className="text-white">
-                                        Kierowca przypisany: {new Date(item.driverAssignedAt).toLocaleString()}
+                                        Kierowca przypisany: {new Date(item.driverAssignedAt).toLocaleString('pl-PL')}
                                     </Text>
                                     {item.isReturn && (
                                         <Text className="text-red-400 font-bold">Zamówienie zwrotne</Text>
@@ -425,11 +425,11 @@ export default function Deliveries() {
 
                                 {item.isReturn ? (
                                     <Text className="text-white">
-                                        Utworzono: {new Date(item.createdAt).toLocaleString()}
+                                        Utworzono: {new Date(item.createdAt).toLocaleString('pl-PL')}
                                     </Text>
                                 ) : (
                                     <Text className="text-white">
-                                        Zaakceptowano: {new Date(item.acceptedAt).toLocaleString()}
+                                        Zaakceptowano: {new Date(item.acceptedAt).toLocaleString('pl-PL')}
                                     </Text>
                                 )}
 
@@ -524,7 +524,7 @@ export default function Deliveries() {
                             <View className="flex-row items-center">
                                 <Feather name="user-check" size={20} color="#f7ca65" />
                                 <Text className="text-white text-lg ml-2 mt-2">
-                                    Kierowca przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString()}
+                                    Kierowca przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString('pl-PL')}
                                 </Text>
                             </View>
                         )}

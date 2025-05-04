@@ -108,7 +108,7 @@ export default function OrderHistory() {
                                 <Text className="text-white">Dostawa: {item.destinationAddress}</Text>
                                 <Text className="text-white">Biblioteka: {item.libraryName}</Text>
                                 <Text className="text-white">
-                                    Dostarczono: {new Date(item.deliveredAt).toLocaleString()}
+                                    Dostarczono: {new Date(item.deliveredAt).toLocaleString('pl-PL')}
                                 </Text>
                             </View>
                             <Text className="text-3xl font-bold text-green-500">{item.amount.toFixed(2)} zł</Text>
@@ -180,31 +180,31 @@ export default function OrderHistory() {
                                 <View className="flex-row items-center mt-2">
                                     <Feather name="calendar" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Utworzono: {new Date(selectedOrder.createdAt).toLocaleString()}
+                                        Utworzono: {new Date(selectedOrder.createdAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="user-check" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Kierowca przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString()}
+                                        Kierowca przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="package" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Odebrano: {new Date(selectedOrder.pickedUpAt).toLocaleString()}
+                                        Odebrano: {new Date(selectedOrder.pickedUpAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="check-circle" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Dostarczono: {new Date(selectedOrder.deliveredAt).toLocaleString()}
+                                        Dostarczono: {new Date(selectedOrder.deliveredAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="clock" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Zaakceptowano: {new Date(selectedOrder.acceptedAt).toLocaleString()}
+                                        Zaakceptowano: {new Date(selectedOrder.acceptedAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
                             </>
@@ -213,31 +213,31 @@ export default function OrderHistory() {
                                 <View className="flex-row items-center mt-4">
                                     <Feather name="calendar" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Utworzono: {new Date(selectedOrder.createdAt).toLocaleString()}
+                                        Utworzono: {new Date(selectedOrder.createdAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="clock" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Zaakceptowano: {new Date(selectedOrder.acceptedAt).toLocaleString()}
+                                        Zaakceptowano: {new Date(selectedOrder.acceptedAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="user-check" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Kierowca przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString()}
+                                        Kierowca przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="package" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Odebrano: {new Date(selectedOrder.pickedUpAt).toLocaleString()}
+                                        Odebrano: {new Date(selectedOrder.pickedUpAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Feather name="check-circle" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Dostarczono: {new Date(selectedOrder.deliveredAt).toLocaleString()}
+                                        Dostarczono: {new Date(selectedOrder.deliveredAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
                             </>
