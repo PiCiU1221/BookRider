@@ -6,6 +6,9 @@ import CustomModal from "@/app/components/custom_modal";
 import CONFIG from "@/config";
 import {Feather} from "@expo/vector-icons";
 
+import orderStatusLabels from "@/app/constants/orderStatusLabels";
+import paymentStatusLabels from "@/app/constants/paymentStatusLabels";
+
 interface OrderDriverDetailsDTO {
     orderId: number;
     userId: string;
@@ -99,7 +102,10 @@ export default function OrderHistory() {
     return (
         <View className="flex-1 p-4 bg-theme_background">
             <StatusBar style="light" />
-            <Text className="text-2xl font-bold text-white mt-10 mb-4">Historia zamówień</Text>
+            <View className="flex-row items-center justify-center mt-10 mb-4">
+                <Feather name="archive" size={24} color="#f7ca65" className="mr-2" />
+                <Text className="text-2xl font-bold text-white">Historia zamówień</Text>
+            </View>
 
             <FlatList
                 data={orders}
@@ -178,11 +184,11 @@ export default function OrderHistory() {
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="info" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Status: {selectedOrder.status}</Text>
+                            <Text className="text-white text-lg ml-2">Status: {orderStatusLabels[selectedOrder.status as keyof typeof orderStatusLabels]}</Text>
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="credit-card" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Status płatności: {selectedOrder.paymentStatus}</Text>
+                            <Text className="text-white text-lg ml-2">Status płatności: {paymentStatusLabels[selectedOrder.paymentStatus as keyof typeof paymentStatusLabels]}</Text>
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="message-square" size={20} color="#f7ca65" />
@@ -217,7 +223,7 @@ export default function OrderHistory() {
                                 <View className="flex-row items-center">
                                     <Feather name="user-check" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Kierowca przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString('pl-PL')}
+                                        Przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
@@ -256,7 +262,7 @@ export default function OrderHistory() {
                                 <View className="flex-row items-center">
                                     <Feather name="user-check" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Kierowca przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString('pl-PL')}
+                                        Przypisano: {new Date(selectedOrder.driverAssignedAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
                                 <View className="flex-row items-center">
@@ -284,8 +290,12 @@ export default function OrderHistory() {
 
                             {selectedOrder.orderItems.map((item, index) => (
                                 <View key={index} className="flex-row justify-between py-2 border-t border-gray-300">
-                                    <Text className="text-white">{item.book.title}</Text>
-                                    <Text className="text-white">{item.book.authorNames.join(", ")}</Text>
+                                    <Text className="text-white" style={{ maxWidth: 120, flexWrap: 'wrap' }}>
+                                        {item.book.title}
+                                    </Text>
+                                    <Text className="text-white" style={{ maxWidth: 120, flexWrap: 'wrap' }}>
+                                        {item.book.authorNames.join(", ")}
+                                    </Text>
                                     <Text className="text-white">{item.quantity}</Text>
                                 </View>
                             ))}
