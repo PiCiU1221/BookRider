@@ -9,6 +9,11 @@ import { Feather } from "@expo/vector-icons";
 import orderStatusLabels from "@/app/constants/orderStatusLabels";
 import paymentStatusLabels from "@/app/constants/paymentStatusLabels";
 
+interface UserOrderResponseDTO {
+    userPayment: number;
+    orderResponseDTO: OrderDetailsDTO;
+}
+
 interface OrderDetailsDTO {
     orderId: number;
     userId: string;
@@ -42,10 +47,10 @@ interface BookResponseDTO {
 }
 
 export default function OrderHistory() {
-    const [orders, setOrders] = useState<OrderDetailsDTO[]>([]);
+    const [orders, setOrders] = useState<UserOrderResponseDTO[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const [selectedOrder, setSelectedOrder] = useState<OrderDetailsDTO | null>(null);
+    const [selectedOrder, setSelectedOrder] = useState<UserOrderResponseDTO | null>(null);
     const [apiResponse, setApiResponse] = useState<any>(null);
     const [selectedOrderType, setSelectedOrderType] = useState<OrderType>("inRealization");
     const [currentPage, setCurrentPage] = useState(0);
@@ -96,7 +101,7 @@ export default function OrderHistory() {
         fetchOrders(selectedOrderType, currentPage);
     }, [selectedOrderType, currentPage]);
 
-    const handleOrderPress = (order: OrderDetailsDTO): void => {
+    const handleOrderPress = (order: UserOrderResponseDTO): void => {
         setSelectedOrder(order);
         setModalVisible(true);
     };
@@ -158,23 +163,23 @@ export default function OrderHistory() {
 
             <FlatList
                 data={orders}
-                keyExtractor={(item) => item.orderId.toString()}
+                keyExtractor={(item) => item.orderResponseDTO.orderId.toString()}
                 contentContainerStyle={{ paddingBottom: 10 }}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleOrderPress(item)}>
                         <View className="bg-black/10 p-4 mb-4 rounded-lg border border-gray-300 flex-row justify-between items-center">
                             <View className="flex-1">
-                                <Text className="text-lg font-semibold text-white">ID zamówienia: {item.orderId}</Text>
-                                <Text className="text-white">Odbiór: {item.pickupAddress}</Text>
-                                <Text className="text-white">Dostawa: {item.destinationAddress}</Text>
-                                <Text className="text-white">Biblioteka: {item.libraryName}</Text>
+                                <Text className="text-lg font-semibold text-white">ID zamówienia: {item.orderResponseDTO.orderId}</Text>
+                                <Text className="text-white">Odbiór: {item.orderResponseDTO.pickupAddress}</Text>
+                                <Text className="text-white">Dostawa: {item.orderResponseDTO.destinationAddress}</Text>
+                                <Text className="text-white">Biblioteka: {item.orderResponseDTO.libraryName}</Text>
                                 <Text className="text-white">
-                                    {item.deliveredAt ?
-                                        `Data dostarczenia: ${new Date(item.deliveredAt).toLocaleString('pl-PL')}` :
-                                        `Data utworzenia: ${new Date(item.createdAt).toLocaleString('pl-PL')}`}
+                                    {item.orderResponseDTO.deliveredAt ?
+                                        `Data dostarczenia: ${new Date(item.orderResponseDTO.deliveredAt).toLocaleString('pl-PL')}` :
+                                        `Data utworzenia: ${new Date(item.orderResponseDTO.createdAt).toLocaleString('pl-PL')}`}
                                 </Text>
                             </View>
-                            <Text className="text-3xl font-bold text-green-500">{item.amount.toFixed(2)} zł</Text>
+                            <Text className="text-3xl font-bold text-green-500">{item.userPayment.toFixed(2)} zł</Text>
                         </View>
                     </TouchableOpacity>
                 )}
@@ -223,38 +228,38 @@ export default function OrderHistory() {
                     <View className="space-y-4">
                         <View className="flex-row items-center">
                             <Feather name="hash" size={20} color="#f7ca65" />
-                            <Text className="text-white text-2xl font-semibold ml-2">ID zamówienia: {selectedOrder.orderId}</Text>
+                            <Text className="text-white text-2xl font-semibold ml-2">ID zamówienia: {selectedOrder.orderResponseDTO.orderId}</Text>
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="dollar-sign" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Kwota: {selectedOrder.amount.toFixed(2)} zł</Text>
+                            <Text className="text-white text-lg ml-2">Kwota: {selectedOrder.userPayment.toFixed(2)} zł</Text>
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="info" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Status: {orderStatusLabels[selectedOrder.status as keyof typeof orderStatusLabels]}</Text>
+                            <Text className="text-white text-lg ml-2">Status: {orderStatusLabels[selectedOrder.orderResponseDTO.status as keyof typeof orderStatusLabels]}</Text>
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="credit-card" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Status płatności: {paymentStatusLabels[selectedOrder.paymentStatus as keyof typeof paymentStatusLabels]}</Text>
+                            <Text className="text-white text-lg ml-2">Status płatności: {paymentStatusLabels[selectedOrder.orderResponseDTO.paymentStatus as keyof typeof paymentStatusLabels]}</Text>
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="message-square" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Wiadomość dla kierowcy: {selectedOrder.noteToDriver || "None"}</Text>
+                            <Text className="text-white text-lg ml-2">Wiadomość dla kierowcy: {selectedOrder.orderResponseDTO.noteToDriver || "None"}</Text>
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="book" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Biblioteka: {selectedOrder.libraryName}</Text>
+                            <Text className="text-white text-lg ml-2">Biblioteka: {selectedOrder.orderResponseDTO.libraryName}</Text>
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="map-pin" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Odbiór: {selectedOrder.pickupAddress}</Text>
+                            <Text className="text-white text-lg ml-2">Odbiór: {selectedOrder.orderResponseDTO.pickupAddress}</Text>
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="map-pin" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Dostawa: {selectedOrder.destinationAddress}</Text>
+                            <Text className="text-white text-lg ml-2">Dostawa: {selectedOrder.orderResponseDTO.destinationAddress}</Text>
                         </View>
 
-                        {selectedOrder.isReturn ? (
+                        {selectedOrder.orderResponseDTO.isReturn ? (
                             <>
                                 <View className="flex-row items-center mt-2">
                                     <Feather name="refresh-cw" size={20} color="#ff5555" />
@@ -264,38 +269,38 @@ export default function OrderHistory() {
                                 <View className="flex-row items-center mt-2">
                                     <Feather name="calendar" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Utworzono: {new Date(selectedOrder.createdAt).toLocaleString('pl-PL')}
+                                        Utworzono: {new Date(selectedOrder.orderResponseDTO.createdAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
-                                {selectedOrder.driverAssignedAt && (
+                                {selectedOrder.orderResponseDTO.driverAssignedAt && (
                                     <View className="flex-row items-center">
                                         <Feather name="user-check" size={20} color="#f7ca65" />
                                         <Text className="text-white text-lg ml-2">
-                                            Przypisano kierowce: {new Date(selectedOrder.driverAssignedAt).toLocaleString('pl-PL')}
+                                            Przypisano kierowce: {new Date(selectedOrder.orderResponseDTO.driverAssignedAt).toLocaleString('pl-PL')}
                                         </Text>
                                     </View>
                                 )}
-                                {selectedOrder.pickedUpAt && (
+                                {selectedOrder.orderResponseDTO.pickedUpAt && (
                                     <View className="flex-row items-center">
                                         <Feather name="package" size={20} color="#f7ca65" />
                                         <Text className="text-white text-lg ml-2">
-                                            Odebrano: {new Date(selectedOrder.pickedUpAt).toLocaleString('pl-PL')}
+                                            Odebrano: {new Date(selectedOrder.orderResponseDTO.pickedUpAt).toLocaleString('pl-PL')}
                                         </Text>
                                     </View>
                                 )}
-                                {selectedOrder.deliveredAt && (
+                                {selectedOrder.orderResponseDTO.deliveredAt && (
                                     <View className="flex-row items-center">
                                         <Feather name="check-circle" size={20} color="#f7ca65" />
                                         <Text className="text-white text-lg ml-2">
-                                            Dostarczono: {new Date(selectedOrder.deliveredAt).toLocaleString('pl-PL')}
+                                            Dostarczono: {new Date(selectedOrder.orderResponseDTO.deliveredAt).toLocaleString('pl-PL')}
                                         </Text>
                                     </View>
                                 )}
-                                {selectedOrder.acceptedAt && (
+                                {selectedOrder.orderResponseDTO.acceptedAt && (
                                     <View className="flex-row items-center">
                                         <Feather name="clock" size={20} color="#f7ca65" />
                                         <Text className="text-white text-lg ml-2">
-                                            Przyjęto: {new Date(selectedOrder.acceptedAt).toLocaleString('pl-PL')}
+                                            Przyjęto: {new Date(selectedOrder.orderResponseDTO.acceptedAt).toLocaleString('pl-PL')}
                                         </Text>
                                     </View>
                                 )}
@@ -305,38 +310,38 @@ export default function OrderHistory() {
                                 <View className="flex-row items-center mt-4">
                                     <Feather name="calendar" size={20} color="#f7ca65" />
                                     <Text className="text-white text-lg ml-2">
-                                        Utworzono: {new Date(selectedOrder.createdAt).toLocaleString('pl-PL')}
+                                        Utworzono: {new Date(selectedOrder.orderResponseDTO.createdAt).toLocaleString('pl-PL')}
                                     </Text>
                                 </View>
-                                {selectedOrder.acceptedAt && (
+                                {selectedOrder.orderResponseDTO.acceptedAt && (
                                     <View className="flex-row items-center">
                                         <Feather name="clock" size={20} color="#f7ca65" />
                                         <Text className="text-white text-lg ml-2">
-                                            Przyjęto: {new Date(selectedOrder.acceptedAt).toLocaleString('pl-PL')}
+                                            Przyjęto: {new Date(selectedOrder.orderResponseDTO.acceptedAt).toLocaleString('pl-PL')}
                                         </Text>
                                     </View>
                                 )}
-                                {selectedOrder.driverAssignedAt && (
+                                {selectedOrder.orderResponseDTO.driverAssignedAt && (
                                     <View className="flex-row items-center">
                                         <Feather name="user-check" size={20} color="#f7ca65" />
                                         <Text className="text-white text-lg ml-2">
-                                            Kierowca przypisany: {new Date(selectedOrder.driverAssignedAt).toLocaleString('pl-PL')}
+                                            Kierowca przypisany: {new Date(selectedOrder.orderResponseDTO.driverAssignedAt).toLocaleString('pl-PL')}
                                         </Text>
                                     </View>
                                 )}
-                                {selectedOrder.pickedUpAt && (
+                                {selectedOrder.orderResponseDTO.pickedUpAt && (
                                     <View className="flex-row items-center">
                                         <Feather name="package" size={20} color="#f7ca65" />
                                         <Text className="text-white text-lg ml-2">
-                                            Odebrano: {new Date(selectedOrder.pickedUpAt).toLocaleString('pl-PL')}
+                                            Odebrano: {new Date(selectedOrder.orderResponseDTO.pickedUpAt).toLocaleString('pl-PL')}
                                         </Text>
                                     </View>
                                 )}
-                                {selectedOrder.deliveredAt && (
+                                {selectedOrder.orderResponseDTO.deliveredAt && (
                                     <View className="flex-row items-center">
                                         <Feather name="check-circle" size={20} color="#f7ca65" />
                                         <Text className="text-white text-lg ml-2">
-                                            Dostarczono: {new Date(selectedOrder.deliveredAt).toLocaleString('pl-PL')}
+                                            Dostarczono: {new Date(selectedOrder.orderResponseDTO.deliveredAt).toLocaleString('pl-PL')}
                                         </Text>
                                     </View>
                                 )}
@@ -354,7 +359,7 @@ export default function OrderHistory() {
                                 <Text className="text-white font-semibold">Ilość</Text>
                             </View>
 
-                            {selectedOrder.orderItems.map((item, index) => (
+                            {selectedOrder.orderResponseDTO.orderItems.map((item, index) => (
                                 <View key={index} className="flex-row justify-between py-2 border-t border-gray-300">
                                     <Text className="text-white" style={{ maxWidth: 120, flexWrap: 'wrap' }}>
                                         {item.book.title}
