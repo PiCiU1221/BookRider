@@ -33,7 +33,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
         >
             <View
                 className="bg-theme_background p-6 rounded-lg"
-                style={{ maxHeight: 600 }}
+                style={{ maxHeight: 700 }}
             >
                 {loading ? (
                     <ActivityIndicator className="p-6" size={80} color="#f7ca65" />
