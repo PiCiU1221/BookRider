@@ -27,6 +27,8 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -310,7 +312,7 @@ public class BookControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "example_user@acit.com", roles = {"user"})
+    @WithMockUser(username = "bcit_user@bookrider.pl", roles = {"user"})
     void whenUserGetsTitlesWithInput_thenReturnOnlySelectedTitles() throws Exception {
 
         List<String> authors1 = List.of("Walter White", "Jessie Pinkman");
@@ -327,7 +329,7 @@ public class BookControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "example_user@acit.com", roles = {"user"})
+    @WithMockUser(username = "bcit_user@bookrider.pl", roles = {"user"})
     void whenUserGetsTitlesWithInputFromMiddle_thenReturnOnlySelectedTitles() throws Exception {
 
         List<String> authors1 = List.of("Walter White", "Jessie Pinkman");
@@ -341,5 +343,67 @@ public class BookControllerIT {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.hasSize(Matchers.greaterThanOrEqualTo(3))));
+    }
+
+    @Test
+    @WithMockUser(username = "example_sys_admin@bookrider.pl", roles = {"system_administrator"})
+    void whenSysAdminRemovesBook_thenReturnNoContent() throws Exception {
+
+        List<String> authors1 = List.of("Walter White", "Jessie Pinkman");
+        Book book = createBook("Poetry", "Polish", "Oxford", authors1, "BCIT_Book1", "04032025121", 2015, "random.com");
+
+        List<Book> books = libraryReference.getBooks();
+        books.add(book);
+        libraryReference.setBooks(books);
+        libraryRepository.save(libraryReference);
+
+        List<Library> libraries = book.getLibraries();
+        libraries.add(libraryReference);
+        book.setLibraries(libraries);
+        bookRepository.save(book);
+
+        libraryReference = libraryRepository.findById(1).orElseThrow();
+        books = libraryReference.getBooks();
+        assertTrue(books.contains(book));
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/books/{id}", book.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNoContent());
+
+        libraryReference = libraryRepository.findById(1).orElseThrow();
+        books = libraryReference.getBooks();
+        assertFalse(books.contains(book));
+    }
+
+    @Test
+    @WithMockUser(username = "librarian67:1", roles = {"librarian"})
+    void whenLibrarianRemovesBook_thenReturnNoContent() throws Exception {
+
+        List<String> authors1 = List.of("Walter White", "Jessie Pinkman");
+        Book book = createBook("Poetry", "Polish", "Oxford", authors1, "BCIT_Book1", "04032025121", 2015, "random.com");
+
+        List<Book> books = libraryReference.getBooks();
+        books.add(book);
+        libraryReference.setBooks(books);
+        libraryRepository.save(libraryReference);
+
+        List<Library> libraries = book.getLibraries();
+        libraries.add(libraryReference);
+        book.setLibraries(libraries);
+        bookRepository.save(book);
+
+        libraryReference = libraryRepository.findById(1).orElseThrow();
+        books = libraryReference.getBooks();
+        assertTrue(books.contains(book));
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/books/my-library/{id}", book.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNoContent());
+
+        libraryReference = libraryRepository.findById(1).orElseThrow();
+        books = libraryReference.getBooks();
+        assertFalse(books.contains(book));
     }
 }

@@ -121,4 +121,9 @@ public class TransactionService {
         return transactionRepository.findAmountByOrderIdAndTransactionType(orderId, transactionType)
                 .orElse(BigDecimal.ZERO);
     }
+
+    public BigDecimal getLateFeeTransactionAmountByOrderId(Integer orderId) {
+        return transactionRepository.findLateFeeByOrderId(orderId)
+                .orElse(BigDecimal.ZERO);
+    }
 }

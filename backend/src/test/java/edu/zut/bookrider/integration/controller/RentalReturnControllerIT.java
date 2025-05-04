@@ -454,14 +454,12 @@ public class RentalReturnControllerIT {
     @WithMockUser(username = "librarianRrcit:1", roles = {"librarian"})
     void whenLibrarianRequestsDeliveryReturnCompletion_thenReturnNoContent() throws Exception {
 
-        Library library1 = createLibrary("Library1", "70-426", "Szczecin", "Generała Ludomiła Rayskiego 3", 53.434882, 14.552266);
-
         Author author = createAuthor("Author");
         Language language = createLanguage("language");
 
         Book book = createBook("Book1", "113109022025", language, author);
 
-        Order deliveryOrder = createOrder(user, driver, library1, address, book, 2, OrderStatus.DELIVERED, false);
+        Order deliveryOrder = createOrder(user, driver, existingLibrary, address, book, 2, OrderStatus.DELIVERED, false);
 
         Rental rental = new Rental();
         rental.setUser(user);
@@ -473,7 +471,7 @@ public class RentalReturnControllerIT {
         rental.setStatus(RentalStatus.RENTED);
         rental = rentalRepository.save(rental);
 
-        Order returnOrder = createOrder(user, driver, library1, address, book, 2, OrderStatus.AWAITING_LIBRARY_CONFIRMATION, true);
+        Order returnOrder = createOrder(user, driver, existingLibrary, address, book, 2, OrderStatus.AWAITING_LIBRARY_CONFIRMATION, true);
 
         RentalReturn rentalReturn = new RentalReturn();
         rentalReturn.setReturnOrder(returnOrder);
@@ -508,14 +506,12 @@ public class RentalReturnControllerIT {
     @WithMockUser(username = "librarianRrcit:1", roles = {"librarian"})
     void whenLibrarianRequestsInPersonReturnCompletion_thenReturnNoContent() throws Exception {
 
-        Library library1 = createLibrary("Library1", "70-426", "Szczecin", "Generała Ludomiła Rayskiego 3", 53.434882, 14.552266);
-
         Author author = createAuthor("Author");
         Language language = createLanguage("language");
 
         Book book = createBook("Book1", "113109022025", language, author);
 
-        Order deliveryOrder = createOrder(user, driver, library1, address, book, 2, OrderStatus.DELIVERED, false);
+        Order deliveryOrder = createOrder(user, driver, existingLibrary, address, book, 2, OrderStatus.DELIVERED, false);
 
         Rental rental = new Rental();
         rental.setUser(user);
@@ -998,6 +994,99 @@ public class RentalReturnControllerIT {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/rental-returns")
                         .content(new ObjectMapper().writeValueAsString(generalRentalReturnRequestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithMockUser(username = "librarianRrcit:1", roles = {"librarian"})
+    void whenLibrarianRequestsDeliveryReturnCompletionFromWrongLibrary_thenReturnConflict() throws Exception {
+
+        Library library1 = createLibrary("Library1", "70-426", "Szczecin", "Generała Ludomiła Rayskiego 3", 53.434882, 14.552266);
+
+        Author author = createAuthor("Author");
+        Language language = createLanguage("language");
+
+        Book book = createBook("Book1", "113109022025", language, author);
+
+        Order deliveryOrder = createOrder(user, driver, library1, address, book, 2, OrderStatus.DELIVERED, false);
+
+        Rental rental = new Rental();
+        rental.setUser(user);
+        rental.setBook(deliveryOrder.getOrderItems().get(0).getBook());
+        rental.setLibrary(deliveryOrder.getLibrary());
+        rental.setOrder(deliveryOrder);
+        rental.setQuantity(2);
+        rental.setReturnDeadline(LocalDateTime.now().plusDays(30));
+        rental.setStatus(RentalStatus.RENTED);
+        rental = rentalRepository.save(rental);
+
+        Order returnOrder = createOrder(user, driver, library1, address, book, 2, OrderStatus.AWAITING_LIBRARY_CONFIRMATION, true);
+
+        RentalReturn rentalReturn = new RentalReturn();
+        rentalReturn.setReturnOrder(returnOrder);
+        rentalReturn.setStatus(RentalReturnStatus.IN_PROGRESS);
+
+        RentalReturnItem rentalReturnItem = new RentalReturnItem();
+        rentalReturnItem.setRentalReturn(rentalReturn);
+        rentalReturnItem.setRental(rental);
+        rentalReturnItem.setBook(rental.getBook());
+        rentalReturnItem.setReturnedQuantity(2);
+
+        List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
+        rentalReturnItems.add(rentalReturnItem);
+        rentalReturn.setRentalReturnItems(rentalReturnItems);
+
+        rentalReturn = rentalReturnRepository.save(rentalReturn);
+        assertEquals(RentalReturnStatus.IN_PROGRESS, rentalReturn.getStatus());
+
+        assertEquals(BigDecimal.valueOf(0.00).setScale(2, RoundingMode.CEILING), driver.getBalance());
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/rental-returns/{rentalReturnId}/complete-delivery", rentalReturn.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithMockUser(username = "librarianRrcit:1", roles = {"librarian"})
+    void whenLibrarianRequestsInPersonReturnCompletionFromWrongLibrary_thenReturnConflict() throws Exception {
+
+        Library library1 = createLibrary("Library1", "70-426", "Szczecin", "Generała Ludomiła Rayskiego 3", 53.434882, 14.552266);
+
+        Author author = createAuthor("Author");
+        Language language = createLanguage("language");
+
+        Book book = createBook("Book1", "113109022025", language, author);
+
+        Order deliveryOrder = createOrder(user, driver, library1, address, book, 2, OrderStatus.DELIVERED, false);
+
+        Rental rental = new Rental();
+        rental.setUser(user);
+        rental.setBook(deliveryOrder.getOrderItems().get(0).getBook());
+        rental.setLibrary(deliveryOrder.getLibrary());
+        rental.setOrder(deliveryOrder);
+        rental.setQuantity(2);
+        rental.setReturnDeadline(LocalDateTime.now().plusDays(30));
+        rental.setStatus(RentalStatus.RENTED);
+        rental = rentalRepository.save(rental);
+
+        RentalReturn rentalReturn = new RentalReturn();
+        rentalReturn.setStatus(RentalReturnStatus.IN_PERSON);
+
+        RentalReturnItem rentalReturnItem = new RentalReturnItem();
+        rentalReturnItem.setRentalReturn(rentalReturn);
+        rentalReturnItem.setRental(rental);
+        rentalReturnItem.setBook(rental.getBook());
+        rentalReturnItem.setReturnedQuantity(2);
+
+        List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
+        rentalReturnItems.add(rentalReturnItem);
+        rentalReturn.setRentalReturnItems(rentalReturnItems);
+
+        rentalReturn = rentalReturnRepository.save(rentalReturn);
+        assertEquals(RentalReturnStatus.IN_PERSON, rentalReturn.getStatus());
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/rental-returns/{rentalReturnId}/complete-in-person", rentalReturn.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
     }

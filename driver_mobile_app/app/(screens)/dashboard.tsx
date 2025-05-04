@@ -156,13 +156,12 @@ export default function Dashboard() {
 
                     <View className="absolute bottom-0 left-0 w-full bg-theme_background flex-row">
                         <TouchableOpacity
-                            className="w-1/3 p-3 items-center justify-center"
+                            className="w-1/3 p-4 items-center justify-center"
                             onPress={() => {
                                 router.push("/order_history");
                             }}
                         >
-                            <Icon name="document-text" size={30} color="white" />
-                            <Text className="text-white text-sm text-center">Zamówienia</Text>
+                            <Icon name="document-text" size={32} color="white" />
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -171,8 +170,7 @@ export default function Dashboard() {
                                 router.push("/deliveries");
                             }}
                         >
-                            <Icon name="car" size={30} color="white" />
-                            <Text className="text-white text-sm">Dostawy</Text>
+                            <Icon name="car" size={38} color="white" />
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -181,8 +179,7 @@ export default function Dashboard() {
                                 router.push("/account");
                             }}
                         >
-                            <Icon name="person" size={30} color="white" />
-                            <Text className="text-white text-sm">Konto</Text>
+                            <Icon name="person" size={32} color="white" />
                         </TouchableOpacity>
                     </View>
 

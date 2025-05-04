@@ -38,6 +38,7 @@ public class BookService {
     private final AuthorRepository authorRepository;
     private final PublisherRepository publisherRepository;
     private final LanguageRepository languageRepository;
+    private final UserService userService;
 
     @Transactional(readOnly = true)
     public PageResponseDTO<BookResponseDto> searchBooks(
@@ -230,6 +231,20 @@ public class BookService {
         libraryRepository.saveAll(book.getLibraries());
 
         bookRepository.delete(book);
+    }
+
+    @Transactional
+    public void deleteBookFromLibrary(Integer bookId) {
+        User librarian = userService.getUser();
+        Library library = librarian.getLibrary();
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException("Book with id " + bookId + " not found"));
+
+        List<Book> books = library.getBooks();
+        books.remove(book);
+        library.setBooks(books);
+
+        libraryRepository.save(library);
     }
 
     @Transactional

@@ -9,6 +9,7 @@ interface CustomModalProps {
     onClose: () => void;
     loading?: boolean;
     children?: React.ReactNode;
+    hideOkButton?: boolean;
 }
 
 const CustomModal: React.FC<CustomModalProps> = ({
@@ -18,6 +19,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
                                                      onClose,
                                                      loading = false,
                                                      children,
+                                                     hideOkButton,
                                                  }) => {
     const showContent = isVisible && !loading;
 
@@ -48,12 +50,14 @@ const CustomModal: React.FC<CustomModalProps> = ({
                         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                             {children && <View>{children}</View>}
                         </ScrollView>
-                        <TouchableOpacity
-                            onPress={onClose}
-                            className="bg-theme_accent rounded-xl w-full py-3 mt-4"
-                        >
-                            <Text className="text-xl text-white text-center font-semibold">OK</Text>
-                        </TouchableOpacity>
+                        {!hideOkButton && (
+                            <TouchableOpacity
+                                onPress={onClose}
+                                className="bg-theme_accent rounded-xl w-full py-3 mt-4"
+                            >
+                                <Text className="text-xl text-white text-center font-semibold">OK</Text>
+                            </TouchableOpacity>
+                        )}
                     </>
                 ) : null}
             </View>

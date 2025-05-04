@@ -17,12 +17,12 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
     @Query("""
     SELECT r FROM Rental r
     WHERE r.user = :user
+    AND r.status != 'RETURNED'
+    AND r.status != 'RETURN_IN_PROGRESS'
     ORDER BY 
         CASE r.status
             WHEN 'RENTED' THEN 1
             WHEN 'PARTIALLY_RETURNED' THEN 2
-            WHEN 'RETURN_IN_PROGRESS' THEN 3
-            WHEN 'RETURNED' THEN 4
         END,
         r.rentedAt DESC
     """)

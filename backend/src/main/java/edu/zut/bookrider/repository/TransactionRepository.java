@@ -14,4 +14,16 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     @Query("SELECT t.amount FROM Transaction t WHERE t.order.id = :orderId AND t.transactionType = :transactionType")
     Optional<BigDecimal> findAmountByOrderIdAndTransactionType(@Param("orderId") Integer orderId,
                                                                @Param("transactionType") TransactionType transactionType);
+
+    @Query("""
+        SELECT t.amount
+        FROM Transaction t
+        WHERE t.rentalReturn.id = (
+            SELECT r.id
+            FROM RentalReturn r
+            WHERE r.returnOrder.id = :orderId
+        )
+        AND t.transactionType = 'LATE_FEE_PAYMENT'
+    """)
+    Optional<BigDecimal> findLateFeeByOrderId(@Param("orderId") Integer orderId);
 }
