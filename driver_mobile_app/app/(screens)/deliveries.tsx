@@ -19,7 +19,7 @@ interface OrderDetailsDTO {
     destinationAddress: string;
     isReturn: boolean;
     status: string;
-    amount: string;
+    amount: number;
     paymentStatus: string;
     noteToDriver: string;
     createdAt: Date;
@@ -376,7 +376,7 @@ export default function Deliveries() {
                                         <Text className="text-red-400 font-bold">Zamówienie zwrotne</Text>
                                     )}
                                 </View>
-                                <Text className="text-3xl font-bold text-green-500">{item.amount} zł</Text>
+                                <Text className="text-3xl font-bold text-green-500">{item.amount.toFixed(2)} zł</Text>
                             </View>
                         </TouchableOpacity>
                     )}
@@ -437,7 +437,7 @@ export default function Deliveries() {
                                     <Text className="text-red-400 font-bold">Zamówienie zwrotne</Text>
                                 )}
                             </View>
-                            <Text className="text-3xl font-bold text-green-500">{item.amount} zł</Text>
+                            <Text className="text-3xl font-bold text-green-500">{item.amount.toFixed(2)} zł</Text>
                         </View>
                     </TouchableOpacity>
                 )}
@@ -564,7 +564,7 @@ export default function Deliveries() {
                                         {(selectedOrder?.status === 'DRIVER_ACCEPTED' && !selectedOrder?.isReturn) ||
                                         (selectedOrder?.status === 'DRIVER_ACCEPTED' && selectedOrder?.isReturn)
                                             ? 'Nawiguj do adresu obioru'
-                                            : 'Nawiduj do adresu dostawy'}
+                                            : 'Nawiguj do adresu dostawy'}
                                     </Text>
                                 </TouchableOpacity>
 

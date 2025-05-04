@@ -14,7 +14,7 @@ interface OrderDriverDetailsDTO {
     destinationAddress: string;
     isReturn: boolean;
     status: string;
-    amount: string;
+    amount: number;
     paymentStatus: string;
     noteToDriver: string;
     deliveryPhotoUrl: string;
@@ -111,7 +111,7 @@ export default function OrderHistory() {
                                     Dostarczono: {new Date(item.deliveredAt).toLocaleString()}
                                 </Text>
                             </View>
-                            <Text className="text-3xl font-bold text-green-500">{item.amount} zł</Text>
+                            <Text className="text-3xl font-bold text-green-500">{item.amount.toFixed(2)} zł</Text>
                         </View>
                     </TouchableOpacity>
                 )}
@@ -143,7 +143,7 @@ export default function OrderHistory() {
                         </View>
                         <View className="flex-row items-center">
                             <Feather name="dollar-sign" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Zarobki: {selectedOrder.amount} zł</Text>
+                            <Text className="text-white text-lg ml-2">Zarobki: {selectedOrder.amount.toFixed(2)} zł</Text>
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="info" size={20} color="#f7ca65" />
