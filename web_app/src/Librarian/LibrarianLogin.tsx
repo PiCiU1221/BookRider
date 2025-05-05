@@ -141,11 +141,17 @@ const LibrarianLogin: React.FC = () => {
                             </button>
                         </Link>
                     </div>
-                    <div style={formContainerStyle}>
-                        <h2 style={headerStyle}>Logowanie bibliotekarza</h2>
-                        <form onSubmit={handleSubmit} style={formStyle}>
-                            <div style={formGroupStyle}>
-                                <label htmlFor="username" style={labelStyle}>Nazwa użytkownika:</label>
+                    <div
+                        className="absolute top-[22%] left-1/2 transform -translate-x-1/2 bg-white p-10 rounded-xl shadow-2xl w-[clamp(280px,30vw,400px)] h-[clamp(505px,55vh,90vh)]">
+                        <h2 className="text-center mb-6 text-3xl font-semibold text-[#2c3e50]">
+                            Logowanie bibliotekarza
+                        </h2>
+
+                        <form onSubmit={handleSubmit} className="flex flex-col">
+                            <div className="mb-5">
+                                <label htmlFor="username" className="block text-[16px] text-[#34495e] mb-2">
+                                    Nazwa użytkownika:
+                                </label>
                                 <input
                                     type="text"
                                     id="username"
@@ -154,11 +160,14 @@ const LibrarianLogin: React.FC = () => {
                                     onChange={handleInputChange}
                                     required
                                     maxLength={25}
-                                    className="peer p-2 border rounded-md w-full"
+                                    className="p-2 border rounded-md w-full"
                                 />
                             </div>
-                            <div style={formGroupStyle}>
-                                <label htmlFor="libraryId" style={labelStyle}>Identyfikator biblioteki:</label>
+
+                            <div className="mb-5">
+                                <label htmlFor="libraryId" className="block text-[16px] text-[#34495e] mb-2">
+                                    Identyfikator biblioteki:
+                                </label>
                                 <input
                                     type="text"
                                     id="libraryId"
@@ -167,11 +176,14 @@ const LibrarianLogin: React.FC = () => {
                                     onChange={handleInputChange}
                                     required
                                     maxLength={10}
-                                    className="peer p-2 border rounded-md w-full"
+                                    className="p-2 border rounded-md w-full"
                                 />
                             </div>
-                            <div style={formGroupStyle}>
-                                <label htmlFor="password" style={labelStyle}>Hasło:</label>
+
+                            <div className="mb-5">
+                                <label htmlFor="password" className="block text-[16px] text-[#34495e] mb-2">
+                                    Hasło:
+                                </label>
                                 <input
                                     type="password"
                                     id="password"
@@ -180,29 +192,29 @@ const LibrarianLogin: React.FC = () => {
                                     onChange={handleInputChange}
                                     required
                                     maxLength={25}
-                                    className="peer p-2 border rounded-md w-full"
+                                    className="p-2 border rounded-md w-full"
                                 />
                             </div>
-                            <div style={errorStyle} className="flex items-center gap-2">
-                                {error && (
-                                    <>
-                                        <svg
-                                            className="flex-shrink-0 w-4 h-4"
-                                            aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path
-                                                d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-                                        </svg>
-                                        <p className="m-0">{error}</p>
-                                    </>
-                                )}
-                            </div>
+
+                            {error && (
+                                <div className="text-red-600 text-sm mb-4 flex items-center gap-2">
+                                    <svg
+                                        className="w-4 h-4 flex-shrink-0"
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                                    </svg>
+                                    <p className="m-0">{error}</p>
+                                </div>
+                            )}
+
                             <button
                                 type="submit"
-                                className="py-3 px-0 border-none rounded-lg bg-[#3B576C] text-white text-lg cursor-pointer transition-all duration-300 hover:bg-[#314757]"
+                                className="py-3 rounded-lg bg-[#3B576C] text-white text-lg transition duration-300 hover:bg-[#314757]"
                             >
                                 Logowanie
                             </button>
@@ -212,51 +224,6 @@ const LibrarianLogin: React.FC = () => {
             </div>
         </div>
     );
-};
-
-const formContainerStyle: React.CSSProperties = {
-    backgroundColor: '#fff',
-    padding: '40px',
-    borderRadius: '8px',
-    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)',
-    width: 'clamp(280px, 30vw, 400px)',
-    height: 'clamp(510px, 59vh, 90vh)',
-    position: 'absolute',
-    top: '22%',
-    left: '50%',
-    transform: 'translateX(-50%)',
-};
-
-const headerStyle: React.CSSProperties = {
-    textAlign: 'center',
-    marginBottom: '25px',
-    fontSize: '28px',
-    fontWeight: '600',
-    color: '#2c3e50',
-    width: '100%',
-    marginLeft: '0%',
-};
-
-const formStyle = {
-    display: 'flex',
-    flexDirection: 'column' as const,
-};
-
-const formGroupStyle = {
-    marginBottom: '20px',
-};
-
-const labelStyle: React.CSSProperties = {
-    fontSize: '16px',
-    color: '#34495e',
-    marginBottom: '8px',
-};
-
-const errorStyle: React.CSSProperties = {
-    color: 'red',
-    marginBottom: '2%',
-    fontSize: '14px',
-    marginTop: '-3%',
 };
 
 export default LibrarianLogin;

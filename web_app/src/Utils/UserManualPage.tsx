@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 
-export const LegalInfoPage: React.FC = () => {
+export const UserManualPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#314757] flex items-center justify-center text-white">
             <div className="text-center space-y-10 px-4">
@@ -11,7 +11,7 @@ export const LegalInfoPage: React.FC = () => {
                     alt="Book Rider Logo"
                     src="/book-high-res.png"
                 />
-                <h1 className="text-3xl font-semibold">Informacje o kwestiach prawnych <br /> związanych z systemem Book Rider</h1>
+                <h1 className="text-3xl font-semibold">Informacje o funkcjonowaniu systemu Book Rider</h1>
                 <Link to="/">
                     <button className="mt-10 bg-gray-200 text-[#314757] px-6 py-2 rounded-lg text-lg hover:scale-105 transition-all duration-[0.3s]">
                         Powrót do strony głównej
@@ -22,4 +22,4 @@ export const LegalInfoPage: React.FC = () => {
     );
 };
 
-export default LegalInfoPage;
+export default UserManualPage;

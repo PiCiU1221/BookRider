@@ -72,10 +72,10 @@ const RegistrationForm: React.FC = () => {
                 throw new Error('Registration failed');
             }
 
-            navigate('/add-library');
+            navigate('/library-admin-login');
         } catch (error) {
             setError('Podczas rejestracji nastąpił błąd.');
-            console.error('Registration Error:', error);
+            console.error('Error:', error);
         }
     };
 

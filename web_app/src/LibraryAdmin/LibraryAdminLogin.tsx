@@ -62,7 +62,26 @@ const LibraryAdminLogin: React.FC = () => {
                     localStorage.setItem('role', role);
                     localStorage.setItem('email', email);
 
-                    navigate('/add-library');
+                    const statusResponse = await fetch(`${API_BASE_URL}/api/library-requests/me?page=0&size=1`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    });
+
+                    if (statusResponse.ok) {
+                        const requests = await statusResponse.json();
+                        const status = requests[0]?.status;
+
+                        if (status === 'PENDING') {
+                            navigate('/processing-info');
+                        } else if (status === 'APPROVED') {
+                            navigate('/library-admin-dashboard');
+                        } else {
+                            navigate('/add-library');
+                        }
+                    } else {
+                        navigate('/'); // Landing page
+                    }
 
                 } else {
                     setError('Authorization header missing');
@@ -152,11 +171,16 @@ const LibraryAdminLogin: React.FC = () => {
                             </button>
                         </Link>
                     </div>
-                    <div style={formContainerStyle}>
-                        <h2 style={headerStyle}>Logowanie administratora biblioteki</h2>
-                        <form onSubmit={handleSubmit} style={formStyle}>
-                            <div style={formGroupStyle}>
-                                <label htmlFor="email" style={labelStyle}>Adres email:</label>
+                    <div
+                        className="absolute bg-white p-10 rounded-xl shadow-2xl w-[clamp(280px,30vw,400px)] h-[clamp(480px,55vh,90vh)] top-[25%] left-1/2 transform -translate-x-1/2">
+                        <h2 className="text-center mb-[25px] text-3xl font-semibold text-[#2c3e50] w-[100%] ">
+                            Logowanie administratora biblioteki
+                        </h2>
+
+                        <form onSubmit={handleSubmit} className="flex flex-col">
+                            <div className="mb-[20px]">
+                                <label htmlFor="email" className="text-[16px] text-[#34495e] mb-[8px] block">Adres
+                                    email:</label>
                                 <input
                                     type="text"
                                     id="email"
@@ -165,12 +189,13 @@ const LibraryAdminLogin: React.FC = () => {
                                     onChange={handleInputChange}
                                     required
                                     maxLength={25}
-                                    className={`peer p-2 border rounded-md w-full ${!emailValid ? 'border-red-500' : 'border-gray-300'}`}
+                                    className={`peer p-2 border rounded-md w-full ${!emailValid ? 'border-red-600' : 'border-gray-300'}`}
                                 />
                             </div>
 
-                            <div style={formGroupStyle}>
-                                <label htmlFor="password" style={labelStyle}>Hasło:</label>
+                            <div className="mb-[20px]">
+                                <label htmlFor="password"
+                                       className="text-[16px] text-[#34495e] mb-[8px] block">Hasło:</label>
                                 <input
                                     type="password"
                                     id="password"
@@ -183,23 +208,22 @@ const LibraryAdminLogin: React.FC = () => {
                                 />
                             </div>
 
-                            <div style={errorStyle} className="flex items-center gap-2">
-                                {error && (
-                                    <>
-                                        <svg
-                                            className="flex-shrink-0 w-4 h-4"
-                                            aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path
-                                                d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-                                        </svg>
-                                        <p className="m-0">{error}</p>
-                                    </>
-                                )}
-                            </div>
+                            {error && (
+                                <div className="flex items-center gap-2 text-red-600 text-[14px] -mt-[3%] mb-[2%]">
+                                    <svg
+                                        className="flex-shrink-0 w-4 h-4"
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z"
+                                        />
+                                    </svg>
+                                    <p className="m-0">{error}</p>
+                                </div>
+                            )}
 
                             <button
                                 type="submit"
@@ -207,68 +231,22 @@ const LibraryAdminLogin: React.FC = () => {
                             >
                                 Logowanie
                             </button>
-
                         </form>
 
                         <div className="text-center mt-5">
                             <Link to="/register">
                                 <button
-                                    className="py-3 px-8 w-full hover:text-[#7c92a3] transition-all duration-[0.3s] font-normal text-[#3B576C] text-[0.9vw] text-center tracking-[0] leading-[normal]">
+                                    className="py-3 px-8 w-full hover:text-[#7c92a3] transition-all duration-[0.3s] font-normal text-[#3B576C] text-base text-center tracking-[0] leading-[normal]"
+                                >
                                     Nie jesteś zarejestrowany?
                                 </button>
                             </Link>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
     );
-};
-
-const formContainerStyle: React.CSSProperties = {
-    backgroundColor: '#fff',
-    padding: '2.5vw',
-    borderRadius: '0.5vw',
-    boxShadow: '0 0.5vw 1.5vw rgba(0, 0, 0, 0.3)',
-    width: 'clamp(280px, 30vw, 400px)',
-    height: 'clamp(460px, 59vh, 90vh)',
-    position: 'absolute',
-    top: '25%',
-    left: '50%',
-    transform: 'translateX(-50%)',
-};
-
-const headerStyle: React.CSSProperties = {
-    textAlign: 'center',
-    marginBottom: '25px',
-    fontSize: 'clamp(27px, 1.3vw, 50px)',
-    fontWeight: '600',
-    color: '#2c3e50',
-    width: '110%',
-    marginLeft: '-5%',
-};
-
-const formStyle = {
-    display: 'flex',
-    flexDirection: 'column' as const,
-};
-
-const formGroupStyle = {
-    marginBottom: '20px',
-};
-
-const labelStyle: React.CSSProperties = {
-    fontSize: '16px',
-    color: '#34495e',
-    marginBottom: '8px',
-};
-
-const errorStyle: React.CSSProperties = {
-    color: 'red',
-    marginBottom: '2%',
-    fontSize: '14px',
-    marginTop: '-3%',
 };
 
 export default LibraryAdminLogin;
