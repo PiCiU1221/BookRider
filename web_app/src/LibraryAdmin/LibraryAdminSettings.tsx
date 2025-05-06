@@ -3,7 +3,7 @@ import {Link, useNavigate} from 'react-router-dom';
 
 // const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const LibrarianSettings: React.FC = () => {
+const LibraryAdminSettings: React.FC = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -21,17 +21,15 @@ const LibrarianSettings: React.FC = () => {
                 className="flex justify-around p-1 pr-4 space-x-2.5 bg-[#3B576C] text-white sticky top-0 z-[1000] shadow-md">
                 <div>
                     <img
-                        className="relative w-[80vw] h-auto object-cover left-[1%]"
+                        className="relative w-[45vw] h-auto object-cover left-[1%]"
                         alt="Book Rider Logo"
                         src="/book-rider-high-resolution-logo.png"
                     />
                 </div>
                 {[
-                    {id: 'addBook', label: 'Książki', path: '/librarian-dashboard'},
-                    {id: 'orders', label: 'Wypożyczenia', path: '/orders'},
-                    {id: 'returns', label: 'Zwroty', path: '/returns'},
-                    {id: 'readers', label: 'Czytelnicy', path: '/readers'},
-                    {id: 'settings', label: 'Ustawienia', path: '/librarian-settings'},
+                    {id: 'librarian_search', label: 'Bibliotekarze', path: '/library-admin-dashboard'},
+                    {id: 'add_librarians', label: 'Dodaj', path: '/library-admin-add-librarian'},
+                    {id: 'settings', label: 'Ustawienia', path: '/library-admin-settings'},
                 ].map(({id, label, path}) => (
                     <Link
                         key={id}
@@ -48,15 +46,12 @@ const LibrarianSettings: React.FC = () => {
                     Wyloguj się
                 </button>
             </header>
-
             <main className="flex justify-center items-center p-9 w-full max-w-[800vw]">
-                <div>
-                    <h1>Ustawienia będą tutaj</h1>
-                </div>
-
+                <section className="h-[80%] max-h-[90%] p-9 rounded-2xl mb-[400px] w-[65%] bg-white text-gray-600">
+                    <h2 className="text-center p-4 mb-4 text-3xl font-semibold">Ustawienia</h2>
+                </section>
             </main>
         </div>
     );
 };
-
-export default LibrarianSettings;
+export default LibraryAdminSettings;

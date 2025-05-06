@@ -14,7 +14,9 @@ import SubmissionDetailsDriver from './SystemAdmin/SubmissionDetailsDriver.tsx';
 import RegistrationForm from './LibraryAdmin/LibraryAdminRegisterForm.tsx';
 import LibraryAdminLogin from './LibraryAdmin/LibraryAdminLogin.tsx';
 import LibraryAdminHomePage from './LibraryAdmin/LibraryAdminHomePage.tsx';
-import LibraryAdminAddLibrary from './LibraryAdmin/LibraryAdminAddLibrary';
+import LibraryAdminAddLibrary from './LibraryAdmin/LibraryAdminAddLibrary.tsx';
+import LibraryAdminAddLibrarian from './LibraryAdmin/LibraryAdminAddLibrarian.tsx';
+import LibraryAdminSettings from './LibraryAdmin/LibraryAdminSettings.tsx';
 
 // Librarian
 import LibrarianLogin from './Librarian/LibrarianLogin.tsx';
@@ -58,6 +60,8 @@ const App: React.FC = () => {
                 <Route path="/returns" element={<LibrarianReturns />} />
                 <Route path="/readers" element={<LibrarianReaders />} />
                 <Route path="/librarian-settings" element={<LibrarianSettings />} />
+                <Route path="/library-admin-add-librarian" element={<LibraryAdminAddLibrarian />} />
+                <Route path="/library-admin-settings" element={<LibraryAdminSettings />} />
                 <Route
                     path="/api-docs"
                     element={
