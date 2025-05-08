@@ -1,50 +1,111 @@
-# Welcome to your Expo app 👋
+# User Mobile App - v1.0
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Overview
 
-## Get started
+The **User Mobile App** is a client application built specifically for the **BookRider** backend. It provides a structured interface for users to interact with the system’s API, allowing them to:
 
-1. Install dependencies
+- Browse our selection of books available for borrowing.
+- Filter books based on various factors, like categories or libraries.
+- Add selected books to their shopping cart and manage their state.
+- Check prices for deliveries or returns.
+- Track borrowed and returned books.
+- Create in-person or with our delivery returns.
 
-   ```bash
-   npm install
-   ```
+This application was designed to integrate with our backend, ensuring that users can interact with the backend through a standardized and consistent interface.
 
-2. Start the app
+## 🔥 **Tech Stack**
 
-   ```bash
-    npx expo start
-   ```
+- **React Native**
+- **Expo**
+- **NativeWind**
+- 
+## 📸 Screenshots
 
-In the output, you'll find options to open the app in a
+<table>
+  <tr>
+    <td><img src="docs/screenshots/main-screen.png" alt="main-screen" width="300"/></td>
+    <td><img src="docs/screenshots/book-preview.png" alt="book-preview" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Main screen</td>
+    <td>Book preview</td>
+  </tr>
+</table>
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+<br>
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+<table>
+  <tr>
+    <td><img src="docs/screenshots/book-filtering.png" alt="book-filtering" width="300"/></td>
+    <td><img src="docs/screenshots/book-querying.png" alt="book-querying" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Book filtering</td>
+    <td>Book querying</td>
+  </tr>
+</table>
 
-## Get a fresh project
+<br>
 
-When you're ready, run:
+<table>
+  <tr>
+    <td><img src="docs/screenshots/shopping-cart.png" alt="shopping-cart" width="300"/></td>
+    <td><img src="docs/screenshots/account-details.png" alt="account-details" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Shopping cart</td>
+    <td>Account details</td>
+  </tr>
+</table>
 
-```bash
-npm run reset-project
-```
+<br>
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+<table>
+  <tr>
+    <td><img src="docs/screenshots/rental-return-preview.png" alt="rental-return-preview" width="300"/></td>
+    <td><img src="docs/screenshots/return-confirmation-preview.png" alt="return-confirmation-preview" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Rental return preview</td>
+    <td>Return confirmation preview</td>
+  </tr>
+</table>
 
-## Learn more
+<br>
 
-To learn more about developing your project with Expo, look at the following resources:
+<table>
+  <tr>
+    <td><img src="docs/screenshots/rental-return-scan-id-view.png" alt="return-scan-id-view" width="300"/></td>
+    <td><img src="docs/screenshots/rentals-screen.png" alt="rentals-view" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Rental return scan ID view</td>
+    <td>Rentals view</td>
+  </tr>
+</table>
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+<br>
 
-## Join the community
+<table>
+  <tr>
+    <td><img src="docs/screenshots/order-history-details.png" alt="order-history-details" width="300"/></td>
+    <td><img src="docs/screenshots/order-history.png" alt="order-history-view" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Order history details</td>
+    <td>Order history view</td>
+  </tr>
+</table>
 
-Join our community of developers creating universal apps.
+<br>
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+<table>
+  <tr>
+    <td><img src="docs/screenshots/login-screen.png" alt="login-screen" width="300"/></td>
+    <td><img src="docs/screenshots/register-screen.png" alt="register-screen" width="300"/></td>
+  </tr>
+  <tr>
+    <td>Login screen</td>
+    <td>Register screen</td>
+  </tr>
+</table>
