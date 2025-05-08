@@ -7,6 +7,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomModal from "@/app/components/custom_modal";
 import CONFIG from "@/config";
 
+import driverApplicationStatusLabels from "@/app/constants/driverApplicationStatusLabels";
+import driverDocumentTypeLabels from "@/app/constants/driverDocumentTypeLabels";
+
 interface DriverApplication {
     id: string;
     status: string;
@@ -120,9 +123,9 @@ export default function DriverApplication() {
                     renderItem={({ item }) => (
                         <TouchableOpacity onPress={() => fetchApplicationDetails(item.id)}>
                             <View className="bg-black/10 p-4 mb-4 rounded-lg border border-gray-300">
-                                <Text className="text-lg font-semibold text-white">Status: {item.status}</Text>
+                                <Text className="text-lg font-semibold text-white">Status: {driverApplicationStatusLabels[item.status as keyof typeof driverApplicationStatusLabels]}</Text>
                                 <Text className="text-white">
-                                    Złożono: {new Date(item.submittedAt).toLocaleString()}
+                                    Złożono: {new Date(item.submittedAt).toLocaleString('pl-PL')}
                                 </Text>
                             </View>
                         </TouchableOpacity>
@@ -166,20 +169,20 @@ export default function DriverApplication() {
 
                         <View className="flex-row items-center">
                             <Feather name="check-circle" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Status: <Text className="font-normal">{selectedApplication.status}</Text></Text>
+                            <Text className="text-white text-lg ml-2">Status: <Text className="font-normal">{driverApplicationStatusLabels[selectedApplication.status as keyof typeof driverApplicationStatusLabels]}</Text></Text>
                         </View>
 
                         <View className="flex-row items-center">
                             <Feather name="calendar" size={20} color="#f7ca65" />
                             <Text className="text-white text-lg ml-2">
-                                Złożono: <Text className="font-normal">{new Date(selectedApplication.submittedAt).toLocaleString()}</Text>
+                                Złożono: <Text className="font-normal">{new Date(selectedApplication.submittedAt).toLocaleString('pl-PL')}</Text>
                             </Text>
                         </View>
 
                         <View className="flex-row items-center">
                             <Feather name="calendar" size={20} color="#f7ca65" />
                             <Text className="text-white text-lg ml-2">
-                                Przejrzano: <Text className="font-normal">{selectedApplication.reviewedAt ? new Date(selectedApplication.reviewedAt).toLocaleString() : "Brak"}</Text>
+                                Przejrzano: <Text className="font-normal">{selectedApplication.reviewedAt ? new Date(selectedApplication.reviewedAt).toLocaleString('pl-PL') : "Brak"}</Text>
                             </Text>
                         </View>
 
@@ -194,8 +197,8 @@ export default function DriverApplication() {
                             <Text className="text-white text-xl font-semibold mb-2">Dokumenty:</Text>
                             {selectedApplication.driverDocuments.map((doc, index) => (
                                 <View key={index} className="bg-black/10 p-4 rounded-lg mb-4">
-                                    <Text className="text-white text-lg font-medium">Rodzaj: <Text className="font-normal">{doc.documentType}</Text></Text>
-                                    <Text className="text-white text-lg font-medium">Termin ważności: <Text className="font-normal">{new Date(doc.expiryDate).toLocaleDateString()}</Text></Text>
+                                    <Text className="text-white text-lg font-medium">Rodzaj: <Text className="font-normal">{driverDocumentTypeLabels[doc.documentType as keyof typeof driverDocumentTypeLabels]}</Text></Text>
+                                    <Text className="text-white text-lg font-medium">Termin ważności: <Text className="font-normal">{new Date(doc.expiryDate).toLocaleDateString('pl-PL')}</Text></Text>
                                     <View className="mt-4">
                                         <Image
                                             source={{ uri: doc.documentPhotoUrl }}
