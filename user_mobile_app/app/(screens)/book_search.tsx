@@ -334,7 +334,7 @@ export default function BookSearch() {
     let publisherDebounceTimer: NodeJS.Timeout;
 
     const handlePublisherChange = (text: string) => {
-        setLibraryName(text);
+        setPublisher(text);
 
         clearTimeout(publisherDebounceTimer);
 
@@ -624,7 +624,7 @@ export default function BookSearch() {
                     <View className="flex-row items-center justify-between mb-6">
                         <View className="flex-row items-center">
                             <Feather name="filter" size={24} color="#f7ca65" className="mr-2 mt-1" />
-                            <Text className="text-white text-2xl font-bold">Filter Books</Text>
+                            <Text className="text-white text-2xl font-bold">Filtrowanie książek</Text>
                         </View>
 
                         <TouchableOpacity
@@ -636,19 +636,19 @@ export default function BookSearch() {
                     </View>
 
                     <View className="space-y-4">
-                        <View className="flex-row items-center">
+                        <View className="flex-row items-center mb-1">
                             <Feather name="book" size={20} color="#f7ca65" className="mr-1" />
-                            <Text className="text-white text-lg mb-1">Book Title</Text>
+                            <Text className="text-white text-xl mb-1">Tytuł książki</Text>
                         </View>
                         <TextInput
                             value={bookTitle}
                             onChangeText={handleBookTitleChange}
-                            placeholder="Enter book title"
+                            placeholder="Wprowadź tytuł książki"
                             placeholderTextColor="#C8C8C8"
                             className="bg-black/10 text-lg text-white border border-gray-300 rounded-lg p-2 mb-2"
                         />
 
-                        <View className="border border-gray-300 rounded-lg mb-2 h-12 flex justify-center">
+                        <View className="border border-gray-300 rounded-lg mb-4 h-12 flex justify-center">
                             <Picker
                                 selectedValue={selectedTitle}
                                 onValueChange={(itemValue) => setSelectedTitle(itemValue)}
@@ -658,7 +658,7 @@ export default function BookSearch() {
                                 enabled={bookTitles.length > 0}
                             >
                                 {bookTitles.length === 0 ? (
-                                    <Picker.Item label="No book titles found" value="" enabled={false} />
+                                    <Picker.Item label="Nie znaleziono tytułów" value="" enabled={false} />
                                 ) : (
                                     [<Picker.Item key="empty" label="Brak" value="" />,
                                         ...bookTitles.map((title, index) => (
@@ -668,11 +668,11 @@ export default function BookSearch() {
                             </Picker>
                         </View>
 
-                        <View className="flex-row items-center">
+                        <View className="flex-row items-center mb-1">
                             <Feather name="tag" size={20} color="#f7ca65" className="mr-1" />
-                            <Text className="text-white text-lg mb-1">Category</Text>
+                            <Text className="text-white text-xl mb-1">Kategoria</Text>
                         </View>
-                        <View className="border border-gray-300 rounded-lg mb-2 h-12 flex justify-center">
+                        <View className="border border-gray-300 rounded-lg mb-4 h-12 flex justify-center">
                             <Picker
                                 selectedValue={selectedCategory}
                                 onValueChange={(itemValue) => setSelectedCategory(itemValue)}
@@ -688,19 +688,19 @@ export default function BookSearch() {
                             </Picker>
                         </View>
 
-                        <View className="flex-row items-center">
+                        <View className="flex-row items-center mb-1">
                             <Feather name="user" size={20} color="#f7ca65" className="mr-1" />
-                            <Text className="text-white text-lg mb-1">Publisher</Text>
+                            <Text className="text-white text-xl mb-1">Wydawca</Text>
                         </View>
                         <TextInput
                             value={publisher}
                             onChangeText={handlePublisherChange}
-                            placeholder="Enter publisher"
+                            placeholder="Wprowadź wydawcę"
                             placeholderTextColor="#C8C8C8"
                             className="bg-black/10 text-lg text-white border border-gray-300 rounded-lg p-2 mb-2"
                         />
 
-                        <View className="border border-gray-300 rounded-lg mb-2 h-12 flex justify-center">
+                        <View className="border border-gray-300 rounded-lg mb-4 h-12 flex justify-center">
                             <Picker
                                 selectedValue={selectedPublisher}
                                 onValueChange={(itemValue) => setSelectedPublisher(itemValue)}
@@ -710,7 +710,7 @@ export default function BookSearch() {
                                 enabled={publishers.length > 0}
                             >
                                 {publishers.length === 0 ? (
-                                    <Picker.Item label="No publishers found" value="" enabled={false} />
+                                    <Picker.Item label="Nie znaleziono wydawców" value="" enabled={false} />
                                 ) : (
                                     [<Picker.Item key="empty" label="Brak" value="" />,
                                         ...publishers.map((publisher, index) => (
@@ -720,19 +720,19 @@ export default function BookSearch() {
                             </Picker>
                         </View>
 
-                        <View className="flex-row items-center">
+                        <View className="flex-row items-center mb-1">
                             <Feather name="home" size={20} color="#f7ca65" className="mr-1" />
-                            <Text className="text-white text-lg mb-1">Library</Text>
+                            <Text className="text-white text-xl mb-1">Biblioteka</Text>
                         </View>
                         <TextInput
                             value={libraryName}
                             onChangeText={handleLibraryNameChange}
-                            placeholder="Enter library name"
+                            placeholder="Wprowadź nazwę biblioteki"
                             placeholderTextColor="#C8C8C8"
                             className="bg-black/10 text-lg text-white border border-gray-300 rounded-lg p-2 mb-2"
                         />
 
-                        <View className="border border-gray-300 rounded-lg mb-2 h-12 flex justify-center">
+                        <View className="border border-gray-300 rounded-lg mb-4 h-12 flex justify-center">
                             <Picker
                                 selectedValue={selectedLibrary}
                                 onValueChange={(itemValue) => setSelectedLibrary(itemValue)}
@@ -742,7 +742,7 @@ export default function BookSearch() {
                                 enabled={libraries.length > 0}
                             >
                                 {libraries.length === 0 ? (
-                                    <Picker.Item label="No libraries found" value="" enabled={false} />
+                                    <Picker.Item label="Nie znaleziono bibliotek" value="" enabled={false} />
                                 ) : (
                                     [<Picker.Item key="empty" label="Brak" value="" />,
                                         ...libraries.map((library, index) => (
@@ -752,9 +752,9 @@ export default function BookSearch() {
                             </Picker>
                         </View>
 
-                        <View className="flex-row items-center">
+                        <View className="flex-row items-center mb-1">
                             <Feather name="globe" size={20} color="#f7ca65" className="mr-1" />
-                            <Text className="text-white text-lg mb-1">Language</Text>
+                            <Text className="text-white text-xl mb-1">Język</Text>
                         </View>
                         <View className="border border-gray-300 rounded-lg mb-2 h-12 flex justify-center">
                             <Picker
@@ -786,7 +786,7 @@ export default function BookSearch() {
                         }}
                     >
                         <Ionicons name="search" size={20} color="white" style={{ marginRight: 8 }} />
-                        <Text className="text-white text-lg font-semibold">Apply Filters</Text>
+                        <Text className="text-white text-lg font-semibold">Zatwierdź filtry</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -811,7 +811,7 @@ export default function BookSearch() {
                         }}
                     >
                         <Ionicons name="refresh" size={20} color="white" style={{ marginRight: 8 }} />
-                        <Text className="text-white text-lg font-semibold">Reset Filters</Text>
+                        <Text className="text-white text-lg font-semibold">Zresetuj filtry</Text>
                     </TouchableOpacity>
                 </Animated.View>
             )}

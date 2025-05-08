@@ -95,7 +95,7 @@ export default function Login() {
 
                 <View className="flex-1 justify-center mb-10 mx-8">
                     <Text className="text-theme_accent text-3xl font-bold tracking-wide text-left ml-2 mb-8">
-                        Login
+                        Logowanie
                     </Text>
 
                     <Animated.View

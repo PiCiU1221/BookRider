@@ -258,7 +258,7 @@ export default function Rentals() {
                         </TouchableOpacity>
                     )}
                     ListEmptyComponent={
-                        <View className="items-center justify-center mb-12 mt-12">
+                        <View className="items-center justify-center mb-12 mt-10">
                             <Text className="text-white text-lg">Nie masz jeszcze wypożyczeń. Zamów książkę i po dostawie pojawi się tutaj.</Text>
                         </View>
                     }
@@ -472,7 +472,7 @@ export default function Rentals() {
                                     color="white"
                                     style={{ marginRight: 8 }}
                                 />
-                                <Text className="text-white text-lg font-semibold">Z dostawą</Text>
+                                <Text className="text-white text-lg font-semibold">Z odbiorem</Text>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -555,38 +555,41 @@ export default function Rentals() {
                                     );
                                 })}
                             </View>
-                            <View className="border-t border-white pt-2 mt-4">
-                                <View className="flex-row">
-                                    <View className="flex-1 p-1">
-                                        <Text className="text-white font-semibold">Koszt dostawy:</Text>
-                                    </View>
-                                    <View className="w-24 p-1 items-center justify-center">
-                                        <Text className="text-white">{rentalReturnCost?.deliveryCost.toFixed(2)} PLN</Text>
-                                    </View>
-                                </View>
-
-                                <View className="flex-row">
-                                    <View className="flex-1 p-1">
-                                        <Text className="text-white font-semibold">Opłaty za opóznienia:</Text>
-                                    </View>
-                                    <View className="w-24 p-1 items-center justify-center">
-                                        <Text className="text-red-500">{rentalReturnCost?.totalLateFees.toFixed(2)} PLN</Text>
-                                    </View>
-                                </View>
-
-                                <View className="flex-row">
-                                    <View className="flex-1 p-1">
-                                        <Text className="text-white font-semibold">Cena całkowita:</Text>
-                                    </View>
-                                    <View className="w-24 p-1 items-center justify-center">
-                                        <Text className="text-white">{rentalReturnCost?.totalPrice.toFixed(2)} PLN</Text>
-                                    </View>
-                                </View>
-                            </View>
                         </View>
                     ))}
 
-                    <View className="flex flex-row w-full space-x-4 mt-6">
+                    {rentalReturnCost && (
+                        <View className="p-4 rounded-lg border border-white mb-4">
+                            <View className="flex-row">
+                                <View className="flex-1 p-1">
+                                    <Text className="text-white font-semibold">Koszt dostawy:</Text>
+                                </View>
+                                <View className="w-24 p-1 items-center justify-center">
+                                    <Text className="text-white">{rentalReturnCost.deliveryCost.toFixed(2)} PLN</Text>
+                                </View>
+                            </View>
+
+                            <View className="flex-row">
+                                <View className="flex-1 p-1">
+                                    <Text className="text-white font-semibold">Opłaty za opóźnienia:</Text>
+                                </View>
+                                <View className="w-24 p-1 items-center justify-center">
+                                    <Text className="text-red-500">{rentalReturnCost.totalLateFees.toFixed(2)} PLN</Text>
+                                </View>
+                            </View>
+
+                            <View className="flex-row">
+                                <View className="flex-1 p-1">
+                                    <Text className="text-white font-semibold">Cena całkowita:</Text>
+                                </View>
+                                <View className="w-24 p-1 items-center justify-center">
+                                    <Text className="text-white">{rentalReturnCost.totalPrice.toFixed(2)} PLN</Text>
+                                </View>
+                            </View>
+                        </View>
+                    )}
+
+                    <View className="flex flex-row w-full space-x-4 mt-4">
                         <TouchableOpacity
                             onPress={() => {
                                 setRentalReturnPriceVisible(false);

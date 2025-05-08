@@ -34,7 +34,7 @@ interface ApiResponse {
 
 export default function CreateDriverApplication() {
     const [documents, setDocuments] = useState<Document[]>([
-        { documentType: '', expirationDate: '', base64Image: '', imageUri: null, imageSaved: false },
+        { documentType: 'ID', expirationDate: '', base64Image: '', imageUri: null, imageSaved: false },
     ]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
@@ -44,7 +44,7 @@ export default function CreateDriverApplication() {
     const handleAddDocument = () => {
         setDocuments([
             ...documents,
-            { documentType: '', expirationDate: '', base64Image: '', imageUri: null, imageSaved: false },
+            { documentType: 'ID', expirationDate: '', base64Image: '', imageUri: null, imageSaved: false },
         ]);
     };
 
@@ -68,6 +68,42 @@ export default function CreateDriverApplication() {
             expirationDate: document.expirationDate,
         }));
 
+        const invalidDocuments = documents
+            .map((doc, index) => {
+                const missingFields: string[] = [];
+
+                if (!doc.base64Image) missingFields.push("zdjęcie");
+                if (!doc.documentType) missingFields.push("typ dokumentu");
+                if (!doc.expirationDate) {
+                    missingFields.push("data ważności");
+                } else {
+                    const today = new Date();
+                    const expiration = new Date(doc.expirationDate);
+
+                    today.setHours(0, 0, 0, 0);
+                    expiration.setHours(0, 0, 0, 0);
+
+                    if (expiration <= today) {
+                        missingFields.push("data ważności (musi być przyszła)");
+                    }
+                }
+
+                return missingFields.length > 0
+                    ? `Dokument ${index + 1} nie zawiera: ${missingFields.join(", ")}.`
+                    : null;
+            })
+            .filter((msg) => msg !== null);
+
+        if (invalidDocuments.length > 0) {
+            setApiResponse({
+                status: "error",
+                message: invalidDocuments.join("\n"),
+            });
+            setLoading(false);
+            setIsSubmitting(false);
+            return;
+        }
+
         try {
             const token = await AsyncStorage.getItem("jwtToken");
 
@@ -75,7 +111,7 @@ export default function CreateDriverApplication() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${token}`,
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify(requestBody),
             });
@@ -88,7 +124,7 @@ export default function CreateDriverApplication() {
                     message: 'Twój wniosek został pomyślnie złożony!',
                 });
                 setDocuments([
-                    { documentType: '', expirationDate: '', base64Image: '', imageUri: null, imageSaved: false },
+                    { documentType: 'ID', expirationDate: '', base64Image: '', imageUri: null, imageSaved: false },
                 ]);
             } else {
                 setApiResponse({
@@ -265,7 +301,7 @@ export default function CreateDriverApplication() {
 
             <CustomModal
                 isVisible={modalVisible}
-                title={apiResponse?.status === 'success' ? 'Złożenie wniosku zakończone sukcesem!' : 'Error'}
+                title={apiResponse?.status === 'success' ? 'Złożenie wniosku zakończone sukcesem!' : 'Błąd'}
                 message={apiResponse?.message}
                 onClose={() => {
                     if (apiResponse?.status === 'success') {

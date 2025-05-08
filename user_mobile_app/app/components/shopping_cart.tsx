@@ -163,6 +163,7 @@ const ShoppingCartComponent = forwardRef(
                     message: "There was an error while removing item from shopping cart",
                 });
             } finally {
+                setCheckoutConfirmVisible(false);
                 setLoading(false);
                 setModalVisible(true);
             }
@@ -188,8 +189,8 @@ const ShoppingCartComponent = forwardRef(
 
                 if (response.ok) {
                     setApiResponse({
-                        status: "Success",
-                        message: "Successfully updated delivery address",
+                        status: "Sukces",
+                        message: "Pomyślnie zaktualizowano adres dostawy",
                     });
                     setAddressInputMode(false);
                     setStreet("");
@@ -227,12 +228,12 @@ const ShoppingCartComponent = forwardRef(
             <View className="absolute inset-0 bg-theme_background p-6 z-50 pt-9">
                 <CustomModal
                     isVisible={modalVisible}
-                    title={apiResponse?.status === "Success" ? "Success!" : "Error"
+                    title={apiResponse?.status === "Sukces" ? "Sukces!" : "Error"
                     }
                     message={apiResponse?.message}
                     onClose={() => {
                         setModalVisible(false);
-                        if (apiResponse?.status === "Success") {
+                        if (apiResponse?.status === "Sukces") {
                             fetchShoppingCart(setShoppingCart, setLoading);
                         }
                     }}

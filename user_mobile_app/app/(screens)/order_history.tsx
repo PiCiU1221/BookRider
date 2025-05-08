@@ -244,7 +244,7 @@ export default function OrderHistory() {
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="message-square" size={20} color="#f7ca65" />
-                            <Text className="text-white text-lg ml-2">Wiadomość dla kierowcy: {selectedOrder.orderResponseDTO.noteToDriver || "None"}</Text>
+                            <Text className="text-white text-lg ml-2">Wiadomość dla kierowcy: {selectedOrder.orderResponseDTO.noteToDriver || "Brak"}</Text>
                         </View>
                         <View className="flex-row items-center mt-4">
                             <Feather name="book" size={20} color="#f7ca65" />
