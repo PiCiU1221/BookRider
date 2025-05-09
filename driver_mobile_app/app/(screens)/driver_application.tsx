@@ -88,7 +88,6 @@ export default function DriverApplication() {
             });
 
             const details: DriverApplicationDetailsDTO = await response.json();
-            console.log(details);
             setSelectedApplication(details);
         } catch (error: any) {
             Alert.alert("Error", error.message || "Unknown error");
