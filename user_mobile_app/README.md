@@ -18,7 +18,7 @@ This application was designed to integrate with our backend, ensuring that users
 - **React Native**
 - **Expo**
 - **NativeWind**
-- 
+
 ## 📸 Screenshots
 
 <table>
