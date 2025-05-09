@@ -30,7 +30,7 @@ The system is composed of four core components:
 For detailed documentation on each component, including setup instructions, architecture notes, and development guidelines, refer to the `README.md` file located in the corresponding directory:
 
 - [`/backend`](./backend)
-- [`/web-app`](./web-app)
-- [`/user-mobile-app`](./user-mobile-app)
-- [`/driver-mobile-app`](./driver-mobile-app)
+- [`/web_app`](./web_app)
+- [`/user_mobile_app`](./user_mobile_app)
+- [`/driver_mobile_app`](./driver_mobile_app)
 
