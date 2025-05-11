@@ -12,6 +12,7 @@ import edu.zut.bookrider.model.enums.DocumentType;
 import edu.zut.bookrider.model.enums.DriverApplicationStatus;
 import edu.zut.bookrider.repository.DriverApplicationRequestRepository;
 import edu.zut.bookrider.repository.UserRepository;
+import edu.zut.bookrider.security.websocket.WebSocketHandler;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,8 @@ public class DriverApplicationRequestService {
     private final DriverDocumentService driverDocumentService;
     private final DriverApplicationReadMapper driverApplicationReadMapper;
     private final UserService userService;
+
+    private final WebSocketHandler webSocketHandler;
 
     @Transactional
     public CreateDriverApplicationResponseDTO processDriverApplication(
@@ -101,6 +104,11 @@ public class DriverApplicationRequestService {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        List<User> administrators = userService.getAllAdministrators();
+        for (User administrator : administrators) {
+            webSocketHandler.sendRefreshSignal(administrator.getEmail(), "administrator/driver-applications");
         }
 
         return new CreateDriverApplicationResponseDTO(
@@ -235,6 +243,8 @@ public class DriverApplicationRequestService {
             User driver = application.getUser();
             userService.verifyUser(driver);
         }
+
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "driver/driver-applications");
 
         driverApplicationRequestRepository.save(application);
     }
