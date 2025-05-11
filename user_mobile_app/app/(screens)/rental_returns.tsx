@@ -10,6 +10,7 @@ import { StyleSheet } from 'react-native';
 
 import rentalReturnStatusLabels from "../constants/rentalReturnStatusLabels";
 import orderStatusLabels from "../constants/orderStatusLabels";
+import useWebSocketConnection from "@/app/components/web_socket_connection";
 
 interface RentalReturnDTO {
     id: number;
@@ -92,6 +93,11 @@ export default function RentalReturns() {
     useEffect(() => {
         fetchRentalReturns(currentPage);
     }, [currentPage]);
+
+    useWebSocketConnection("user/rental-returns", () => {
+        setCurrentPage(0);
+        fetchRentalReturns(currentPage);
+    });
 
     const handleRentalReturnPress = (rentalReturn: RentalReturnDTO): void => {
         setSelectedRentalReturn(rentalReturn);

@@ -10,6 +10,7 @@ import edu.zut.bookrider.model.enums.OrderStatus;
 import edu.zut.bookrider.model.enums.PaymentStatus;
 import edu.zut.bookrider.model.enums.TransactionType;
 import edu.zut.bookrider.repository.OrderRepository;
+import edu.zut.bookrider.security.websocket.WebSocketHandler;
 import edu.zut.bookrider.util.BASE64DecodedMultipartFile;
 import edu.zut.bookrider.util.LocationUtils;
 import jakarta.validation.Valid;
@@ -49,15 +50,19 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderWithPhotoMapper orderWithPhotoMapper;
 
+    private final WebSocketHandler webSocketHandler;
+
     @Transactional
     public Order createOrderFromCartItem(ShoppingCartItem item) {
 
         User user = item.getShoppingCart().getUser();
         libraryCardService.validateLibraryCard(user.getId());
 
+        Library library = item.getLibrary();
+
         Order order = new Order();
         order.setUser(user);
-        order.setLibrary(item.getLibrary());
+        order.setLibrary(library);
         order.setPickupAddress(order.getLibrary().getAddress());
         order.setDestinationAddress(item.getShoppingCart().getDeliveryAddress());
         order.setIsReturn(false);
@@ -76,6 +81,14 @@ public class OrderService {
                 .collect(Collectors.toList());
 
         order.setOrderItems(orderItems);
+
+        Integer libraryId = library.getId();
+        List<User> librarians = userService.getAllLibrarians(libraryId);
+
+        for (User librarian : librarians) {
+            String username = librarian.getUsername() + ":" + libraryId;
+            webSocketHandler.sendRefreshSignal(username, "librarian/orders/pending");
+        }
 
         return orderRepository.save(order);
     }
@@ -200,6 +213,10 @@ public class OrderService {
         order.setLibrarian(librarian);
         order.setAcceptedAt(LocalDateTime.now());
         orderRepository.save(order);
+
+        User user = order.getUser();
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/in-realization");
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/pending");
     }
 
     @Transactional
@@ -218,6 +235,10 @@ public class OrderService {
         order.setLibrarian(librarian);
         order.setDeclineReason(declineOrderRequestDTO.getReason());
         orderRepository.save(order);
+
+        User user = order.getUser();
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/delivered");
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/pending");
     }
 
     @Transactional
@@ -241,6 +262,11 @@ public class OrderService {
         order.setStatus(OrderStatus.IN_TRANSIT);
         order.setPickedUpAt(LocalDateTime.now());
         orderRepository.save(order);
+
+        User user = order.getUser();
+        User driver = order.getDriver();
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/in-realization");
+        webSocketHandler.sendRefreshSignal(driver.getEmail(), "driver/delivery/in-realization");
     }
 
     public PageResponseDTO<OrderResponseDTO> getDriverPendingOrdersWithDistance(
@@ -344,6 +370,9 @@ public class OrderService {
         order.setStatus(OrderStatus.DRIVER_ACCEPTED);
         order.setDriverAssignedAt(LocalDateTime.now());
         orderRepository.save(order);
+
+        User user = order.getUser();
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/in-realization");
     }
 
     @Transactional
@@ -388,6 +417,8 @@ public class OrderService {
             order.setStatus(OrderStatus.AWAITING_LIBRARY_CONFIRMATION);
             orderRepository.save(order);
 
+            webSocketHandler.sendRefreshSignal(driver.getEmail(), "driver/in-realization");
+
             return new DeliverOrderResponseDTO(false);
         } else {
             order.setStatus(OrderStatus.DELIVERED);
@@ -397,6 +428,12 @@ public class OrderService {
             orderRepository.save(order);
 
             transactionService.createDriverPayoutTransaction(driver, order);
+
+            User user = order.getUser();
+            webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/delivered");
+            webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/pending");
+            webSocketHandler.sendRefreshSignal(user.getEmail(), "driver/order-history");
+
             return new DeliverOrderResponseDTO(true);
         }
     }
@@ -409,6 +446,14 @@ public class OrderService {
 
         User driver = order.getDriver();
         transactionService.createDriverPayoutTransaction(driver, order);
+
+        webSocketHandler.sendRefreshSignal(driver.getEmail(), "driver/in-realization");
+        webSocketHandler.sendRefreshSignal(driver.getEmail(), "driver/order-history");
+
+        User user = order.getUser();
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/delivered");
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/in-realization");
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/rental-returns");
     }
 
     public NavigationResponseDTO getNavigation(
