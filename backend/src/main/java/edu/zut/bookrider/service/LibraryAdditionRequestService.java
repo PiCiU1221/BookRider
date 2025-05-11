@@ -12,6 +12,7 @@ import edu.zut.bookrider.model.enums.LibraryAdditionStatus;
 import edu.zut.bookrider.repository.LibraryAdditionRequestRepository;
 import edu.zut.bookrider.repository.LibraryRepository;
 import edu.zut.bookrider.repository.UserRepository;
+import edu.zut.bookrider.security.websocket.WebSocketHandler;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,8 @@ public class LibraryAdditionRequestService {
     private final LibraryAdditionReadMapper libraryAdditionReadMapper;
     private final LibraryService libraryService;
     private final UserService userService;
+
+    private final WebSocketHandler webSocketHandler;
 
     @Transactional
     public CreateLibraryAdditionResponseDTO createLibraryRequest(
@@ -86,6 +89,11 @@ public class LibraryAdditionRequestService {
         libraryRequest.setStatus(LibraryAdditionStatus.PENDING);
 
         LibraryAdditionRequest savedLibraryRequest = libraryAdditionRequestRepository.save(libraryRequest);
+
+        List<User> administrators = userService.getAllAdministrators();
+        for (User administrator : administrators) {
+            webSocketHandler.sendRefreshSignal(administrator.getEmail(), "administrator/library-requests");
+        }
 
         return new CreateLibraryAdditionResponseDTO(
                 savedLibraryRequest.getId(),
@@ -218,6 +226,8 @@ public class LibraryAdditionRequestService {
             userService.updateLibrary(requestCreator, createdLibrary);
             userService.verifyUser(requestCreator);
         }
+
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/library-requests");
 
         libraryAdditionRequestRepository.save(request);
     }
