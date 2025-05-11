@@ -113,4 +113,11 @@ public class RentalService {
                 rentals.getTotalPages()
         );
     }
+
+    public Rental updateRentalStatus(Integer rentalId, RentalStatus status) {
+        Rental rental =  getRentalById(rentalId);
+        rental.setStatus(status);
+
+        return rentalRepository.save(rental);
+    }
 }

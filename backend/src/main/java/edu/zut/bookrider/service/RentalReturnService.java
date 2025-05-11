@@ -9,7 +9,9 @@ import edu.zut.bookrider.model.*;
 import edu.zut.bookrider.model.enums.OrderStatus;
 import edu.zut.bookrider.model.enums.PaymentStatus;
 import edu.zut.bookrider.model.enums.RentalReturnStatus;
+import edu.zut.bookrider.model.enums.RentalStatus;
 import edu.zut.bookrider.repository.RentalReturnRepository;
+import edu.zut.bookrider.security.websocket.WebSocketHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +43,8 @@ public class RentalReturnService {
     private final RentalReturnRepository rentalReturnRepository;
     private final RentalReturnMapper rentalReturnMapper;
     private final RentalMapper rentalMapper;
+
+    private final WebSocketHandler webSocketHandler;
 
     private BigDecimal processLateFeesForRentals(List<RentalWithQuantityDTO> rentals,
                                                  List<RentalLateFeeDTO> lateFeeBreakdown) {
@@ -141,6 +145,11 @@ public class RentalReturnService {
         rentalReturn.setReturnedAt(LocalDateTime.now());
 
         rentalReturnRepository.save(rentalReturn);
+
+        User user = rentalReturn.getRentalReturnItems().get(0).getRental().getUser();
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/delivered");
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/in-realization");
+        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/rental-returns");
     }
 
     public void checkIfCorrectLibrary(RentalReturn rentalReturn) {
@@ -155,14 +164,7 @@ public class RentalReturnService {
     @Transactional
     public List<RentalReturnDTO> createRentalReturn(GeneralRentalReturnRequestDTO rentalReturnRequestDTO) {
 
-        for (RentalReturnWithQuantityRequestDTO requestDTO : rentalReturnRequestDTO.getRentalReturnRequests()) {
-            Rental rental = rentalService.getRentalById(requestDTO.getRentalId());
-
-            boolean isAlreadyReturned = rentalReturnItemService.isAlreadyReturned(rental);
-            if (isAlreadyReturned) {
-                throw new RentalAlreadyReturnedException("Rental " + rental.getId() + " has already been returned.");
-            }
-        }
+        checkRentals(rentalReturnRequestDTO.getRentalReturnRequests());
 
         User user = userService.getUser();
         Address pickupAddress = addressService.findOrCreateAddress(rentalReturnRequestDTO.getCreateAddressDTO());
@@ -203,6 +205,20 @@ public class RentalReturnService {
                 .toList();
     }
 
+    public void checkRentals(List<RentalReturnWithQuantityRequestDTO> rentalReturnRequests) {
+        for (RentalReturnWithQuantityRequestDTO requestDTO : rentalReturnRequests) {
+            Integer rentalId = requestDTO.getRentalId();
+            Rental rental = rentalService.getRentalById(rentalId);
+
+            boolean isAlreadyReturned = rentalReturnItemService.isAlreadyReturned(rental);
+            if (isAlreadyReturned) {
+                throw new RentalAlreadyReturnedException("Rental " + rental.getId() + " has already been returned.");
+            }
+
+            rentalService.updateRentalStatus(rentalId, RentalStatus.RETURN_IN_PROGRESS);
+        }
+    }
+
     @Transactional
     public RentalReturn createRentalReturnForOrder(Order returnOrder, List<RentalWithQuantityDTO> rentals) {
 
@@ -230,6 +246,8 @@ public class RentalReturnService {
 
     @Transactional
     public List<RentalReturnDTO> createInPersonRentalReturn(InPersonRentalReturnRequestDTO inPersonRentalReturnRequest) {
+
+        checkRentals(inPersonRentalReturnRequest.getRentalReturnRequests());
 
         Map<Library, List<RentalWithQuantityDTO>> rentalsByLibrary =
                 rentalService.groupRentalsByLibrary(inPersonRentalReturnRequest.getRentalReturnRequests());
