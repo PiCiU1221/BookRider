@@ -6,9 +6,11 @@ import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomModal from "@/app/components/custom_modal";
 import CONFIG from "@/config";
+import * as Updates from "expo-updates";
 
 import driverApplicationStatusLabels from "@/app/constants/driverApplicationStatusLabels";
 import driverDocumentTypeLabels from "@/app/constants/driverDocumentTypeLabels";
+import useWebSocketConnection from "@/app/components/web_socket_connection";
 
 interface DriverApplication {
     id: string;
@@ -64,6 +66,12 @@ export default function DriverApplication() {
 
             setApplications(formattedData);
             setApiResponse({ status: "success" });
+
+            const hasApprovedApplication = formattedData.some(app => app.status === "APPROVED");
+
+            if (hasApprovedApplication) {
+                await Updates.reloadAsync();
+            }
         } catch (error: any) {
             setApiResponse({ status: "error", message: error.message || "Unknown error" });
         } finally {
@@ -99,6 +107,10 @@ export default function DriverApplication() {
     useEffect(() => {
         fetchApplications();
     }, []);
+
+    useWebSocketConnection("driver/driver-applications", () => {
+        fetchApplications();
+    });
 
     const handleCreateApplicationPress = (): void => {
         router.replace("/create_driver_application");
