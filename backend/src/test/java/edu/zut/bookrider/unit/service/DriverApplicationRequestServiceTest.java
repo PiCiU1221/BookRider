@@ -8,8 +8,10 @@ import edu.zut.bookrider.model.enums.DocumentType;
 import edu.zut.bookrider.model.enums.DriverApplicationStatus;
 import edu.zut.bookrider.repository.DriverApplicationRequestRepository;
 import edu.zut.bookrider.repository.UserRepository;
+import edu.zut.bookrider.security.websocket.WebSocketHandler;
 import edu.zut.bookrider.service.DriverApplicationRequestService;
 import edu.zut.bookrider.service.DriverDocumentService;
+import edu.zut.bookrider.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -24,8 +26,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class DriverApplicationRequestServiceTest {
@@ -45,7 +46,14 @@ public class DriverApplicationRequestServiceTest {
     @Mock
     private Authentication authentication;
 
+    @Mock
+    private WebSocketHandler webSocketHandler;
+
+    @Mock
+    private UserService userService;
+
     private User driver;
+    private User systemAdmin;
     private DriverApplicationRequest applicationRequest;
     private CreateDriverDocumentDTO documentDto;
 
@@ -55,10 +63,19 @@ public class DriverApplicationRequestServiceTest {
         driverRole.setId(1);
         driverRole.setName("driver");
 
+        Role systemAdministratorRole = new Role();
+        systemAdministratorRole.setId(2);
+        systemAdministratorRole.setName("system_administrator");
+
         driver = new User();
         driver.setId("RANDOM");
         driver.setEmail("driver@email.com");
         driver.setRole(driverRole);
+
+        systemAdmin = new User();
+        systemAdmin.setId("RANDOM2");
+        systemAdmin.setEmail("system_admin@email.com");
+        systemAdmin.setRole(systemAdministratorRole);
 
         applicationRequest = new DriverApplicationRequest();
         applicationRequest.setId(1);
@@ -82,6 +99,8 @@ public class DriverApplicationRequestServiceTest {
         String documentUrl = "http://example.com/driver-license.jpg";
         when(driverDocumentService.saveDriverDocument(documentDto, applicationRequest)).thenReturn(
                 new CreateDriverDocumentResponseDTO(DocumentType.DRIVER_LICENSE, documentUrl, LocalDate.now().plusYears(5)));
+
+        when(userService.getAllAdministrators()).thenReturn(List.of(systemAdmin));
 
         CreateDriverApplicationResponseDTO response = driverApplicationRequestService.createDriverApplication(authentication, List.of(documentDto));
 
@@ -155,6 +174,8 @@ public class DriverApplicationRequestServiceTest {
                 .thenReturn(Optional.of(admin));
         when(driverApplicationRequestRepository.findById(applicationRequest.getId()))
                 .thenReturn(Optional.of(applicationRequest));
+
+        doNothing().when(webSocketHandler).sendRefreshSignal(any(), any());
 
         driverApplicationRequestService.changeStatus(applicationRequest.getId(), DriverApplicationStatus.UNDER_REVIEW, null, authentication);
 
