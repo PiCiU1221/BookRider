@@ -11,23 +11,26 @@ import edu.zut.bookrider.model.enums.LibraryAdditionStatus;
 import edu.zut.bookrider.repository.LibraryAdditionRequestRepository;
 import edu.zut.bookrider.repository.LibraryRepository;
 import edu.zut.bookrider.repository.UserRepository;
+import edu.zut.bookrider.security.websocket.WebSocketHandler;
 import edu.zut.bookrider.service.AddressService;
 import edu.zut.bookrider.service.LibraryAdditionRequestService;
+import edu.zut.bookrider.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class LibraryAdditionRequestServiceTest {
@@ -47,8 +50,15 @@ public class LibraryAdditionRequestServiceTest {
     @Mock
     private LibraryAdditionRequestRepository libraryAdditionRequestRepository;
 
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private WebSocketHandler webSocketHandler;
+
     private Authentication authentication;
     private User libraryAdmin;
+    private User systemAdmin;
     private CreateLibraryAdditionDTO createLibraryAdditionDTO;
 
     @BeforeEach
@@ -60,10 +70,19 @@ public class LibraryAdditionRequestServiceTest {
         libraryAdministratorRole.setId(1);
         libraryAdministratorRole.setName("library_administrator");
 
+        Role systemAdministratorRole = new Role();
+        systemAdministratorRole.setId(2);
+        systemAdministratorRole.setName("system_administrator");
+
         libraryAdmin = new User();
         libraryAdmin.setId("RANDOM");
         libraryAdmin.setEmail("library_admin@email.com");
         libraryAdmin.setRole(libraryAdministratorRole);
+
+        systemAdmin = new User();
+        systemAdmin.setId("RANDOM2");
+        systemAdmin.setEmail("system_admin@email.com");
+        systemAdmin.setRole(systemAdministratorRole);
 
         createLibraryAdditionDTO = new CreateLibraryAdditionDTO();
         createLibraryAdditionDTO.setStreet("Wojska Polskiego 14");
@@ -99,6 +118,10 @@ public class LibraryAdditionRequestServiceTest {
         savedRequest.setStatus(LibraryAdditionStatus.PENDING);
 
         when(libraryAdditionRequestRepository.save(any(LibraryAdditionRequest.class))).thenReturn(savedRequest);
+
+        when(userService.getAllAdministrators()).thenReturn(List.of(systemAdmin));
+
+        doNothing().when(webSocketHandler).sendRefreshSignal(any(), any());
 
         CreateLibraryAdditionResponseDTO response = libraryAdditionRequestService.createLibraryRequest(createLibraryAdditionDTO, authentication);
 
