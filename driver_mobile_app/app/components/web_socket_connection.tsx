@@ -26,7 +26,7 @@ const useWebSocketConnection = (
         }
 
         const apiBaseUrl = CONFIG.API_BASE_URL ? CONFIG.API_BASE_URL.replace(/^https?:\/\//, '') : '';
-        const wsUrl = `ws://${apiBaseUrl}/ws?token=${encodeURIComponent(jwtToken)}&channel=${encodeURIComponent(channel)}`;
+        const wsUrl = `wss://${apiBaseUrl}/ws?token=${encodeURIComponent(jwtToken)}&channel=${encodeURIComponent(channel)}`;
         const ws = new WebSocket(wsUrl);
 
         ws.onmessage = (e) => {
