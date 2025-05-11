@@ -8,6 +8,8 @@ import { Feather } from "@expo/vector-icons";
 
 import orderStatusLabels from "@/app/constants/orderStatusLabels";
 import paymentStatusLabels from "@/app/constants/paymentStatusLabels";
+import useWebSocketConnection from "@/app/components/web_socket_connection";
+import {current} from "@react-native-community/cli-tools/build/releaseChecker";
 
 interface UserOrderResponseDTO {
     userPayment: number;
@@ -118,6 +120,22 @@ export default function OrderHistory() {
         pending: "Oczekujące",
         delivered: "Dostarczone",
     };
+
+    const mapOrderTypeToChannel = (type: OrderType): string => {
+        switch (type) {
+            case "inRealization":
+                return "user/orders/in-realization";
+            case "pending":
+                return "user/orders/pending";
+            case "delivered":
+                return "user/orders/delivered";
+        }
+    };
+
+    useWebSocketConnection(mapOrderTypeToChannel(selectedOrderType), () => {
+        setCurrentPage(0);
+        fetchOrders(selectedOrderType, currentPage);
+    });
 
     const getOrderTitle = () => {
         return orderTranslations[selectedOrderType];
