@@ -244,7 +244,8 @@ public class DriverApplicationRequestService {
             userService.verifyUser(driver);
         }
 
-        webSocketHandler.sendRefreshSignal(user.getEmail(), "driver/driver-applications");
+        User driver = application.getUser();
+        webSocketHandler.sendRefreshSignal(driver.getEmail(), "driver/driver-applications");
 
         driverApplicationRequestRepository.save(application);
     }

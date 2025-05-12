@@ -17,12 +17,13 @@ The backend manages **user authentication, order processing, shopping cart manag
 - **Dockerized Backend**: Ensures **consistent deployments** across environments.
 - **API Documentation**: Available via **Swagger UI** (`/swagger-ui`).
 
-## 🔥 **Tech Stack**
+## 🛠️ **Tech Stack**
 - **Java 17** + **Spring Boot 3.x** – RESTful API framework.
 - **PostgreSQL** – Relational database.
 - **Docker** – Containerized deployment.
-- **Nginx** – Reverse proxy & SSL termination.
+- **WebSocket** - Real time notifications.
 - **AWS EC2** – Cloud infrastructure.
+- **Nginx** – Reverse proxy & SSL termination.
 - **Swagger** – API documentation.
 
 ## 🛡️ **Security Features**
@@ -36,6 +37,8 @@ The backend CI/CD pipeline is fully automated using **GitHub Actions**. The pipe
 - **Unit and Integration Tests**: The pipeline runs the unit and integration tests on the GitHub servers using the JVM.
 - **Deployment to EC2**: If the tests pass, the workflow connects to the **AWS EC2 instance** via **SSH**, pulls the latest changes from the remote GitHub repository, and updates the backend container with the new code.
 - **Automatic Restart**: The updated container automatically restarts with the new code, ensuring the backend is continuously deployed and up-to-date.
+
+The reverse proxy config file is named nginx.config and is located in this directory.
 
 ## 🧑‍💻 **User Roles & Permissions**
 

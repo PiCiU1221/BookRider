@@ -13,11 +13,18 @@ The **User Mobile App** is a client application built specifically for the **Boo
 
 This application was designed to integrate with our backend, ensuring that users can interact with the backend through a standardized and consistent interface.
 
-## 🔥 **Tech Stack**
+## 🛠️ **Tech Stack**
 
 - **React Native**
 - **Expo**
 - **NativeWind**
+
+## 🔄 **WebSocket Integration**
+
+The app uses **WebSockets** to maintain a real-time connection between the server and client devices.
+
+Refresh notifications are automatically pushed when there are updates to the **order status**, **rental return status**, or the currently active **order category** (*Pending*, *In Realization*, or *Delivered*).  
+Only the visible category is refreshed, keeping the user’s current view up-to-date without needing to manually reload the app.
 
 ## 📸 Screenshots
 
