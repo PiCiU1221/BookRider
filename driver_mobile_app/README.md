@@ -11,7 +11,7 @@ The **Driver Mobile App** is a client application built specifically for the **B
 
 This application was designed to integrate with our backend, ensuring that drivers can interact with the backend through a standardized and consistent interface.
 
-## 🔥 **Tech Stack**
+## 🛠️ **Tech Stack**
 
 - **React Native**
 - **Expo**
@@ -21,7 +21,13 @@ This application was designed to integrate with our backend, ensuring that drive
 
 The app includes an embedded Google Maps display for visualizing delivery routes and locations. 
 
-Additionally, a **"Open in Google Maps"** button is provided, allowing drivers to open the delivery route in the **Google Maps app** for turn-by-turn navigation if they prefer using the external app for navigation instead of the embedded map view.  
+Additionally, a **"Open in Google Maps"** button is provided, allowing drivers to open the delivery route in the **Google Maps app** for turn-by-turn navigation if they prefer using the external app for navigation instead of the embedded map view.
+
+## 🔄 **WebSocket Integration**
+
+The app uses **WebSockets** to maintain a real-time connection between the server and client devices.
+
+Whenever an **order status changes**, a **refresh notification** is instantly pushed to all relevant clients, ensuring that drivers, customers, and dispatchers always have up-to-date information without needing to manually refresh the app.
 
 ## 📸 Screenshots
 
