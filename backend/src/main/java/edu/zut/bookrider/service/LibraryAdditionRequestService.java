@@ -227,7 +227,8 @@ public class LibraryAdditionRequestService {
             userService.verifyUser(requestCreator);
         }
 
-        webSocketHandler.sendRefreshSignal(user.getEmail(), "user/library-requests");
+        User requestCreator = request.getCreatedBy();
+        webSocketHandler.sendRefreshSignal(requestCreator.getEmail(), "user/library-requests");
 
         libraryAdditionRequestRepository.save(request);
     }
