@@ -124,7 +124,7 @@ public class DriverApplicationRequestService {
             int page,
             int size) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "submittedAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "submittedAt"));
         Page<DriverApplicationRequest> applicationsPage;
 
         if (statuses == null || statuses.isEmpty()) {
@@ -194,8 +194,8 @@ public class DriverApplicationRequestService {
 
         String userEmail = authentication.getName().split(":")[0];
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<DriverApplicationRequest> userApplications = driverApplicationRequestRepository.findByUser_Email(userEmail, pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "submittedAt"));
+        Page<DriverApplicationRequest> userApplications = driverApplicationRequestRepository.findByUserEmail(userEmail, pageable);
         return userApplications.getContent().stream()
                 .map(driverApplicationReadMapper::map)
                 .toList();
