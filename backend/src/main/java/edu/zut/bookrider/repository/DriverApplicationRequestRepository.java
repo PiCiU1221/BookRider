@@ -18,5 +18,5 @@ public interface DriverApplicationRequestRepository extends JpaRepository<Driver
     Page<DriverApplicationRequest> findByStatusIn(@Param("statuses") List<DriverApplicationStatus> statuses, Pageable pageable);
 
     @Query("SELECT d FROM DriverApplicationRequest d WHERE d.user.email = :email")
-    Page<DriverApplicationRequest> findByUser_Email(@Param("email") String email, Pageable pageable);
+    Page<DriverApplicationRequest> findByUserEmail(@Param("email") String email, Pageable pageable);
 }
