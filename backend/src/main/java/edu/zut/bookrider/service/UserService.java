@@ -101,6 +101,14 @@ public class UserService {
         return userRepository.findByRoleNameAndLibraryId("librarian", libraryId);
     }
 
+    public List<User> getAllLibrarians(Integer libraryId) {
+        return userRepository.findByRoleNameAndLibraryId("librarian", libraryId);
+    }
+
+    public List<User> getAllAdministrators() {
+        return userRepository.findByRoleName("system_administrator");
+    }
+
     @Transactional
     public void changePassword(ChangePasswordDto changePasswordDto) {
         User user = getUser();

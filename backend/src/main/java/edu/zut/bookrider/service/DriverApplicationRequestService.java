@@ -12,6 +12,7 @@ import edu.zut.bookrider.model.enums.DocumentType;
 import edu.zut.bookrider.model.enums.DriverApplicationStatus;
 import edu.zut.bookrider.repository.DriverApplicationRequestRepository;
 import edu.zut.bookrider.repository.UserRepository;
+import edu.zut.bookrider.security.websocket.WebSocketHandler;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,8 @@ public class DriverApplicationRequestService {
     private final DriverDocumentService driverDocumentService;
     private final DriverApplicationReadMapper driverApplicationReadMapper;
     private final UserService userService;
+
+    private final WebSocketHandler webSocketHandler;
 
     @Transactional
     public CreateDriverApplicationResponseDTO processDriverApplication(
@@ -103,6 +106,11 @@ public class DriverApplicationRequestService {
             }
         }
 
+        List<User> administrators = userService.getAllAdministrators();
+        for (User administrator : administrators) {
+            webSocketHandler.sendRefreshSignal(administrator.getEmail(), "administrator/driver-applications");
+        }
+
         return new CreateDriverApplicationResponseDTO(
                 savedRequest.getId(),
                 savedRequest.getUser().getEmail(),
@@ -116,7 +124,7 @@ public class DriverApplicationRequestService {
             int page,
             int size) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "submittedAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "submittedAt"));
         Page<DriverApplicationRequest> applicationsPage;
 
         if (statuses == null || statuses.isEmpty()) {
@@ -186,8 +194,8 @@ public class DriverApplicationRequestService {
 
         String userEmail = authentication.getName().split(":")[0];
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<DriverApplicationRequest> userApplications = driverApplicationRequestRepository.findByUser_Email(userEmail, pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "submittedAt"));
+        Page<DriverApplicationRequest> userApplications = driverApplicationRequestRepository.findByUserEmail(userEmail, pageable);
         return userApplications.getContent().stream()
                 .map(driverApplicationReadMapper::map)
                 .toList();
@@ -235,6 +243,9 @@ public class DriverApplicationRequestService {
             User driver = application.getUser();
             userService.verifyUser(driver);
         }
+
+        User driver = application.getUser();
+        webSocketHandler.sendRefreshSignal(driver.getEmail(), "driver/driver-applications");
 
         driverApplicationRequestRepository.save(application);
     }

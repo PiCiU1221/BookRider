@@ -13,6 +13,7 @@ import {Feather} from "@expo/vector-icons";
 
 import orderStatusLabels from "@/app/constants/orderStatusLabels";
 import paymentStatusLabels from "@/app/constants/paymentStatusLabels";
+import useWebSocketConnection from "@/app/components/web_socket_connection";
 
 interface OrderDetailsDTO {
     orderId: number;
@@ -104,6 +105,10 @@ export default function Deliveries() {
     useEffect(() => {
         fetchInRealizationOrders();
     }, []);
+
+    useWebSocketConnection("driver/in-realization", () => {
+        fetchInRealizationOrders();
+    });
 
     const handleOrderPress = (order: OrderDetailsDTO): void => {
         setSelectedOrder(order);

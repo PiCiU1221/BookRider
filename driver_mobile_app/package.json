@@ -59,7 +59,8 @@
     "react-native-webview": "^13.12.2",
     "tailwind-rn": "^4.2.0",
     "tailwindcss": "^3.4.17",
-    "tailwindscss": "^0.3.0"
+    "tailwindscss": "^0.3.0",
+    "expo-updates": "~0.27.4"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

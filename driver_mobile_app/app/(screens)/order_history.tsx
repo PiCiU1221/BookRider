@@ -8,6 +8,7 @@ import {Feather} from "@expo/vector-icons";
 
 import orderStatusLabels from "@/app/constants/orderStatusLabels";
 import paymentStatusLabels from "@/app/constants/paymentStatusLabels";
+import useWebSocketConnection from "@/app/components/web_socket_connection";
 
 interface OrderDriverDetailsDTO {
     orderId: number;
@@ -93,6 +94,11 @@ export default function OrderHistory() {
     useEffect(() => {
         fetchOrders(currentPage);
     }, [currentPage]);
+
+    useWebSocketConnection("driver/order-history", () => {
+        setCurrentPage(0);
+        fetchOrders(currentPage);
+    });
 
     const handleOrderPress = (order: OrderDriverDetailsDTO): void => {
         setSelectedOrder(order);
