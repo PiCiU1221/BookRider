@@ -47,7 +47,7 @@ const LibraryAdminHomePage: React.FC = () => {
 
     const fetchLibrarian = async () => {
         const token = localStorage.getItem('access_token');
-        if (!usernameSearch.trim()) return; // prevent triggering on empty string
+        if (!usernameSearch.trim()) return;
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/library-admins/librarians?username=${usernameSearch}`, {
