@@ -165,12 +165,12 @@ public class OrderService {
     }
 
     public PageResponseDTO<OrderResponseDTO> getLibraryInRealizationOrders(int page, int size) {
-        return getLibraryOrdersByStatus(List.of(OrderStatus.ACCEPTED), page, size);
+        return getLibraryOrdersByStatus(List.of(OrderStatus.ACCEPTED, OrderStatus.DRIVER_ACCEPTED), page, size);
     }
 
     public PageResponseDTO<OrderResponseDTO> getLibraryCompletedOrders(int page, int size) {
         return getLibraryOrdersByStatus(
-                List.of(OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED, OrderStatus.DRIVER_ACCEPTED, OrderStatus.DECLINED),
+                List.of(OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED, OrderStatus.DECLINED),
                 page, size);
     }
 
