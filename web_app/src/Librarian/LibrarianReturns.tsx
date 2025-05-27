@@ -37,7 +37,7 @@ const LibrarianReturns: React.FC = () => {
     const [returnType, setReturnType] = useState<'inPerson' | 'driver'>('inPerson');
     const [rentalReturnId, setRentalReturnId] = useState<number | null>(null);
     const [rentalReturnDetails, setRentalReturnDetails] = useState<RentalReturnDetails | null>(null);
-    const [driverId, setDriverId] = useState<string | null>(null);
+    const [driverId, setDriverId] = useState<string>('');
     // const [returnStatus, setReturnStatus] = useState<'IN_PROGRESS' | 'COMPLETED'>('IN_PROGRESS');
 
     const navigate = useNavigate();
@@ -58,23 +58,6 @@ const LibrarianReturns: React.FC = () => {
     }, [messageType]);
 
     // Returns ---------------------------------------------------------------------------------------------------------
-    const fetchRentalReturnDetailsInPerson = async (rentalReturnId: number) => {
-        const token = localStorage.getItem('access_token');
-        if (!token) return;
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/rental-returns/${rentalReturnId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-            const data = await response.json();
-            setRentalReturnDetails(data);
-        } catch (error) {
-            console.error('Error fetching rental return details:', error);
-        }
-    };
-
     const completeInPersonReturn = async (rentalReturnId: number) => {
         const token = localStorage.getItem('access_token');
         if (!token) return;
@@ -102,29 +85,12 @@ const LibrarianReturns: React.FC = () => {
         }
     };
 
-    const fetchRentalReturnDetailsByDriver = async (driverId: string) => {
-        const token = localStorage.getItem('access_token');
-        if (!token) return;
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/rental-returns/latest-by-driver/${driverId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-            const data = await response.json();
-            setRentalReturnDetails(data);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
-
     const completeDriverReturn = async (rentalReturnId: number) => {
         const token = localStorage.getItem('access_token');
         if (!token) return;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/rental-returns/${rentalReturnId}/complete-delivery`, {
+            const response = await fetch(`${API_BASE_URL}/api/rental-returns/${rentalReturnId}/handover?driverId=${encodeURIComponent(driverId)}`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -153,12 +119,32 @@ const LibrarianReturns: React.FC = () => {
     };
 
     const handleFetchReturnDetails = async () => {
-        if (!rentalReturnId) return;
+        const token = localStorage.getItem('access_token');
 
-        if (returnType === 'inPerson') {
-            await fetchRentalReturnDetailsInPerson(rentalReturnId);
-        } else if (returnType === 'driver' && driverId) {
-            await fetchRentalReturnDetailsByDriver(driverId);
+        if (!rentalReturnId || isNaN(rentalReturnId)) {
+            setMessage("Nieprawidłowe ID zwrotu");
+            setMessageType("error");
+            return;
+        }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/rental-returns/${rentalReturnId}`, {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setRentalReturnDetails(data);
+                    setMessage("");
+                } else {
+                    throw new Error("Nie udało się pobrać danych zwrotu");
+                }
+        } catch (error) {
+            console.error("Błąd podczas pobierania szczegółów zwrotu:", error);
+            setMessage("Wystąpił błąd podczas pobierania danych.");
+            setMessageType("error");
         }
     };
 
@@ -226,12 +212,6 @@ const LibrarianReturns: React.FC = () => {
             </header>
 
             <main className="flex justify-center items-center p-9 w-full max-w-[800vw]">
-
-                {/*{activeSection === 'settings' && (*/}
-                {/*    <section className="p-5 rounded-md mb-[400px] h-[80%] max-h-[90%] w-[65%]">*/}
-                {/*        <h2 className="text-center text-white">Ustawienia</h2>*/}
-                {/*    </section>*/}
-                {/*)}*/}
                 <div className="bg-white p-9 rounded-2xl shadow-md h-[80%] max-h-[90%] w-[65%]">
                     <h3 className="text-3xl p-4 font-semibold mb-20 text-gray-600 text-center">Zwroty</h3>
 
@@ -244,7 +224,6 @@ const LibrarianReturns: React.FC = () => {
                             >
                                 Zwrot osobiście
                             </button>
-
                             <button
                                 onClick={() => handleReturnOptionChange('driver')}
                                 className={`w-full py-3 px-6 rounded-lg ${returnType === 'driver' ? 'bg-[#4B6477] text-white' : 'bg-gray-200 text-gray-800'} sm:w-[75%] md:w-[70%] lg:w-[60%]`}
@@ -254,49 +233,55 @@ const LibrarianReturns: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="border-t border-gray-300 my-8 mb-[8%]"></div>
+                    <div className="border-t border-gray-300 my-8 mb-[8%]"/>
 
-                    <div className="mb-6">
-                        <h4 className="text-2xl font-thin text-gray-700 mb-8">Wprowadź wymagane dane:</h4>
-                        <div className="space-y-4">
-                            <div>
-                                <label htmlFor="rentalReturnId" className="block text-gray-600 font-medium mb-2">ID
-                                    zwrotu</label>
-                                <input
-                                    id="rentalReturnId"
-                                    type="text"
-                                    placeholder="Wprowadź ID zwrotu"
-                                    value={rentalReturnId || ''}
-                                    onChange={(e) => setRentalReturnId(Number(e.target.value))}
-                                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
-                                />
-                            </div>
-
-                            {returnType === 'driver' && (
+                    {(returnType === 'inPerson' || returnType === 'driver') && (
+                        <div className="mb-6">
+                            <h4 className="text-2xl font-thin text-gray-700 mb-8">Wprowadź wymagane dane:</h4>
+                            <div className="space-y-4">
                                 <div>
-                                    <label htmlFor="driverId" className="block text-gray-600 font-medium mb-2">ID
-                                        kierowcy</label>
+                                    <label htmlFor="rentalReturnId" className="block text-gray-600 font-medium mb-2">
+                                        {returnType === 'inPerson'
+                                            ? 'ID zwrotu'
+                                            : 'ID zwrotu'}
+                                    </label>
                                     <input
-                                        id="driverId"
+                                        id="rentalReturnId"
                                         type="text"
-                                        placeholder="Wprowadź ID kierowcy"
-                                        value={driverId || ''}
-                                        onChange={(e) => setDriverId(e.target.value)}
+                                        placeholder="Wprowadź ID zwrotu"
+                                        value={rentalReturnId || ''}
+                                        onChange={(e) => setRentalReturnId(Number(e.target.value))}
                                         className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
                                     />
                                 </div>
-                            )}
 
-                            <div className="flex justify-center mt-4">
-                                <button
-                                    onClick={handleFetchReturnDetails}
-                                    className="mb-6 mt-5 w-[15vw] py-2 px-4 bg-[#3B576C] text-white rounded-md cursor-pointer hover:bg-[#314757] duration-200 ease-out"
-                                >
-                                    Zwróć
-                                </button>
+                                {returnType === 'driver' && (
+                                    <div>
+                                        <label htmlFor="driverId" className="block text-gray-600 font-medium mb-2">
+                                            ID kierowcy
+                                        </label>
+                                        <input
+                                            id="driverId"
+                                            type="text"
+                                            placeholder="Wprowadź ID kierowcy"
+                                            value={driverId}
+                                            onChange={(e) => setDriverId(e.target.value)}
+                                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
+                                        />
+                                    </div>
+                                )}
+
+                                <div className="flex justify-center mt-4">
+                                    <button
+                                        onClick={handleFetchReturnDetails}
+                                        className="mb-6 mt-5 w-[15vw] py-2 px-4 bg-[#3B576C] text-white rounded-md cursor-pointer hover:bg-[#314757] duration-200 ease-out"
+                                    >
+                                        Zwróć
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {rentalReturnDetails && (
                         <div className="mt-6">
@@ -327,12 +312,16 @@ const LibrarianReturns: React.FC = () => {
 
                     {message && (
                         <div
-                            className={`mt-4 p-4 rounded-md ${messageType === 'success' ? 'bg-green-100 text-[#3B576C]' : 'bg-red-100 text-red-800'}`}>
+                            className={`mt-4 p-4 rounded-md ${
+                                messageType === 'success'
+                                    ? 'bg-green-100 text-[#3B576C]'
+                                    : 'bg-red-100 text-red-800'
+                            }`}
+                        >
                             {message}
                         </div>
                     )}
                 </div>
-
             </main>
         </div>
     );
