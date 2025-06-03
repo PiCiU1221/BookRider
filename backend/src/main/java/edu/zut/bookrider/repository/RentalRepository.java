@@ -18,7 +18,6 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
     SELECT r FROM Rental r
     WHERE r.user = :user
     AND r.status != 'RETURNED'
-    AND r.status != 'RETURN_IN_PROGRESS'
     ORDER BY 
         CASE r.status
             WHEN 'RENTED' THEN 1
