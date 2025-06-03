@@ -57,8 +57,16 @@ export default function Dashboard() {
     }, []);
 
     useEffect(() => {
-        if (navigationData) {
-            const parsedData = JSON.parse(navigationData as string);
+        if (!navigationData || typeof navigationData !== 'string') {
+            return;
+        }
+
+        try {
+            if (navigationData === 'undefined' || navigationData === 'null') return;
+
+            const parsedData = JSON.parse(navigationData);
+
+            if (!parsedData?.steps) return;
 
             const steps = parsedData.steps;
             const allCoordinates: Coordinate[] = [];
@@ -74,6 +82,8 @@ export default function Dashboard() {
             setTotalDuration(parsedData.totalDuration);
 
             setDirections(allCoordinates);
+        } catch (e) {
+            return;
         }
     }, [navigationData]);
 
