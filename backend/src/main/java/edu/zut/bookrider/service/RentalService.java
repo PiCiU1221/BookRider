@@ -32,6 +32,7 @@ public class RentalService {
 
     private final RentalRepository rentalRepository;
     private final RentalMapper rentalMapper;
+    private final RentalReturnItemService rentalReturnItemService;
 
     @Transactional
     public void createRental(OrderItem orderItem) {
@@ -100,9 +101,16 @@ public class RentalService {
         User user = userService.getUser();
         Page<Rental> rentals = rentalRepository.findAllByUser(user, pageable);
 
-        List<RentalDTO> rentalDTOs = rentals.getContent()
-                .stream()
-                .map(rentalMapper::map)
+        List<RentalDTO> rentalDTOs = rentals.getContent().stream()
+                .map(rental -> {
+                    int remainingQuantity = rental.getQuantity();
+                    if (rental.getStatus() == RentalStatus.PARTIALLY_RETURNED) {
+                        int returned = rentalReturnItemService.sumReturnedQuantityByRentalId(rental.getId());
+                        remainingQuantity -= returned;
+                    }
+                    rental.setQuantity(remainingQuantity);
+                    return rentalMapper.map(rental);
+                })
                 .toList();
 
         return new PageResponseDTO<>(
