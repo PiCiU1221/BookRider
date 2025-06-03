@@ -3,6 +3,7 @@ package edu.zut.bookrider.integration.controller;
 import edu.zut.bookrider.model.*;
 import edu.zut.bookrider.model.enums.OrderStatus;
 import edu.zut.bookrider.model.enums.PaymentStatus;
+import edu.zut.bookrider.model.enums.RentalReturnStatus;
 import edu.zut.bookrider.model.enums.RentalStatus;
 import edu.zut.bookrider.repository.*;
 import edu.zut.bookrider.service.UserIdGeneratorService;
@@ -57,6 +58,8 @@ public class RentalControllerIT {
     private RoleRepository roleRepository;
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private RentalReturnRepository rentalReturnRepository;
 
     private User user;
     private User driver;
@@ -202,5 +205,46 @@ public class RentalControllerIT {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(2));
+    }
+
+    @Test
+    @WithMockUser(username = "testuser@rcit.com", roles = {"user"})
+    void whenUserRequestsRentalsWithPartialReturns_thenReturnRentalsPageWithCorrectQuantities() throws Exception {
+
+        Author author = createAuthor("Author");
+        Language language = createLanguage("language");
+
+        Book book1 = createBook("Book1", "113109022025", language, author);
+        Book book2 = createBook("Book2", "113209022025", language, author);
+
+        Order order1 = createOrder(user, driver, library1, address, book1, 2, OrderStatus.PENDING, false);
+        Order order2 = createOrder(user, driver, library1, address, book2, 1, OrderStatus.PENDING, false);
+
+        createRental(order1, 2, RentalStatus.RENTED);
+        Rental rental1 = createRental(order2, 3, RentalStatus.PARTIALLY_RETURNED);
+
+        Order returnOrder = createOrder(user, driver, library1, address, book2, 2, OrderStatus.AWAITING_LIBRARY_CONFIRMATION, true);
+
+        RentalReturn rentalReturn = new RentalReturn();
+        rentalReturn.setReturnOrder(returnOrder);
+        rentalReturn.setStatus(RentalReturnStatus.IN_PROGRESS);
+
+        RentalReturnItem rentalReturnItem = new RentalReturnItem();
+        rentalReturnItem.setRentalReturn(rentalReturn);
+        rentalReturnItem.setRental(rental1);
+        rentalReturnItem.setBook(rental1.getBook());
+        rentalReturnItem.setReturnedQuantity(2);
+
+        List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
+        rentalReturnItems.add(rentalReturnItem);
+        rentalReturn.setRentalReturnItems(rentalReturnItems);
+
+        rentalReturn = rentalReturnRepository.save(rentalReturn);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/rentals")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.content[1].quantity").value(1));
     }
 }
