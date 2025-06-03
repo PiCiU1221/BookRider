@@ -327,10 +327,6 @@ UPDATE orders
 SET payment_status = 'COMPLETED'
 WHERE id = 2;
 
-UPDATE rentals
-SET status = 'RETURN_IN_PROGRESS'
-WHERE id = 1;
-
 -- Rental table for tracking rentals (because they can be partial)
 INSERT INTO rental_returns (return_order_id, returned_at, status)
 VALUES

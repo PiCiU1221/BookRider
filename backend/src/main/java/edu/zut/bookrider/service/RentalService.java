@@ -103,13 +103,12 @@ public class RentalService {
 
         List<RentalDTO> rentalDTOs = rentals.getContent().stream()
                 .map(rental -> {
-                    int remainingQuantity = rental.getQuantity();
-                    if (rental.getStatus() == RentalStatus.PARTIALLY_RETURNED) {
-                        int returned = rentalReturnItemService.sumReturnedQuantityByRentalId(rental.getId());
-                        remainingQuantity -= returned;
-                    }
-                    rental.setQuantity(remainingQuantity);
-                    return rentalMapper.map(rental);
+                    int totalReturned = rentalReturnItemService.sumReturnedQuantityByRentalId(rental.getId());
+                    int remaining = rental.getQuantity() - totalReturned;
+
+                    RentalDTO dto = rentalMapper.map(rental);
+                    dto.setQuantity(remaining);
+                    return dto;
                 })
                 .toList();
 
