@@ -167,6 +167,23 @@ public class RentalReturnControllerIT {
         return rentalRepository.save(rental);
     }
 
+    private GeneralRentalReturnRequestDTO createSingleRentalReturnRequest(Address address, Rental rental, int quantityToReturn) {
+        RentalReturnWithQuantityRequestDTO rentalReturnRequestDTO = new RentalReturnWithQuantityRequestDTO();
+        rentalReturnRequestDTO.setRentalId(rental.getId());
+        rentalReturnRequestDTO.setQuantityToReturn(quantityToReturn);
+
+        CreateAddressDTO createAddressDTO = new CreateAddressDTO();
+        createAddressDTO.setStreet(address.getStreet());
+        createAddressDTO.setCity(address.getCity());
+        createAddressDTO.setPostalCode(address.getPostalCode());
+
+        GeneralRentalReturnRequestDTO request = new GeneralRentalReturnRequestDTO();
+        request.setCreateAddressDTO(createAddressDTO);
+        request.setRentalReturnRequests(List.of(rentalReturnRequestDTO));
+
+        return request;
+    }
+
     @BeforeEach
     void setUp() {
         user = createUser("testuser@rrcit.com", "user", 9999);
@@ -996,6 +1013,53 @@ public class RentalReturnControllerIT {
                         .content(new ObjectMapper().writeValueAsString(generalRentalReturnRequestDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser@rrcit.com:user", roles = {"user"})
+    void whenUserRequestsReturnOrderPartiallyReturnedReturn_thenReturnOk() throws Exception {
+
+        Author author = createAuthor("Author");
+        Language language = createLanguage("language");
+
+        Book book = createBook("Book1", "113109022025", language, author);
+
+        Order deliveryOrder = createOrder(user, driver, library1, address, book, 3, OrderStatus.DELIVERED, false);
+
+        Rental rental = new Rental();
+        rental.setUser(user);
+        rental.setBook(deliveryOrder.getOrderItems().get(0).getBook());
+        rental.setLibrary(deliveryOrder.getLibrary());
+        rental.setOrder(deliveryOrder);
+        rental.setQuantity(3);
+        rental.setReturnDeadline(LocalDateTime.now().plusDays(30));
+        rental.setStatus(RentalStatus.RENTED);
+        rental = rentalRepository.save(rental);
+
+        Order returnOrder = createOrder(user, driver, library1, address, book, 1, OrderStatus.DRIVER_ACCEPTED, true);
+
+        RentalReturn rentalReturn = new RentalReturn();
+        rentalReturn.setReturnOrder(returnOrder);
+        rentalReturn.setStatus(RentalReturnStatus.IN_PROGRESS);
+
+        RentalReturnItem rentalReturnItem = new RentalReturnItem();
+        rentalReturnItem.setRentalReturn(rentalReturn);
+        rentalReturnItem.setRental(rental);
+        rentalReturnItem.setBook(rental.getBook());
+        rentalReturnItem.setReturnedQuantity(1);
+
+        List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
+        rentalReturnItems.add(rentalReturnItem);
+        rentalReturn.setRentalReturnItems(rentalReturnItems);
+
+        rentalReturnRepository.save(rentalReturn);
+
+        GeneralRentalReturnRequestDTO requestDTO = createSingleRentalReturnRequest(address, rental, 2);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/rental-returns")
+                        .content(new ObjectMapper().writeValueAsString(requestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test
