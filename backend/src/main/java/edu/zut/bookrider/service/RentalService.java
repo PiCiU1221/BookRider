@@ -101,16 +101,17 @@ public class RentalService {
         User user = userService.getUser();
         Page<Rental> rentals = rentalRepository.findAllByUser(user, pageable);
 
-        List<RentalDTO> rentalDTOs = rentals.getContent().stream()
-                .map(rental -> {
-                    int totalReturned = rentalReturnItemService.sumReturnedQuantityByRentalId(rental.getId());
-                    int remaining = rental.getQuantity() - totalReturned;
+        List<RentalDTO> rentalDTOs = new ArrayList<>();
+        for (Rental rental : rentals.getContent()) {
+            int totalReturned = rentalReturnItemService.sumReturnedQuantityByRentalId(rental.getId());
+            int remaining = rental.getQuantity() - totalReturned;
 
-                    RentalDTO dto = rentalMapper.map(rental);
-                    dto.setQuantity(remaining);
-                    return dto;
-                })
-                .toList();
+            if (remaining > 0) {
+                RentalDTO dto = rentalMapper.map(rental);
+                dto.setQuantity(remaining);
+                rentalDTOs.add(dto);
+            }
+        }
 
         return new PageResponseDTO<>(
                 rentalDTOs,
