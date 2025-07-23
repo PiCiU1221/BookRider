@@ -146,18 +146,7 @@ const LibrarianOrders: React.FC = () => {
             if (response.ok) {
                 setPendingMessage('Zamówienie zostało zatwierdzone.');
                 setPendingMessageType('success');
-
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
-
-                setOrderDetails(prev =>
-                    prev.map(order =>
-                        order.orderId === orderId
-                            ? { ...order, status: 'IN_REALIZATION' }
-                            : order
-                    )
-                );
+                await fetchOrderDetails();
             } else {
                 setPendingMessage('Nie udało się zatwierdzić zamówienia.');
                 setPendingMessageType('error');
@@ -194,11 +183,7 @@ const LibrarianOrders: React.FC = () => {
                 setSelectedOrderId(null);
                 setRejectionReason('');
                 setCustomReason('');
-                fetchOrderDetails();
-
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
+                await fetchOrderDetails();
             } else {
                 setPendingMessage('Błąd przy odrzucaniu zamówienia.');
                 setPendingMessageType('error');
@@ -229,16 +214,13 @@ const LibrarianOrders: React.FC = () => {
             if (response.ok) {
                 setRealizationMessage(`Zamówienie ${orderId} zostało przekazane pomyślnie!`);
                 setRealizationMessageType("success");
-
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
+                await fetchOrderDetails();
             } else {
                 setRealizationMessage('Błąd przy przekazywaniu zamówienia.');
                 setRealizationMessageType('error');
             }
         } catch (err) {
-            console.error('Error declining order:', err);
+            console.error('Error handing over order:', err);
         }
     };
 

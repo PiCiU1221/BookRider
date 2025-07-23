@@ -36,8 +36,12 @@ import LegalInfoPage from './Utils/LegalInfoPage.tsx';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 
+import {ToastContainer} from 'react-toastify';
+
 const App: React.FC = () => {
     return (
+        <>
+            <ToastContainer />
         <Router>
             <Routes>
                 <Route path="/" element={<LandingPage />} />
@@ -84,6 +88,7 @@ const App: React.FC = () => {
                 />
             </Routes>
         </Router>
+        </>
     );
 };
 

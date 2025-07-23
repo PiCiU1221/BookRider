@@ -1,12 +1,21 @@
 import React, {useEffect, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
+import {useWebSocketNewOrderNotification} from './useWebSocketNewOrderNotification.tsx';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const LibrarianReturns: React.FC = () => {
-    // Success and error messages
     const [message, setMessage] = useState<string | null>(null);
     const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
+
+    useWebSocketNewOrderNotification('librarian/orders/pending', () => {
+        toast.info("Otrzymano nowe zamówienie!", {
+            position: "bottom-right",
+        });
+        console.log("New order received!");
+    });
 
     // Returns
     interface RentalReturnItem {
