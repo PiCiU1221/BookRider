@@ -90,7 +90,6 @@ const LibrarianAddBook: React.FC = () => {
                 try {
                     const token = localStorage.getItem('access_token');
                     if (!token) {
-                        setError('Brak tokena autoryzacyjnego.');
                         return;
                     }
 
@@ -122,8 +121,10 @@ const LibrarianAddBook: React.FC = () => {
     };
 
     const handleAuthorInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const input = e.target.value;
         setAuthorInput(e.target.value);
         setShowDropdown(true);
+        fetchAuthors(input);
     };
 
     const handleRemoveAuthor = (authorToRemove: string) => {
@@ -220,7 +221,6 @@ const LibrarianAddBook: React.FC = () => {
                 throw new Error(`Błąd ${response.status}: ${errorText}`);
             }
 
-            // alert('Książka dodana');
             navigate('/librarian-dashboard');
         } catch (error) {
             setError((error as Error).message || 'Wystąpił błąd podczas dodawania książki.');

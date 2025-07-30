@@ -68,6 +68,11 @@ const LibrarianHomePage: React.FC = () => {
 
     const navigate = useNavigate();
 
+    // Lazy Loading for the book list display
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
         fetchAssignedLibrary();
         fetchDropdownData();
@@ -112,6 +117,19 @@ const LibrarianHomePage: React.FC = () => {
             };
         }
     }, [deleteBooksMessage]);
+
+    // Lazy Loading
+    useEffect(() => {
+        const handleScroll = () => {
+            const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000;
+            if (nearBottom && !isLoading && hasMore) {
+                fetchBooks(isUserLibraryChecked, page);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isLoading, hasMore, page, isUserLibraryChecked]);
 
     const fetchDropdownData = async () => {
         const token = localStorage.getItem('access_token');
@@ -201,14 +219,16 @@ const LibrarianHomePage: React.FC = () => {
         }
     };
 
-    const fetchBooks = async (filterByLibrary: boolean) => {
+    const fetchBooks = async (filterByLibrary: boolean, pageToFetch: number = 0) => {
         const token = localStorage.getItem('access_token');
-        if (!token) return;
+        if (!token || isLoading || !hasMore) return;
+
+        setIsLoading(true);
 
         const queryParams = new URLSearchParams();
 
-        if (filterByLibrary && assignedLibrary?.name) {
-            queryParams.append("library", assignedLibrary.name);
+        if (filterByLibrary && assignedLibrary?.id) {
+            queryParams.append("libraryId", assignedLibrary.id.toString());
         }
 
         if (bookSearchInput) queryParams.append("title", bookSearchInput);
@@ -220,8 +240,8 @@ const LibrarianHomePage: React.FC = () => {
         if (releaseYearFrom) queryParams.append("releaseYearFrom", releaseYearFrom.toString());
         if (releaseYearTo) queryParams.append("releaseYearTo", releaseYearTo.toString());
 
-        queryParams.append("page", "0");
-        queryParams.append("size", "20");
+        queryParams.append("page", pageToFetch.toString());
+        queryParams.append("size", "3");
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/books/search?${queryParams.toString()}`, {
@@ -232,22 +252,29 @@ const LibrarianHomePage: React.FC = () => {
                 },
             });
 
-            if (!response.ok) {
-                throw new Error(`Error: ${response.statusText}`);
-            }
+            if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
             const data = await response.json();
-            setBookSearchResults(data.content);
+            const newBooks = data.content;
+
+            setBookSearchResults(prev => [...prev, ...newBooks]);
+            setPage(pageToFetch + 1);
+            setHasMore(!data.last);
+
         } catch (error) {
             console.error("Error: ", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleSearch = (reset: boolean = false) => {
         if (reset) {
             setBookSearchResults([]);
+            setPage(0);
+            setHasMore(true);
         }
-        fetchBooks(isUserLibraryChecked);
+        fetchBooks(isUserLibraryChecked, 0);
     };
 
     const handleRedirectToAddBook = () => {
