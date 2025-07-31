@@ -70,10 +70,6 @@ const LibraryAdminAddLibrary: React.FC = () => {
         }
     };
 
-    const handleSettings = () => {
-        alert('Ustawienia');
-    };
-
     return (
         <div className="bg-[#3B576C] min-h-screen">
             <header
@@ -85,12 +81,6 @@ const LibraryAdminAddLibrary: React.FC = () => {
                         src="/book-rider-high-resolution-logo.png"
                     />
                 </div>
-            <button
-                onClick={handleSettings}
-                className="relative mr-3 px-6 py-3 right-[1%] w-[8%] bg-[#314757] rounded-md text-sm transition-all duration-300 hover:bg-[#4b6477] flex items-center justify-center"
-            >
-                Ustawienia
-            </button>
             <button
                 onClick={handleLogout}
                 className="relative py-3 right-[1%] w-[13%] bg-[#314757] rounded-md text-sm transition-all duration-300 hover:bg-[#4b6477]"
