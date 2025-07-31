@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
+import {useWebSocketNewOrderNotification} from './useWebSocketNewOrderNotification.tsx';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -24,6 +27,13 @@ const LibrarianReaders: React.FC = () => {
     const [libraryCardDetails, setLibraryCardDetails] = useState<LibraryCardDetails | null>(null);
 
     const navigate = useNavigate();
+
+    useWebSocketNewOrderNotification('librarian/orders/pending', () => {
+        toast.info("Otrzymano nowe zamówienie!", {
+            position: "bottom-right",
+        });
+        console.log("New order received!");
+    });
 
     // Readers ---------------------------------------------------------------------------------------------------------
     const handleCreateLibraryCard = async () => {

@@ -1,5 +1,8 @@
 import React, {useState, useEffect } from 'react';
 import {Link, useNavigate} from 'react-router-dom';
+import {useWebSocketNewOrderNotification} from './useWebSocketNewOrderNotification.tsx';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -25,7 +28,6 @@ const LibrarianOrders: React.FC = () => {
 
     const [realizationMessage, setRealizationMessage] = React.useState('');
     const [realizationMessageType, setRealizationMessageType] = React.useState<'success' | 'error' | ''>('');
-
 
     // Orders
     const [orderDetails, setOrderDetails] = useState<OrderDetails[]>([]);
@@ -66,6 +68,13 @@ const LibrarianOrders: React.FC = () => {
     }
 
     const navigate = useNavigate();
+
+    useWebSocketNewOrderNotification('librarian/orders/pending', () => {
+        toast.info("Otrzymano nowe zamówienie!", {
+            position: "bottom-right",
+        });
+        console.log("New order received!");
+    });
 
     // Orders ----------------------------------------------------------------------------------------------------------
     useEffect(() => {
@@ -234,7 +243,7 @@ const LibrarianOrders: React.FC = () => {
     };
 
     return (
-        <div className="bg-[#314757] min-h-screen">
+        <div className="bg-[#314757] min-h-screen h-screen overflow-hidden">
             <header
                 className="flex justify-around p-1 pr-4 space-x-2.5 bg-[#3B576C] text-white sticky top-0 z-[1000] shadow-md">
                 <div>
