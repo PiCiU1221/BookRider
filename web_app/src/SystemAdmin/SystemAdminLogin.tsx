@@ -153,7 +153,7 @@ const SysAdminLogin: React.FC = () => {
                         </Link>
                     </div>
                     <div
-                        className="absolute top-[25%] left-1/2 transform -translate-x-1/2 bg-white p-10 rounded-xl shadow-2xl w-[clamp(280px,30vw,400px)] h-[clamp(430px,48vh,90vh)]">
+                        className="absolute top-[25%] left-1/2 transform -translate-x-1/2 bg-white p-10 rounded-xl shadow-2xl w-[clamp(280px,30vw,400px)] h-[clamp(500px,55vh,90vh)]">
                         <h2 className="text-center text-3xl font-semibold text-[#2c3e50] mb-6 w-[100%]">
                             Logowanie <br/> administratora systemów
                         </h2>
