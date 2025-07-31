@@ -46,10 +46,11 @@ const LibrarianSettings: React.FC = () => {
                 }),
             });
 
-            const data = await response.json();
+            const text = await response.text();
 
             if (!response.ok) {
-                throw new Error(data.message || 'Nie udało się zmienić hasła.');
+                const errorData = text ? JSON.parse(text) : { message: 'Błąd zmiany hasła' };
+                throw new Error(errorData.message);
             }
 
             setMessage('Hasło zostało zmienione.');
@@ -160,8 +161,8 @@ const LibrarianSettings: React.FC = () => {
                             </button>
                         </div>
 
-                        {message && <p className="text-green-400 mt-4">{message}</p>}
-                        {error && <p className="text-red-400 mt-4">{error}</p>}
+                        {message && <p className="text-green-500 mt-4">{message}</p>}
+                        {error && <p className="text-red-500 mt-4">{error}</p>}
                     </form>
                 </div>
             </main>
