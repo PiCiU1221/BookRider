@@ -1,5 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
+import {useWebSocketNewOrderNotification} from './useWebSocketNewOrderNotification.tsx';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -72,6 +75,7 @@ const LibrarianHomePage: React.FC = () => {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
+    const isFetchingRef = useRef(false);
 
     useEffect(() => {
         fetchAssignedLibrary();
@@ -130,6 +134,13 @@ const LibrarianHomePage: React.FC = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, [isLoading, hasMore, page, isUserLibraryChecked]);
+
+    useWebSocketNewOrderNotification('librarian/orders/pending', () => {
+        toast.info("Otrzymano nowe zamówienie!", {
+            position: "bottom-right",
+        });
+        console.log("New order received!");
+    });
 
     const fetchDropdownData = async () => {
         const token = localStorage.getItem('access_token');
@@ -221,8 +232,9 @@ const LibrarianHomePage: React.FC = () => {
 
     const fetchBooks = async (filterByLibrary: boolean, pageToFetch: number = 0) => {
         const token = localStorage.getItem('access_token');
-        if (!token || isLoading || !hasMore) return;
+        if (!token || isFetchingRef.current || isLoading || !hasMore) return;
 
+        isFetchingRef.current = true;
         setIsLoading(true);
 
         const queryParams = new URLSearchParams();
@@ -241,7 +253,7 @@ const LibrarianHomePage: React.FC = () => {
         if (releaseYearTo) queryParams.append("releaseYearTo", releaseYearTo.toString());
 
         queryParams.append("page", pageToFetch.toString());
-        queryParams.append("size", "3");
+        queryParams.append("size", "2");
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/books/search?${queryParams.toString()}`, {
@@ -265,6 +277,7 @@ const LibrarianHomePage: React.FC = () => {
             console.error("Error: ", error);
         } finally {
             setIsLoading(false);
+            isFetchingRef.current = false;
         }
     };
 

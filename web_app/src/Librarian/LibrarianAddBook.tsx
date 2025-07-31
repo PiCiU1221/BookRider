@@ -1,5 +1,8 @@
 import React, { useState, useEffect  } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {useWebSocketNewOrderNotification} from './useWebSocketNewOrderNotification.tsx';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -82,6 +85,13 @@ const LibrarianAddBook: React.FC = () => {
 
         fetchDropdownData();
     }, []);
+
+    useWebSocketNewOrderNotification('librarian/orders/pending', () => {
+        toast.info("Otrzymano nowe zamówienie!", {
+            position: "bottom-right",
+        });
+        console.log("New order received!");
+    });
 
     const handleAuthorSelect = async (author: string) => {
         if (!authors.includes(author)) {
