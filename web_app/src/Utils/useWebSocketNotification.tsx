@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export function useWebSocketNewOrderNotification(
+export function useWebSocketNotification(
     channel: string,
     onMessage: (msg: string) => void
 ) {

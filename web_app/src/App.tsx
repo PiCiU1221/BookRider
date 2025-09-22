@@ -9,6 +9,7 @@ import SysAdminLogin from "./SystemAdmin/SystemAdminLogin.tsx";
 import SystemAdminDashboard from './SystemAdmin/SystemAdminHomePage';
 import SubmissionDetailsLibrary from './SystemAdmin/SubmissionDetailsLibrary.tsx';
 import SubmissionDetailsDriver from './SystemAdmin/SubmissionDetailsDriver.tsx';
+import SystemAdminSettings from './SystemAdmin/SystemAdminSettings.tsx';
 
 // Library Administrator
 import RegistrationForm from './LibraryAdmin/LibraryAdminRegisterForm.tsx';
@@ -66,6 +67,7 @@ const App: React.FC = () => {
                 <Route path="/librarian-settings" element={<LibrarianSettings />} />
                 <Route path="/library-admin-add-librarian" element={<LibraryAdminAddLibrarian />} />
                 <Route path="/library-admin-settings" element={<LibraryAdminSettings />} />
+                <Route path="/system-admin-settings" element={<SystemAdminSettings />} />
                 <Route
                     path="/api-docs"
                     element={
