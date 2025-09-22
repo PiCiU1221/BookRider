@@ -1,6 +1,6 @@
 import React, { useState, useEffect  } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {useWebSocketNewOrderNotification} from './useWebSocketNewOrderNotification.tsx';
+import {useWebSocketNotification} from '../Utils/useWebSocketNotification.tsx';
 import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -86,7 +86,7 @@ const LibrarianAddBook: React.FC = () => {
         fetchDropdownData();
     }, []);
 
-    useWebSocketNewOrderNotification('librarian/orders/pending', () => {
+    useWebSocketNotification('librarian/orders/pending', () => {
         toast.info("Otrzymano nowe zamówienie!", {
             position: "bottom-right",
         });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import {useWebSocketNewOrderNotification} from './useWebSocketNewOrderNotification.tsx';
+import {useWebSocketNotification} from '../Utils/useWebSocketNotification.tsx';
 import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -13,7 +13,7 @@ const LibrarianSettings: React.FC = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
 
-    useWebSocketNewOrderNotification('librarian/orders/pending', () => {
+    useWebSocketNotification('librarian/orders/pending', () => {
         toast.info("Otrzymano nowe zamówienie!", {
             position: "bottom-right",
         });

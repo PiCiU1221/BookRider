@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import {useWebSocketNewOrderNotification} from './useWebSocketNewOrderNotification.tsx';
+import {useWebSocketNotification} from '../Utils/useWebSocketNotification.tsx';
 import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -135,7 +135,7 @@ const LibrarianHomePage: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [isLoading, hasMore, page, isUserLibraryChecked]);
 
-    useWebSocketNewOrderNotification('librarian/orders/pending', () => {
+    useWebSocketNotification('librarian/orders/pending', () => {
         toast.info("Otrzymano nowe zamówienie!", {
             position: "bottom-right",
         });

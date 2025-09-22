@@ -1,5 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {useWebSocketNotification} from '../Utils/useWebSocketNotification.tsx';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -40,6 +43,20 @@ const SystemAdminDashboard: React.FC = () => {
     const navigate = useNavigate();
 
     const firstLoad = useRef(true);
+
+    useWebSocketNotification('system-administrator/library-requests/pending', () => {
+        toast.info("Otrzymano nowe zgłoszenie biblioteki!", {
+            position: "bottom-right",
+        });
+        console.log("New library request received!");
+    });
+
+    useWebSocketNotification('system-administrator/driver-requests/pending', () => {
+        toast.info("Otrzymano nowe zgłoszenie kierowcy!", {
+            position: "bottom-right",
+        });
+        console.log("New driver request received!");
+    });
 
     const handleChangePassword = ()=> {
         navigate('/system-admin-settings');
