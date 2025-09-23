@@ -141,7 +141,7 @@ const LibrarianSettings: React.FC = () => {
                             />
                         </div>
 
-                        <div className="block mb-5 text-gray-600 text-lg"> {/* ✅ NEW FIELD */}
+                        <div className="block mb-5 text-gray-600 text-lg">
                             <label className="block mb-1">Powtórz hasło:</label>
                             <input
                                 type="password"
