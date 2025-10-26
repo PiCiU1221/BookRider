@@ -49,7 +49,6 @@ public class RentalReturnItemService {
             RentalReturnItem returnItem = new RentalReturnItem();
             returnItem.setRentalReturn(rentalReturn);
             returnItem.setRental(rental);
-            returnItem.setBook(rental.getBook());
             returnItem.setReturnedQuantity(toReturn);
 
             returnItems.add(returnItem);

@@ -332,9 +332,9 @@ INSERT INTO rental_returns (return_order_id, returned_at, status)
 VALUES
     (1,NULL, 'IN_PROGRESS');
 
-INSERT INTO rental_return_items (rental_return_id, rental_id, book_id, returned_quantity)
+INSERT INTO rental_return_items (rental_return_id, rental_id, returned_quantity)
 VALUES
-    (1, 1, 2, 2);
+    (1, 1, 2);
 
 -- Driver accept the return order
 UPDATE orders

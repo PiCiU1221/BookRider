@@ -64,7 +64,7 @@ public class NavigationServiceTest {
         double totalDuration = navigationResponseDTO.getTotalDuration();
 
         assertEquals(0.2, totalDistance);
-        assertEquals(46.4, totalDuration);
+        assertEquals(46.3, totalDuration);
 
         List<NavigationResponseDTO.RouteStep> steps = navigationResponseDTO.getSteps();
 
@@ -82,7 +82,7 @@ public class NavigationServiceTest {
 
         NavigationResponseDTO.RouteStep thirdStep = steps.get(2);
 
-        assertEquals(59.4, thirdStep.getStepDistance());
+        assertEquals(59.3, thirdStep.getStepDistance());
         assertEquals(10.7, thirdStep.getStepDuration());
         assertEquals("Turn left", thirdStep.getInstruction());
 

@@ -444,7 +444,6 @@ public class RentalReturnControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental);
-        rentalReturnItem.setBook(rental.getBook());
         rentalReturnItem.setReturnedQuantity(2);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
@@ -497,7 +496,6 @@ public class RentalReturnControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental);
-        rentalReturnItem.setBook(rental.getBook());
         rentalReturnItem.setReturnedQuantity(2);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
@@ -546,7 +544,6 @@ public class RentalReturnControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental);
-        rentalReturnItem.setBook(rental.getBook());
         rentalReturnItem.setReturnedQuantity(2);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
@@ -593,7 +590,6 @@ public class RentalReturnControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental);
-        rentalReturnItem.setBook(rental.getBook());
         rentalReturnItem.setReturnedQuantity(2);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
@@ -636,7 +632,6 @@ public class RentalReturnControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental);
-        rentalReturnItem.setBook(rental.getBook());
         rentalReturnItem.setReturnedQuantity(2);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
@@ -858,7 +853,6 @@ public class RentalReturnControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental);
-        rentalReturnItem.setBook(rental.getBook());
         rentalReturnItem.setReturnedQuantity(2);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
@@ -906,7 +900,6 @@ public class RentalReturnControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental);
-        rentalReturnItem.setBook(rental.getBook());
         rentalReturnItem.setReturnedQuantity(2);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
@@ -951,7 +944,6 @@ public class RentalReturnControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental);
-        rentalReturnItem.setBook(rental.getBook());
         rentalReturnItem.setReturnedQuantity(2);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
@@ -996,7 +988,6 @@ public class RentalReturnControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental);
-        rentalReturnItem.setBook(rental.getBook());
         rentalReturnItem.setReturnedQuantity(2);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
@@ -1045,7 +1036,6 @@ public class RentalReturnControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental);
-        rentalReturnItem.setBook(rental.getBook());
         rentalReturnItem.setReturnedQuantity(1);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
@@ -1094,7 +1084,6 @@ public class RentalReturnControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental);
-        rentalReturnItem.setBook(rental.getBook());
         rentalReturnItem.setReturnedQuantity(2);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
@@ -1140,7 +1129,6 @@ public class RentalReturnControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental);
-        rentalReturnItem.setBook(rental.getBook());
         rentalReturnItem.setReturnedQuantity(2);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();

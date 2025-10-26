@@ -268,7 +268,6 @@ CREATE TABLE rental_return_items
     id SERIAL PRIMARY KEY,
     rental_return_id INT NOT NULL REFERENCES rental_returns(id) ON DELETE CASCADE,
     rental_id INT NOT NULL REFERENCES rentals(id) ON DELETE CASCADE,
-    book_id INT NOT NULL REFERENCES books(id),
     returned_quantity INT NOT NULL CHECK (returned_quantity > 0)
 );
 
