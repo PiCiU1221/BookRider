@@ -4,6 +4,7 @@ import edu.zut.bookrider.dto.RentalReturnDTO;
 import edu.zut.bookrider.dto.RentalReturnItemDTO;
 import edu.zut.bookrider.mapper.Mapper;
 import edu.zut.bookrider.mapper.book.BookReadMapper;
+import edu.zut.bookrider.model.Rental;
 import edu.zut.bookrider.model.RentalReturn;
 import edu.zut.bookrider.model.RentalReturnItem;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +35,12 @@ public class RentalReturnMapper implements Mapper<RentalReturn, RentalReturnDTO>
     }
 
     private RentalReturnItemDTO mapItem(RentalReturnItem item) {
+        Rental rental = item.getRental();
+
         return new RentalReturnItemDTO(
                 item.getId(),
-                item.getRental().getId(),
-                item.getBook() != null ? bookReadMapper.map(item.getBook()) : null,
+                rental.getId(),
+                bookReadMapper.map(rental.getBook()),
                 item.getReturnedQuantity()
         );
     }

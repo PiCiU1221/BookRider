@@ -64,7 +64,6 @@ public class RentalControllerIT {
     private User user;
     private User driver;
     private Library library1;
-    private Library library2;
     private Address address;
 
     private Address createAddress(String postalCode, String city, String street, double lat, double lon) {
@@ -160,7 +159,6 @@ public class RentalControllerIT {
         driver = createUser("testdriver@rcit.com", "driver", 0);
 
         library1 = createLibrary("Library1", "70-426", "Szczecin", "Generała Ludomiła Rayskiego 3", 53.434882, 14.552266);
-        library2 = createLibrary("Library2", "70-426", "Szczecin", "Księdza Piotra Wawrzyniaka 13", 53.437720, 14.531702);
     }
 
     @Test
@@ -232,14 +230,13 @@ public class RentalControllerIT {
         RentalReturnItem rentalReturnItem = new RentalReturnItem();
         rentalReturnItem.setRentalReturn(rentalReturn);
         rentalReturnItem.setRental(rental1);
-        rentalReturnItem.setBook(rental1.getBook());
         rentalReturnItem.setReturnedQuantity(2);
 
         List<RentalReturnItem> rentalReturnItems = new ArrayList<>();
         rentalReturnItems.add(rentalReturnItem);
         rentalReturn.setRentalReturnItems(rentalReturnItems);
 
-        rentalReturn = rentalReturnRepository.save(rentalReturn);
+        rentalReturnRepository.save(rentalReturn);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/rentals")
                         .contentType(MediaType.APPLICATION_JSON))
