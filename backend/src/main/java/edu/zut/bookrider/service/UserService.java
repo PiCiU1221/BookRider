@@ -129,6 +129,7 @@ public class UserService {
                 user.getEmail(),
                 user.getFirstName(),
                 user.getLastName(),
+                user.getLibrary() != null ? user.getLibrary().getId() : null,
                 user.getBalance(),
                 user.getCreatedAt()
         );
