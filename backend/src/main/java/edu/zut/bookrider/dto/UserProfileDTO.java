@@ -15,6 +15,7 @@ public class UserProfileDTO {
     private String email;
     private String firstName;
     private String lastName;
+    private Integer libraryId;
     private BigDecimal balance;
     private LocalDateTime createdAt;
 }
