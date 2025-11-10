@@ -3,43 +3,31 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const LibraryAdminLogin: React.FC = () => {
-    const [email, setEmail] = useState('');
+const LibrarianLogin: React.FC = () => {
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [libraryId, setLibraryId] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const [role, setRole] = useState<string>('library_administrator');
-    const [emailValid, setEmailValid] = useState(true);
+    const [role, setRole] = useState<string>('librarian');
     const navigate = useNavigate();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
 
-        if (name === 'email') {
-            setEmail(value);
-
-            const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-            setEmailValid(isValid);
-
-            if (!isValid) {
-                setError('Wprowadź poprawny adres email');
-            } else {
-                setError(null);
-            }
+        if (name === 'username') {
+            setUsername(value);
         } else if (name === 'password') {
             setPassword(value);
-        } else if (name === 'role') {
-            setRole(value);
+        } else if (name === 'libraryId') {
+            setLibraryId(value);
+         } else if (name === 'role') {
+        setRole(value);
         }
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(null);
-
-        if (!emailValid) {
-            setError('Wprowadź poprawny adres email');
-            return;
-        }
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/auth/login/${role}`, {
@@ -48,7 +36,8 @@ const LibraryAdminLogin: React.FC = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    identifier: email,
+                    username,
+                    libraryId: Number(libraryId),
                     password,
                 }),
             });
@@ -60,28 +49,9 @@ const LibraryAdminLogin: React.FC = () => {
 
                     localStorage.setItem('access_token', token);
                     localStorage.setItem('role', role);
-                    localStorage.setItem('email', email);
+                    localStorage.setItem('username', username);
 
-                    const statusResponse = await fetch(`${API_BASE_URL}/api/library-requests/me?page=0&size=1`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
-                    });
-
-                    if (statusResponse.ok) {
-                        const requests = await statusResponse.json();
-                        const status = requests[0]?.status;
-
-                        if (status === 'PENDING') {
-                            navigate('/processing-info');
-                        } else if (status === 'APPROVED') {
-                            navigate('/library-admin-dashboard');
-                        } else {
-                            navigate('/add-library');
-                        }
-                    } else {
-                        navigate('/'); // landing page
-                    }
+                    navigate('/librarian-dashboard');
 
                 } else {
                     setError('Authorization header missing');
@@ -90,13 +60,13 @@ const LibraryAdminLogin: React.FC = () => {
                 const errorData = await response.json();
                 switch (errorData.code) {
                     case 401:
-                        setError('Nieprawidłowy email lub hasło.');
+                        setError('Nieprawidłowa nazwa użytkownika, hasło lub identyfikator biblioteki.');
                         break;
                     case 500:
                         setError('Wewnętrzny błąd serwera. Spróbuj ponownie później.');
                         break;
                     case 400:
-                        setError('Należy podać adres email oraz hasło.');
+                        setError('Należy podać nazwę użytkownika, identyfikator biblioteki oraz hasło.');
                         break;
                     default:
                         setError(errorData.message || 'Błąd logowania. Spróbuj ponownie.');
@@ -172,30 +142,48 @@ const LibraryAdminLogin: React.FC = () => {
                         </Link>
                     </div>
                     <div
-                        className="absolute bg-white p-10 rounded-xl shadow-2xl w-[clamp(280px,30vw,400px)] h-[clamp(480px,55vh,90vh)] top-[25%] left-1/2 transform -translate-x-1/2">
-                        <h2 className="text-center mb-[25px] text-3xl font-semibold text-[#2c3e50] w-[100%] ">
-                            Logowanie administratora biblioteki
+                        className="absolute top-[22%] left-1/2 transform -translate-x-1/2 bg-white p-10 rounded-xl shadow-2xl w-[clamp(280px,30vw,400px)] h-[clamp(505px,55vh,90vh)]">
+                        <h2 className="text-center mb-6 text-3xl font-semibold text-[#2c3e50]">
+                            Logowanie bibliotekarza
                         </h2>
 
                         <form onSubmit={handleSubmit} className="flex flex-col">
-                            <div className="mb-[20px]">
-                                <label htmlFor="email" className="text-[16px] text-[#34495e] mb-[8px] block">Adres
-                                    email:</label>
+                            <div className="mb-5">
+                                <label htmlFor="username" className="block text-[16px] text-[#34495e] mb-2">
+                                    Nazwa użytkownika:
+                                </label>
                                 <input
                                     type="text"
-                                    id="email"
-                                    name="email"
-                                    value={email}
+                                    id="username"
+                                    name="username"
+                                    value={username}
                                     onChange={handleInputChange}
                                     required
-                                    maxLength={50}
-                                    className={`peer p-2 border rounded-md w-full ${!emailValid ? 'border-red-600' : 'border-gray-300'}`}
+                                    maxLength={25}
+                                    className="p-2 border rounded-md w-full"
                                 />
                             </div>
 
-                            <div className="mb-[20px]">
-                                <label htmlFor="password"
-                                       className="text-[16px] text-[#34495e] mb-[8px] block">Hasło:</label>
+                            <div className="mb-5">
+                                <label htmlFor="libraryId" className="block text-[16px] text-[#34495e] mb-2">
+                                    Identyfikator biblioteki:
+                                </label>
+                                <input
+                                    type="text"
+                                    id="libraryId"
+                                    name="libraryId"
+                                    value={libraryId}
+                                    onChange={handleInputChange}
+                                    required
+                                    maxLength={10}
+                                    className="p-2 border rounded-md w-full"
+                                />
+                            </div>
+
+                            <div className="mb-5">
+                                <label htmlFor="password" className="block text-[16px] text-[#34495e] mb-2">
+                                    Hasło:
+                                </label>
                                 <input
                                     type="password"
                                     id="password"
@@ -203,23 +191,22 @@ const LibraryAdminLogin: React.FC = () => {
                                     value={password}
                                     onChange={handleInputChange}
                                     required
-                                    maxLength={50}
-                                    className="peer p-2 border rounded-md w-full"
+                                    maxLength={25}
+                                    className="p-2 border rounded-md w-full"
                                 />
                             </div>
 
                             {error && (
-                                <div className="flex items-center gap-2 text-red-600 text-[14px] -mt-[3%] mb-[2%]">
+                                <div className="text-red-600 text-sm mb-4 flex items-center gap-2">
                                     <svg
-                                        className="flex-shrink-0 w-4 h-4"
+                                        className="w-4 h-4 flex-shrink-0"
                                         aria-hidden="true"
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                     >
                                         <path
-                                            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z"
-                                        />
+                                            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
                                     </svg>
                                     <p className="m-0">{error}</p>
                                 </div>
@@ -227,21 +214,11 @@ const LibraryAdminLogin: React.FC = () => {
 
                             <button
                                 type="submit"
-                                className="py-3 px-0 border-none rounded-lg bg-[#3B576C] text-white text-[1vw] cursor-pointer transition-all duration-300 hover:bg-[#314757]"
+                                className="py-3 rounded-lg bg-[#3B576C] text-white text-lg transition duration-300 hover:bg-[#314757]"
                             >
                                 Logowanie
                             </button>
                         </form>
-
-                        <div className="text-center mt-5">
-                            <Link to="/register">
-                                <button
-                                    className="py-3 px-8 w-full hover:text-[#7c92a3] transition-all duration-[0.3s] font-normal text-[#3B576C] text-base text-center tracking-[0] leading-[normal]"
-                                >
-                                    Nie jesteś zarejestrowany?
-                                </button>
-                            </Link>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -249,4 +226,4 @@ const LibraryAdminLogin: React.FC = () => {
     );
 };
 
-export default LibraryAdminLogin;
+export default LibrarianLogin;

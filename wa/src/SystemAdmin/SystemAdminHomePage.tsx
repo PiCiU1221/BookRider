@@ -1,8 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useWebSocketNotification} from '../Utils/useWebSocketNotification.tsx';
-import {toast} from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -33,6 +30,7 @@ const formatDate = (isoString: string) => {
 };
 
 const SystemAdminDashboard: React.FC = () => {
+    const [email, setEmail] = useState<string | null>(null);
     const [activeSection, setActiveSection] = useState<string>('librarySubmissions');
     const [driverApplications, setDriverApplications] = useState<DriverApplication[]>([]);
     const [libraryRequests, setLibraryRequests] = useState<LibraryRequest[]>([]);
@@ -44,22 +42,8 @@ const SystemAdminDashboard: React.FC = () => {
 
     const firstLoad = useRef(true);
 
-    useWebSocketNotification('administrator/library-requests', () => {
-        toast.info("Otrzymano nowe zgłoszenie biblioteki!", {
-            position: "bottom-right",
-        });
-        console.log("New library request received!");
-    });
-
-    useWebSocketNotification('administrator/driver-applications', () => {
-        toast.info("Otrzymano nowe zgłoszenie kierowcy!", {
-            position: "bottom-right",
-        });
-        console.log("New driver request received!");
-    });
-
-    const handleChangePassword = ()=> {
-        navigate('/system-admin-settings');
+    const getEmail = () => {
+        return localStorage.getItem('email');
     }
 
     const handleLogout = () => {
@@ -74,6 +58,11 @@ const SystemAdminDashboard: React.FC = () => {
         if (firstLoad.current) {
             firstLoad.current = false;
             return;
+        }
+
+        const userEmail = getEmail();
+        if (userEmail) {
+            setEmail(userEmail);
         }
 
         if (activeSection === 'driverSubmissions') {
@@ -189,9 +178,9 @@ const SystemAdminDashboard: React.FC = () => {
                 <div className="text-white p-4 flex justify-end">
 
                     <div className="flex items-center">
-                        <button onClick={handleChangePassword} className="bg-gray-700 text-white px-6 py-2 rounded-md ml-4 whitespace-nowrap">
-                            Ustawienia
-                        </button>
+                        {email && (
+                            <span className="mr-4">{email}</span>
+                        )}
                         <button onClick={handleLogout} className="bg-gray-700 text-white px-6 py-2 rounded-md ml-4 whitespace-nowrap">
                             Wyloguj się
                         </button>

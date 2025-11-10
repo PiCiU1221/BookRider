@@ -3,11 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const LibraryAdminLogin: React.FC = () => {
+const SysAdminLogin: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const [role, setRole] = useState<string>('library_administrator');
+    const [role, setRole] = useState<string>('system_administrator');
     const [emailValid, setEmailValid] = useState(true);
     const navigate = useNavigate();
 
@@ -62,26 +62,7 @@ const LibraryAdminLogin: React.FC = () => {
                     localStorage.setItem('role', role);
                     localStorage.setItem('email', email);
 
-                    const statusResponse = await fetch(`${API_BASE_URL}/api/library-requests/me?page=0&size=1`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
-                    });
-
-                    if (statusResponse.ok) {
-                        const requests = await statusResponse.json();
-                        const status = requests[0]?.status;
-
-                        if (status === 'PENDING') {
-                            navigate('/processing-info');
-                        } else if (status === 'APPROVED') {
-                            navigate('/library-admin-dashboard');
-                        } else {
-                            navigate('/add-library');
-                        }
-                    } else {
-                        navigate('/'); // landing page
-                    }
+                    navigate('/system-admin-dashboard');
 
                 } else {
                     setError('Authorization header missing');
@@ -172,15 +153,15 @@ const LibraryAdminLogin: React.FC = () => {
                         </Link>
                     </div>
                     <div
-                        className="absolute bg-white p-10 rounded-xl shadow-2xl w-[clamp(280px,30vw,400px)] h-[clamp(480px,55vh,90vh)] top-[25%] left-1/2 transform -translate-x-1/2">
-                        <h2 className="text-center mb-[25px] text-3xl font-semibold text-[#2c3e50] w-[100%] ">
-                            Logowanie administratora biblioteki
+                        className="absolute top-[25%] left-1/2 transform -translate-x-1/2 bg-white p-10 rounded-xl shadow-2xl w-[clamp(280px,30vw,400px)] h-[clamp(430px,48vh,90vh)]">
+                        <h2 className="text-center text-3xl font-semibold text-[#2c3e50] mb-6 w-[100%]">
+                            Logowanie <br/> administratora systemów
                         </h2>
-
                         <form onSubmit={handleSubmit} className="flex flex-col">
-                            <div className="mb-[20px]">
-                                <label htmlFor="email" className="text-[16px] text-[#34495e] mb-[8px] block">Adres
-                                    email:</label>
+                            <div className="mb-5">
+                                <label htmlFor="email" className="text-base text-[#34495e] mb-2 block">
+                                    Adres email:
+                                </label>
                                 <input
                                     type="text"
                                     id="email"
@@ -188,14 +169,17 @@ const LibraryAdminLogin: React.FC = () => {
                                     value={email}
                                     onChange={handleInputChange}
                                     required
-                                    maxLength={50}
-                                    className={`peer p-2 border rounded-md w-full ${!emailValid ? 'border-red-600' : 'border-gray-300'}`}
+                                    maxLength={25}
+                                    className={`peer p-2 border rounded-md w-full ${
+                                        !emailValid ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 />
                             </div>
 
-                            <div className="mb-[20px]">
-                                <label htmlFor="password"
-                                       className="text-[16px] text-[#34495e] mb-[8px] block">Hasło:</label>
+                            <div className="mb-5">
+                                <label htmlFor="password" className="text-base text-[#34495e] mb-2 block">
+                                    Hasło:
+                                </label>
                                 <input
                                     type="password"
                                     id="password"
@@ -203,23 +187,20 @@ const LibraryAdminLogin: React.FC = () => {
                                     value={password}
                                     onChange={handleInputChange}
                                     required
-                                    maxLength={50}
-                                    className="peer p-2 border rounded-md w-full"
+                                    maxLength={25}
+                                    className="peer p-2 border border-gray-300 rounded-md w-full"
                                 />
                             </div>
 
                             {error && (
-                                <div className="flex items-center gap-2 text-red-600 text-[14px] -mt-[3%] mb-[2%]">
+                                <div className="text-red-600 text-sm mb-4 flex items-center gap-2">
                                     <svg
-                                        className="flex-shrink-0 w-4 h-4"
-                                        aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="w-4 h-4"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                     >
                                         <path
-                                            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z"
-                                        />
+                                            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
                                     </svg>
                                     <p className="m-0">{error}</p>
                                 </div>
@@ -227,21 +208,11 @@ const LibraryAdminLogin: React.FC = () => {
 
                             <button
                                 type="submit"
-                                className="py-3 px-0 border-none rounded-lg bg-[#3B576C] text-white text-[1vw] cursor-pointer transition-all duration-300 hover:bg-[#314757]"
+                                className="py-3 px-0 rounded-lg bg-[#3B576C] text-white text-lg transition duration-300 hover:bg-[#314757]"
                             >
                                 Logowanie
                             </button>
                         </form>
-
-                        <div className="text-center mt-5">
-                            <Link to="/register">
-                                <button
-                                    className="py-3 px-8 w-full hover:text-[#7c92a3] transition-all duration-[0.3s] font-normal text-[#3B576C] text-base text-center tracking-[0] leading-[normal]"
-                                >
-                                    Nie jesteś zarejestrowany?
-                                </button>
-                            </Link>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -249,4 +220,4 @@ const LibraryAdminLogin: React.FC = () => {
     );
 };
 
-export default LibraryAdminLogin;
+export default SysAdminLogin;
