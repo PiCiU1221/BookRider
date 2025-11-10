@@ -112,7 +112,8 @@ const LibraryAdminHomePage: React.FC = () => {
                                 </div>
                             </div>
 
-                            {message && <p className="text-sm text-gray-700 mt-4">{message}</p>}
+                            {message && <p className="mt-4 p-4 rounded-md bg-green-100 text-[#3B576C]">{message}</p>}
+
                         </div>
                     </div>
                 </section>

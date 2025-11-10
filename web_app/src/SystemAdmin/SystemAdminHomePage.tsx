@@ -44,14 +44,14 @@ const SystemAdminDashboard: React.FC = () => {
 
     const firstLoad = useRef(true);
 
-    useWebSocketNotification('system-administrator/library-requests/pending', () => {
+    useWebSocketNotification('administrator/library-requests', () => {
         toast.info("Otrzymano nowe zgłoszenie biblioteki!", {
             position: "bottom-right",
         });
         console.log("New library request received!");
     });
 
-    useWebSocketNotification('system-administrator/driver-requests/pending', () => {
+    useWebSocketNotification('administrator/driver-applications', () => {
         toast.info("Otrzymano nowe zgłoszenie kierowcy!", {
             position: "bottom-right",
         });

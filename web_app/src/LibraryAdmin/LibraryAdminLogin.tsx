@@ -80,7 +80,7 @@ const LibraryAdminLogin: React.FC = () => {
                             navigate('/add-library');
                         }
                     } else {
-                        navigate('/'); // Landing page
+                        navigate('/'); // landing page
                     }
 
                 } else {
