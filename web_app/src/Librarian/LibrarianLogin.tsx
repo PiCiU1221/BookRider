@@ -159,7 +159,7 @@ const LibrarianLogin: React.FC = () => {
                                     value={username}
                                     onChange={handleInputChange}
                                     required
-                                    maxLength={25}
+                                    maxLength={50}
                                     className="p-2 border rounded-md w-full"
                                 />
                             </div>
@@ -191,7 +191,7 @@ const LibrarianLogin: React.FC = () => {
                                     value={password}
                                     onChange={handleInputChange}
                                     required
-                                    maxLength={25}
+                                    maxLength={50}
                                     className="p-2 border rounded-md w-full"
                                 />
                             </div>

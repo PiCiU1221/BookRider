@@ -169,7 +169,7 @@ const SysAdminLogin: React.FC = () => {
                                     value={email}
                                     onChange={handleInputChange}
                                     required
-                                    maxLength={25}
+                                    maxLength={50}
                                     className={`peer p-2 border rounded-md w-full ${
                                         !emailValid ? 'border-red-500' : 'border-gray-300'
                                     }`}
@@ -187,7 +187,7 @@ const SysAdminLogin: React.FC = () => {
                                     value={password}
                                     onChange={handleInputChange}
                                     required
-                                    maxLength={25}
+                                    maxLength={50}
                                     className="peer p-2 border border-gray-300 rounded-md w-full"
                                 />
                             </div>
