@@ -28,11 +28,10 @@ public interface LibraryRepository extends JpaRepository<Library, Integer> {
             WHERE lb.book_id = :bookId
         )
         ORDER BY 
-            (6371 * acos(
-                cos(radians(:userLat)) * cos(radians(a.latitude)) *
-                cos(radians(a.longitude) - radians(:userLon)) +
-                sin(radians(:userLat)) * sin(radians(a.latitude))
-            )) ASC
+            ST_Distance(
+                ST_SetSRID(ST_MakePoint(a.longitude, a.latitude), 4326)::geography,
+                ST_SetSRID(ST_MakePoint(:userLon, :userLat), 4326)::geography
+            ) ASC
         LIMIT 5
     """, nativeQuery = true)
     List<Library> findNearestLibrariesWithBook(
