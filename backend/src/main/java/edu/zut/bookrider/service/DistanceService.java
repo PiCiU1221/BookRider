@@ -28,13 +28,7 @@ public class DistanceService {
         BigDecimal endLat = BigDecimal.valueOf(endCoordinates.getLatitude());
         BigDecimal endLon = BigDecimal.valueOf(endCoordinates.getLongitude());
 
-        Optional<DistanceCache> cachedDistance = distanceCacheRepository
-                .findByStartLatitudeAndStartLongitudeAndEndLatitudeAndEndLongitude(startLat, startLon, endLat, endLon);
-
-        if (cachedDistance.isEmpty()) {
-            cachedDistance = distanceCacheRepository
-                    .findByStartLatitudeAndStartLongitudeAndEndLatitudeAndEndLongitude(endLat, endLon, startLat, startLon);
-        }
+        Optional<DistanceCache> cachedDistance = distanceCacheRepository.findByCoordinates(startLat, startLon, endLat, endLon);
 
         if (cachedDistance.isPresent()) {
             return cachedDistance.get().getDistance();
