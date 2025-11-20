@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -402,13 +401,7 @@ public class OrderService {
 
         byte[] imageBase64 = Base64.getDecoder().decode(requestDTO.getPhotoBase64());
         MultipartFile multipartFile = new BASE64DecodedMultipartFile(imageBase64);
-        String deliveryPhotoUrl;
-
-        try {
-            deliveryPhotoUrl = imageUploadService.uploadImage(multipartFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String deliveryPhotoUrl = imageUploadService.uploadImage(multipartFile);
 
         order.setDeliveryPhotoUrl(deliveryPhotoUrl);
         order.setDeliveredAt(LocalDateTime.now());

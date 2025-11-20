@@ -16,11 +16,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -51,7 +49,7 @@ public class DriverDocumentServiceTest {
     }
 
     @Test
-    void whenValidInputData_thenReturnCreatedDTO() throws IOException {
+    void whenValidInputData_thenReturnCreatedDTO() {
         String documentUrl = "http://example.com/driver-license.jpg";
         MultipartFile multipartFile = new MockMultipartFile("driver_license.jpg", documentDto.getImageInBytes());
         when(imageUploadService.uploadImage(multipartFile)).thenReturn(documentUrl);
@@ -69,14 +67,5 @@ public class DriverDocumentServiceTest {
         assertEquals(DocumentType.DRIVER_LICENSE, response.getDocumentType());
         assertEquals(documentUrl, response.getDocumentPhotoUrl());
         assertEquals(LocalDate.now().plusYears(5), response.getExpiryDate());
-    }
-
-    @Test
-    void whenInvalidImageInRequest_thenThrowException() throws IOException {
-        when(imageUploadService.uploadImage(any())).thenThrow(new IOException());
-
-        assertThrows(IOException.class, () -> {
-            driverDocumentService.saveDriverDocument(documentDto, applicationRequest);
-        });
     }
 }
