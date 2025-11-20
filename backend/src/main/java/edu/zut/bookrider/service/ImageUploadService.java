@@ -2,6 +2,7 @@ package edu.zut.bookrider.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.zut.bookrider.exception.ImageProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,101 +30,121 @@ import java.util.Iterator;
 public class ImageUploadService {
 
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
-    public String uploadImage(MultipartFile imageFile) throws IOException {
-        // Compress the image
-        byte[] compressedImageBytes = compressImage(imageFile.getBytes());
+    private static final int MAX_DIMENSION = 1600;
+    private static final float JPG_QUALITY = 0.8f;
 
-        // Encode the compressed image bytes to base64
-        String base64Image = Base64.getEncoder().encodeToString(compressedImageBytes);
+    public String uploadImage(MultipartFile imageFile) {
+        try {
+            byte[] resizedBytes = resizeAndCompress(imageFile.getBytes());
 
-        // Prepare the request body
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            String base64Image = Base64.getEncoder().encodeToString(resizedBytes);
 
-        // key is public, no need to hide it
-        String apiKey = "6d207e02198a847aa98d0a2a901485a5";
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
-        body.add("key", apiKey);
-        body.add("action", "upload");
-        body.add("source", base64Image);
-        body.add("format", "json");
+            // key is public, no need to hide it
+            String apiKey = "6d207e02198a847aa98d0a2a901485a5";
 
-        String apiUrl = "https://freeimage.host/api/1/upload";
+            body.add("key", apiKey);
+            body.add("action", "upload");
+            body.add("source", base64Image);
+            body.add("format", "json");
 
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(
-                apiUrl,
-                new HttpEntity<>(body),
-                String.class
-        );
+            String apiUrl = "https://freeimage.host/api/1/upload";
 
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+                    apiUrl,
+                    new HttpEntity<>(body),
+                    String.class
+            );
+
+            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException("Failed to upload image: " + responseEntity.getStatusCode());
+            }
+
             return extractImageUrlFromResponse(responseEntity.getBody());
-        } else {
-            throw new RuntimeException("Failed to upload image: " + responseEntity.getStatusCode());
+        } catch (IOException e) {
+            throw new ImageProcessingException("Failed to process uploaded image: " + e.getMessage());
         }
     }
 
     private String extractImageUrlFromResponse(String responseBody) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-
         return jsonNode.path("image").path("url").asText();
     }
 
-    private byte[] compressImage(byte[] originalImageBytes) throws IOException {
-        // Convert the original image bytes to BufferedImage
-        BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(originalImageBytes));
+    private BufferedImage createOptimizedImage(BufferedImage src, int targetWidth, int targetHeight) {
+        BufferedImage img = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = img.createGraphics();
 
-        // Ensure the image is in a compatible RGB color space
-        BufferedImage rgbImage = new BufferedImage(
-                originalImage.getWidth(),
-                originalImage.getHeight(),
-                BufferedImage.TYPE_INT_RGB
-        );
-        rgbImage.createGraphics().drawImage(originalImage, 0, 0, null);
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, targetWidth, targetHeight);
 
-        // Set the compression quality based on the original image size
-        float compressionQuality = calculateCompressionQuality(originalImageBytes.length);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Create a ByteArrayOutputStream to hold the compressed image bytes
-        ByteArrayOutputStream compressedImageOutputStream = new ByteArrayOutputStream();
+        g.drawImage(src, 0, 0, targetWidth, targetHeight, null);
+        g.dispose();
 
-        // Get all available ImageWriters
-        Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
-        if (writers.hasNext()) {
-            ImageWriter writer = writers.next();
-            ImageWriteParam writeParam = writer.getDefaultWriteParam();
-
-            // Set compression quality
-            writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            writeParam.setCompressionQuality(compressionQuality);
-
-            // Write the compressed image bytes to the ByteArrayOutputStream
-            try (ImageOutputStream ios = ImageIO.createImageOutputStream(compressedImageOutputStream)) {
-                writer.setOutput(ios);
-                writer.write(null, new IIOImage(rgbImage, null, null), writeParam);
-            } finally {
-                writer.dispose();
-            }
-        }
-
-        return compressedImageOutputStream.toByteArray();
+        return img;
     }
 
-    private float calculateCompressionQuality(int originalImageSize) {
-        // Set a threshold for image size above which we apply more compression
-        int sizeThreshold = 10 * 1024 * 1024; // 10 MB
-
-        // Set the initial compression quality
-        float initialCompressionQuality = 0.8f;
-
-        // Adjust compression quality based on image size
-        if (originalImageSize > sizeThreshold) {
-            // If the original image is larger than 10MB, increase compression to reduce size
-            return 0.5f;
-        } else {
-            // Otherwise, use the initial compression quality
-            return initialCompressionQuality;
+    private BufferedImage convertToRGB(BufferedImage img) {
+        if (img.getType() == BufferedImage.TYPE_INT_RGB) {
+            return img;
         }
+        return createOptimizedImage(img, img.getWidth(), img.getHeight());
+    }
+
+
+    private BufferedImage resizeImage(BufferedImage img) {
+        float scale = (float) MAX_DIMENSION / Math.max(img.getWidth(), img.getHeight());
+        int newWidth = Math.round(img.getWidth() * scale);
+        int newHeight = Math.round(img.getHeight() * scale);
+
+        return createOptimizedImage(img, newWidth, newHeight);
+    }
+
+    private byte[] encodeJpg(BufferedImage img) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
+        if (!writers.hasNext()) {
+            throw new IllegalStateException("No JPG writers available");
+        }
+
+        ImageWriter writer = writers.next();
+        ImageWriteParam param = writer.getDefaultWriteParam();
+        param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+        param.setCompressionQuality(JPG_QUALITY);
+
+        try (ImageOutputStream ios = ImageIO.createImageOutputStream(out)) {
+            writer.setOutput(ios);
+            writer.write(null, new IIOImage(img, null, null), param);
+        } finally {
+            writer.dispose();
+        }
+
+        return out.toByteArray();
+    }
+
+    private byte[] resizeAndCompress(byte[] inputBytes) throws IOException {
+        BufferedImage original = ImageIO.read(new ByteArrayInputStream(inputBytes));
+        if (original == null) {
+            throw new IOException("Invalid image data");
+        }
+
+        BufferedImage processed;
+        int maxSide = Math.max(original.getWidth(), original.getHeight());
+
+        if (maxSide > MAX_DIMENSION) {
+            processed = resizeImage(original);
+        } else {
+            processed = convertToRGB(original);
+        }
+
+        return encodeJpg(processed);
     }
 }
