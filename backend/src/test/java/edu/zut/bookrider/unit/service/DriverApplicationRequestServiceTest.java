@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
