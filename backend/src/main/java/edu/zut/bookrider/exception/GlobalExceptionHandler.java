@@ -237,6 +237,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(ImageProcessingException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleImageProcessingException(ImageProcessingException ex) {
+        ApiErrorResponseDTO errorResponse = new ApiErrorResponseDTO(422, ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleIllegalStateException(IllegalStateException ex) {
