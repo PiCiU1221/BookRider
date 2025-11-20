@@ -135,13 +135,7 @@ public class BookService {
 
         byte[] imageBase64 = Base64.getDecoder().decode(bookRequestDto.getImage());
         MultipartFile multipartFile = new BASE64DecodedMultipartFile(imageBase64);
-        String coverImageUrl;
-
-        try {
-            coverImageUrl = imageUploadService.uploadImage(multipartFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String coverImageUrl = imageUploadService.uploadImage(multipartFile);
 
         Book book = new Book();
         book.setTitle(bookRequestDto.getTitle());
@@ -203,13 +197,8 @@ public class BookService {
 
         byte[] imageBase64 = Base64.getDecoder().decode(bookRequestDto.getImage());
         MultipartFile multipartFile = new BASE64DecodedMultipartFile(imageBase64);
-        String coverImageUrl;
 
-        try {
-            coverImageUrl = imageUploadService.uploadImage(multipartFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String coverImageUrl = imageUploadService.uploadImage(multipartFile);
 
         book.setTitle(bookRequestDto.getTitle());
         book.setReleaseYear(bookRequestDto.getReleaseYear());

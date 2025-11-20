@@ -23,7 +23,7 @@ public class DriverDocumentService {
     public CreateDriverDocumentResponseDTO saveDriverDocument(
             @Valid CreateDriverDocumentDTO documentDto,
             DriverApplicationRequest applicationRequest
-    ) throws IOException {
+    ) {
         MultipartFile multipartFile = new BASE64DecodedMultipartFile(documentDto.getImageInBytes());
 
         String documentUrl = imageUploadService.uploadImage(multipartFile);

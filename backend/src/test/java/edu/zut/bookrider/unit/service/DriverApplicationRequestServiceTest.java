@@ -89,7 +89,7 @@ public class DriverApplicationRequestServiceTest {
     }
 
     @Test
-    void whenValidInputData_thenReturnCreatedDTO() throws IOException {
+    void whenValidInputData_thenReturnCreatedDTO() {
         when(authentication.getName()).thenReturn("driver@email.com:driver");
         when(userRepository.findByEmailAndRoleName("driver@email.com", "driver")).thenReturn(java.util.Optional.of(driver));
         when(driverApplicationRequestRepository.existsByUserIdAndPendingOrUnderReview(driver.getId())).thenReturn(false);
@@ -120,21 +120,6 @@ public class DriverApplicationRequestServiceTest {
         when(driverApplicationRequestRepository.existsByUserIdAndPendingOrUnderReview(driver.getId())).thenReturn(true);
 
         assertThrows(IllegalStateException.class, () -> {
-            driverApplicationRequestService.createDriverApplication(authentication, List.of(documentDto));
-        });
-    }
-
-    @Test
-    void whenImageUploadFails_thenThrowException() throws IOException {
-        when(authentication.getName()).thenReturn("driver@email.com:driver");
-        when(userRepository.findByEmailAndRoleName("driver@email.com", "driver")).thenReturn(java.util.Optional.of(driver));
-        when(driverApplicationRequestRepository.existsByUserIdAndPendingOrUnderReview(driver.getId())).thenReturn(false);
-
-        when(driverApplicationRequestRepository.save(any(DriverApplicationRequest.class))).thenReturn(applicationRequest);
-
-        when(driverDocumentService.saveDriverDocument(documentDto, applicationRequest)).thenThrow(new IOException("Upload failed"));
-
-        assertThrows(RuntimeException.class, () -> {
             driverApplicationRequestService.createDriverApplication(authentication, List.of(documentDto));
         });
     }

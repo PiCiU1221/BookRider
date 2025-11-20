@@ -95,15 +95,11 @@ public class DriverApplicationRequestService {
         List<CreateDriverDocumentResponseDTO> createdDocuments = new ArrayList<>();
 
         for (CreateDriverDocumentDTO documentDTO : documents) {
-            try {
-                CreateDriverDocumentResponseDTO createdDocument = driverDocumentService.saveDriverDocument(
-                        documentDTO,
-                        savedRequest
-                );
-                createdDocuments.add(createdDocument);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            CreateDriverDocumentResponseDTO createdDocument = driverDocumentService.saveDriverDocument(
+                    documentDTO,
+                    savedRequest
+            );
+            createdDocuments.add(createdDocument);
         }
 
         List<User> administrators = userService.getAllAdministrators();
