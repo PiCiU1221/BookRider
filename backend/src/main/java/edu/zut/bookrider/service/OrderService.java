@@ -429,8 +429,8 @@ public class OrderService {
 
             User user = order.getUser();
             webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/delivered");
-            webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/pending");
-            webSocketHandler.sendRefreshSignal(user.getEmail(), "driver/order-history");
+            webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/in-realization");
+            webSocketHandler.sendRefreshSignal(driver.getEmail(), "driver/in-realization");
 
             return new DeliverOrderResponseDTO(true);
         }
