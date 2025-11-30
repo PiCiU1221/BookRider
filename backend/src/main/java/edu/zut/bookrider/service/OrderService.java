@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static edu.zut.bookrider.config.SystemConstants.SERVICE_FEE_PERCENTAGE;
+import static edu.zut.bookrider.config.SystemConstants.URGENT_ORDER_THRESHOLD_MINUTES;
 import static java.util.Objects.isNull;
 
 @RequiredArgsConstructor
@@ -272,10 +273,14 @@ public class OrderService {
             @Valid CoordinateDTO location, double maxDistanceInMeters, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        LocalDateTime olderThanDate = LocalDateTime.now().minusMinutes(URGENT_ORDER_THRESHOLD_MINUTES);
         Page<Order> pendingOrders = orderRepository.findOrdersForDriverWithDistance(
                 BigDecimal.valueOf(location.getLatitude()),
                 BigDecimal.valueOf(location.getLongitude()),
-                maxDistanceInMeters, pageable);
+                maxDistanceInMeters,
+                olderThanDate,
+                pageable
+        );
 
         List<OrderResponseDTO> pendingOrderDtos = pendingOrders.getContent().stream().map(order -> {
             OrderResponseDTO dto = orderMapper.map(order);
