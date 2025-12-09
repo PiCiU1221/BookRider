@@ -24,6 +24,8 @@ const LibraryAdminAddLibrary: React.FC = () => {
         emailAddress: '',
     });
 
+    const [errorMessage, setErrorMessage] = useState<string>('');
+
     const handleLogout = () => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('role');
@@ -38,6 +40,7 @@ const LibraryAdminAddLibrary: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setErrorMessage('');
 
         const requestBody = {
             street: formData.addressLine,
@@ -64,9 +67,11 @@ const LibraryAdminAddLibrary: React.FC = () => {
                 navigate('/processing-info');
             } else {
                 console.error('Error submitting request', response.statusText);
+                setErrorMessage('Wystąpił błąd podczas wysyłania formularza.');
             }
         } catch (error) {
             console.error('Error:', error);
+            setErrorMessage('Nie udało się połączyć z serwerem. Sprawdź swoje połączenie internetowe.');
         }
     };
 
@@ -129,6 +134,11 @@ const LibraryAdminAddLibrary: React.FC = () => {
                                 Złóż podanie
                             </button>
                         </div>
+                        {errorMessage && (
+                            <p className="mt-6 text-left text-red-600 font-semibold">
+                                {errorMessage}
+                            </p>
+                        )}
                     </form>
                 </section>
             </main>
