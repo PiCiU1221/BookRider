@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
-import SubmissionDetailsDriver from '../../../SystemAdmin/SubmissionDetailsDriver';
+import SubmissionDetailsLibrary from '../../../SystemAdmin/SubmissionDetailsLibrary';
 
 const mockedNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -9,34 +9,38 @@ vi.mock('react-router-dom', async () => {
     return {
         ...actual,
         useNavigate: () => mockedNavigate,
-        useParams: () => ({ submissionId: '123' }),
+        useParams: () => ({ submissionId: '555' }),
     };
 });
 
 vi.stubGlobal('import', { meta: { env: { VITE_API_BASE_URL: 'http://localhost:8080' } } });
 
-describe('SubmissionDetailsDriver', () => {
-    const mockDriverApp = {
-        id: 123,
-        userEmail: 'driver@test.com',
-        reviewerID: null,
+describe('SubmissionDetailsLibrary', () => {
+    const mockLibraryRequest = {
+        id: 555,
+        creatorEmail: 'librarian@test.com',
+        reviewerId: null,
+        address: {
+            id: 1,
+            street: 'Main St 123',
+            city: 'Warsaw',
+            postalCode: '00-001',
+            latitude: 52.2297,
+            longitude: 21.0122,
+        },
+        libraryName: 'Central Library',
+        phoneNumber: '123-456-789',
+        libraryEmail: 'contact@library.com',
         status: 'PENDING',
-        submittedAt: '2023-11-01T10:00:00Z',
+        submittedAt: '2023-11-15T10:00:00Z',
         reviewedAt: null,
         rejectionReason: null,
-        driverDocuments: [
-            {
-                documentType: 'License',
-                documentPhotoUrl: 'http://img.url/license.jpg',
-                expiryDate: '2025-01-01T00:00:00Z',
-            },
-        ],
     };
 
     const renderComponent = () => {
         return render(
             <BrowserRouter>
-                <SubmissionDetailsDriver />
+                <SubmissionDetailsLibrary />
             </BrowserRouter>
         );
     };
@@ -44,7 +48,7 @@ describe('SubmissionDetailsDriver', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         global.fetch = vi.fn();
-        localStorage.setItem('access_token', 'fake-token');
+        localStorage.setItem('access_token', 'fake-admin-token');
         localStorage.setItem('email', 'admin@test.com');
     });
 
@@ -53,26 +57,27 @@ describe('SubmissionDetailsDriver', () => {
         localStorage.clear();
     });
 
-    it('renders loading state then displays application details', async () => {
+    it('renders loading state then displays library details', async () => {
         (global.fetch as any).mockResolvedValueOnce({
             ok: true,
-            json: async () => mockDriverApp,
+            json: async () => mockLibraryRequest,
         });
 
         renderComponent();
 
-        expect(screen.getByAltText(/Book.*Logo/i)).toBeInTheDocument();
+        expect(screen.getByAltText('Book Rider Logo')).toBeInTheDocument();
         expect(screen.getByText('admin@test.com')).toBeInTheDocument();
 
         await waitFor(() => {
-            expect(screen.getByText('Szczegóły podania nr: 123')).toBeInTheDocument();
-            expect(screen.getByText('Email użytkownika:')).toBeInTheDocument();
-            expect(screen.getByText('driver@test.com')).toBeInTheDocument();
-            expect(screen.getByText('License')).toBeInTheDocument();
+            expect(screen.getByText('Szczegóły podania nr: 555')).toBeInTheDocument();
+            expect(screen.getByText('Central Library')).toBeInTheDocument();
+            expect(screen.getByText('Main St 123, Warsaw, 00-001')).toBeInTheDocument();
+            expect(screen.getByText('librarian@test.com')).toBeInTheDocument();
+            expect(screen.getByText('123-456-789')).toBeInTheDocument();
         });
 
         expect(global.fetch).toHaveBeenCalledWith(
-            expect.stringContaining('/api/driver-applications/123'),
+            expect.stringContaining('/api/library-requests/555'),
             expect.objectContaining({ method: 'GET' })
         );
     });
@@ -80,20 +85,20 @@ describe('SubmissionDetailsDriver', () => {
     it('handles API errors gracefully', async () => {
         (global.fetch as any).mockResolvedValueOnce({
             ok: false,
-            statusText: 'Not Found',
+            statusText: 'Internal Server Error',
         });
 
         renderComponent();
 
         await waitFor(() => {
-            expect(screen.getByText('Błąd podczas pobierania danych.')).toBeInTheDocument();
+            expect(screen.getByText('Error: Failed to fetch library request')).toBeInTheDocument();
         });
     });
 
-    it('approves the application when "Zatwierdź" is clicked', async () => {
+    it('approves the library request when "Zatwierdź" is clicked', async () => {
         (global.fetch as any).mockResolvedValueOnce({
             ok: true,
-            json: async () => mockDriverApp,
+            json: async () => mockLibraryRequest,
         });
 
         renderComponent();
@@ -109,17 +114,17 @@ describe('SubmissionDetailsDriver', () => {
 
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalledWith(
-                expect.stringContaining('/api/driver-applications/123/status?status=APPROVED'),
+                expect.stringContaining('/api/library-requests/555/status?status=APPROVED'),
                 expect.objectContaining({ method: 'PUT' })
             );
             expect(mockedNavigate).toHaveBeenCalledWith('/system-admin-dashboard');
         });
     });
 
-    it('rejects the application with a standard reason', async () => {
+    it('rejects the request with a standard reason', async () => {
         (global.fetch as any).mockResolvedValueOnce({
             ok: true,
-            json: async () => mockDriverApp,
+            json: async () => mockLibraryRequest,
         });
 
         renderComponent();
@@ -127,7 +132,7 @@ describe('SubmissionDetailsDriver', () => {
         const declineBtn = await screen.findByText('Odrzuć');
         fireEvent.click(declineBtn);
 
-        const reasonRadio = screen.getByLabelText('Nieprawidłowy dokument');
+        const reasonRadio = screen.getByLabelText(/Biblioteka została już dodana/i);
         fireEvent.click(reasonRadio);
 
         (global.fetch as any).mockResolvedValueOnce({
@@ -139,7 +144,9 @@ describe('SubmissionDetailsDriver', () => {
         fireEvent.click(submitBtn);
 
         await waitFor(() => {
-            const expectedUrl = '/api/driver-applications/123/status?status=REJECTED&rejectionReason=' + encodeURIComponent('Nieprawidłowy dokument');
+            const reason = 'Biblioteka została już dodana do systemu';
+            const expectedUrl = `/api/library-requests/555/status?status=REJECTED&rejectionReason=${encodeURIComponent(reason)}`;
+
             expect(global.fetch).toHaveBeenCalledWith(
                 expect.stringContaining(expectedUrl),
                 expect.objectContaining({ method: 'PUT' })
@@ -148,10 +155,10 @@ describe('SubmissionDetailsDriver', () => {
         });
     });
 
-    it('rejects the application with a CUSTOM reason', async () => {
+    it('rejects the request with a CUSTOM reason', async () => {
         (global.fetch as any).mockResolvedValueOnce({
             ok: true,
-            json: async () => mockDriverApp,
+            json: async () => mockLibraryRequest,
         });
 
         renderComponent();
@@ -160,8 +167,8 @@ describe('SubmissionDetailsDriver', () => {
 
         fireEvent.click(screen.getByLabelText('Inne'));
 
-        const input = screen.getByPlaceholderText('Podaj przyczynę odmowy akceptacji aplikacji');
-        fireEvent.change(input, { target: { value: 'Custom Reason Test' } });
+        const input = screen.getByPlaceholderText('Podaj przyczynę odmowy akceptacji podania');
+        fireEvent.change(input, { target: { value: 'Fake Library Address' } });
 
         (global.fetch as any).mockResolvedValueOnce({
             ok: true,
@@ -171,7 +178,7 @@ describe('SubmissionDetailsDriver', () => {
         fireEvent.click(screen.getByText('Wyślij'));
 
         await waitFor(() => {
-            const expectedUrl = encodeURIComponent('Custom Reason Test');
+            const expectedUrl = encodeURIComponent('Fake Library Address');
             expect(global.fetch).toHaveBeenCalledWith(
                 expect.stringContaining(expectedUrl),
                 expect.anything()
@@ -179,29 +186,10 @@ describe('SubmissionDetailsDriver', () => {
         });
     });
 
-    it('displays validation error if no reason is selected', async () => {
-        (global.fetch as any).mockResolvedValueOnce({
-            ok: true,
-            json: async () => mockDriverApp,
-        });
-
-        renderComponent();
-
-        fireEvent.click(await screen.findByText('Odrzuć'));
-
-        fireEvent.click(screen.getByText('Wyślij'));
-
-        await waitFor(() => {
-            expect(screen.getByText('Proszę podać powód odrzucenia.')).toBeInTheDocument();
-        });
-
-        expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
     it('displays validation error if "Inne" is selected but input is empty', async () => {
         (global.fetch as any).mockResolvedValueOnce({
             ok: true,
-            json: async () => mockDriverApp,
+            json: async () => mockLibraryRequest,
         });
 
         renderComponent();
@@ -213,27 +201,28 @@ describe('SubmissionDetailsDriver', () => {
         fireEvent.click(screen.getByText('Wyślij'));
 
         await waitFor(() => {
-            expect(screen.getByText('Proszę podać powód odrzucenia.')).toBeInTheDocument();
+            expect(screen.getByText('Podaj przyczynę odmowy.')).toBeInTheDocument();
         });
 
         expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
-    it('handles logout by clearing storage and navigating', async () => {
+    it('displays validation error if NO reason is selected', async () => {
         (global.fetch as any).mockResolvedValueOnce({
             ok: true,
-            json: async () => mockDriverApp,
+            json: async () => mockLibraryRequest,
         });
 
         renderComponent();
 
-        const logoutBtn = await screen.findByText('Wyloguj się');
+        fireEvent.click(await screen.findByText('Odrzuć'));
 
-        fireEvent.click(logoutBtn);
+        fireEvent.click(screen.getByText('Wyślij'));
 
-        expect(localStorage.getItem('access_token')).toBeNull();
-        expect(localStorage.getItem('role')).toBeNull();
+        await waitFor(() => {
+            expect(screen.getByText('Proszę podać powód odrzucenia.')).toBeInTheDocument();
+        });
 
-        expect(mockedNavigate).toHaveBeenCalledWith('/');
+        expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 });
