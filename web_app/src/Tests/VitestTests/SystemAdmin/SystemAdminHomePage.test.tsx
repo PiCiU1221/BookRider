@@ -54,7 +54,7 @@ describe('SystemAdminHomePage', () => {
         localStorage.clear();
     });
 
-    it('UNIT: Renders the dashboard static elements and initializes WebSockets', () => {
+    it('Renders the dashboard static elements and initializes WebSockets', () => {
         renderComponent();
 
         expect(screen.getByAltText('Book Rider Logo')).toBeInTheDocument();
@@ -65,7 +65,7 @@ describe('SystemAdminHomePage', () => {
         expect(useWebSocketNotification).toHaveBeenCalledWith('administrator/driver-applications', expect.any(Function));
     });
 
-    it('UNIT: Handles Logout', () => {
+    it('handles Logout', () => {
         renderComponent();
         localStorage.setItem('role', 'admin');
 
@@ -76,7 +76,7 @@ describe('SystemAdminHomePage', () => {
         expect(mockedNavigate).toHaveBeenCalledWith('/');
     });
 
-    it('INTEGRATION (Driver): Fetches data, displays list, and processes "Open" action', async () => {
+    it('Driver: fetches data, displays list, and processes "Open" action', async () => {
         (global.fetch as any).mockResolvedValueOnce({
             ok: true,
             json: async () => mockDriverData,
@@ -112,7 +112,7 @@ describe('SystemAdminHomePage', () => {
         });
     });
 
-    it('INTEGRATION (Library): Fetches data, displays list, and processes "Open" action', async () => {
+    it('Library: fetches data, displays list, and processes "Open" action', async () => {
         (global.fetch as any).mockImplementation((url: string, options: any) => {
             const method = options?.method || 'GET';
 
@@ -145,7 +145,7 @@ describe('SystemAdminHomePage', () => {
         fireEvent.click(screen.getByText('Podania o zatwierdzenie bibliotek'));
 
         await waitFor(() => {
-            expect(screen.getByText('Nazwa biblioteki: City Library')).toBeInTheDocument();
+            expect(screen.getByText('Nazwa biblioteki: Library 1')).toBeInTheDocument();
         });
 
         const openBtn = screen.getByText('Otwórz');
@@ -160,7 +160,7 @@ describe('SystemAdminHomePage', () => {
         });
     });
 
-    it('INTEGRATION: Appends new data when "Load More" is clicked', async () => {
+    it('appends new data when "Load More" is clicked', async () => {
         (global.fetch as any).mockResolvedValueOnce({
             ok: true,
             json: async () => mockDriverData,
