@@ -10,6 +10,14 @@ interface Librarian {
     lastName: string;
 }
 
+interface PasswordResetResponse {
+    id: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    tempPassword: string;
+}
+
 const LibraryAdminHomePage: React.FC = () => {
     const [usernameSearch, setUsernameSearch] = useState('');
     const [librarians, setLibrarians] = useState<Librarian[]>([]);
@@ -72,6 +80,10 @@ const LibraryAdminHomePage: React.FC = () => {
     };
 
     const resetPassword = async (username: string) => {
+        if (!window.confirm(`Czy na pewno chcesz zresetować hasło dla użytkownika "${username}"?`)) {
+            return;
+        }
+
         const token = localStorage.getItem('access_token');
         try {
             const res = await fetch(`${API_BASE_URL}/api/library-admins/librarians/reset-password/${username}`, {
@@ -80,7 +92,15 @@ const LibraryAdminHomePage: React.FC = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setMessage(res.ok ? 'Hasło bibliotekarza zresetowano pomyślnie.' : 'Nie udało się zresetować hasła bibliotekarza.');
+
+            if (res.ok) {
+                const data: PasswordResetResponse = await res.json();
+                const newPassword = data.tempPassword;
+
+                setMessage(`Hasło zresetowane dla ${username}. Nowe hasło: ${newPassword}`);
+            } else {
+                setMessage('Nie udało się zresetować hasła bibliotekarza.');
+            }
         } catch (err) {
             console.error(err);
             setMessage('Error resetting password');
@@ -210,7 +230,7 @@ const LibraryAdminHomePage: React.FC = () => {
                                 </div>
                             )}
 
-                            {message && <p className="text-sm text-gray-700 mt-4">{message}</p>}
+                            {message && <p className="mt-4 p-4 rounded-md bg-green-100 text-[#3B576C]">{message}</p>}
                         </div>
                     </div>
                 </section>
