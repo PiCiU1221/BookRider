@@ -40,9 +40,19 @@ const LibrarianHomePage: React.FC = () => {
         name: string;
     }
 
+    // UPDATED: Matches your new JSON structure
+    interface LibraryAddress {
+        street: string;
+        city: string;
+        postalCode: string;
+    }
+
     interface Library {
         id: number;
         name: string;
+        phoneNumber: string;
+        email: string;
+        address: LibraryAddress;
     }
 
     // Books
@@ -77,14 +87,25 @@ const LibrarianHomePage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const isFetchingRef = useRef(false);
 
+    // NEW: Ref for the scrollable list container
+    const listRef = useRef<HTMLUListElement>(null);
+
     useEffect(() => {
         fetchAssignedLibrary();
         fetchDropdownData();
     }, []);
 
+    // Logic to reset list when library toggle changes
     useEffect(() => {
         if (assignedLibrary !== null) {
-            fetchBooks(isUserLibraryChecked);
+            setBookSearchResults([]); // Clear existing results
+            setPage(0);
+            setHasMore(true);
+            // We use a timeout to allow state to settle before fetching
+            const timeoutId = setTimeout(() => {
+                fetchBooks(isUserLibraryChecked, 0);
+            }, 0);
+            return () => clearTimeout(timeoutId);
         }
     }, [isUserLibraryChecked, assignedLibrary]);
 
@@ -122,17 +143,29 @@ const LibrarianHomePage: React.FC = () => {
         }
     }, [deleteBooksMessage]);
 
-    // Lazy Loading
+    // UPDATED: Lazy Loading attached to the list element instead of window
     useEffect(() => {
         const handleScroll = () => {
-            const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000;
-            if (nearBottom && !isLoading && hasMore) {
-                fetchBooks(isUserLibraryChecked, page);
+            if (listRef.current) {
+                const { scrollTop, scrollHeight, clientHeight } = listRef.current;
+                // Check if scrolled near bottom
+                if (scrollTop + clientHeight >= scrollHeight - 50) {
+                    if (!isLoading && hasMore) {
+                        fetchBooks(isUserLibraryChecked, page);
+                    }
+                }
             }
         };
 
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        const listElement = listRef.current;
+        if (listElement) {
+            listElement.addEventListener('scroll', handleScroll);
+        }
+        return () => {
+            if (listElement) {
+                listElement.removeEventListener('scroll', handleScroll);
+            }
+        };
     }, [isLoading, hasMore, page, isUserLibraryChecked]);
 
     useWebSocketNotification('librarian/orders/pending', () => {
@@ -232,16 +265,20 @@ const LibrarianHomePage: React.FC = () => {
 
     const fetchBooks = async (filterByLibrary: boolean, pageToFetch: number = 0) => {
         const token = localStorage.getItem('access_token');
-        if (!token || isFetchingRef.current || isLoading || !hasMore) return;
+        // Prevent fetching if we are already loading or if there is no more data (unless it's page 0)
+        if (!token || isFetchingRef.current || (isLoading && pageToFetch !== 0) || (!hasMore && pageToFetch !== 0)) return;
 
         isFetchingRef.current = true;
         setIsLoading(true);
 
         const queryParams = new URLSearchParams();
 
-        if (filterByLibrary && assignedLibrary?.id) {
-            queryParams.append("libraryId", assignedLibrary.id.toString());
+        // --- API UPDATE START ---
+        // Changed from 'libraryId' to 'library' (string name) based on new requirements
+        if (filterByLibrary && assignedLibrary?.name) {
+            queryParams.append("library", assignedLibrary.name);
         }
+        // --- API UPDATE END ---
 
         if (bookSearchInput) queryParams.append("title", bookSearchInput);
         if (categoryInput) queryParams.append("category", categoryInput);
@@ -253,7 +290,7 @@ const LibrarianHomePage: React.FC = () => {
         if (releaseYearTo) queryParams.append("releaseYearTo", releaseYearTo.toString());
 
         queryParams.append("page", pageToFetch.toString());
-        queryParams.append("size", "2");
+        queryParams.append("size", "10"); // Adjusted size for better scrolling experience
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/books/search?${queryParams.toString()}`, {
@@ -269,9 +306,11 @@ const LibrarianHomePage: React.FC = () => {
             const data = await response.json();
             const newBooks = data.content;
 
-            setBookSearchResults(prev => [...prev, ...newBooks]);
+            setBookSearchResults(prev => pageToFetch === 0 ? newBooks : [...prev, ...newBooks]);
             setPage(pageToFetch + 1);
-            setHasMore(!data.last);
+
+            // Updated check based on new JSON response which has totalPages
+            setHasMore(data.currentPage < data.totalPages - 1);
 
         } catch (error) {
             console.error("Error: ", error);
@@ -286,8 +325,10 @@ const LibrarianHomePage: React.FC = () => {
             setBookSearchResults([]);
             setPage(0);
             setHasMore(true);
+            fetchBooks(isUserLibraryChecked, 0);
+        } else {
+            fetchBooks(isUserLibraryChecked, 0);
         }
-        fetchBooks(isUserLibraryChecked, 0);
     };
 
     const handleRedirectToAddBook = () => {
@@ -636,7 +677,10 @@ const LibrarianHomePage: React.FC = () => {
                     </div>
 
                     {searchResults.length > 0 ? (
-                        <ul className="mt-12 bg-white p-3 rounded max-h-[40vw] overflow-y-auto">
+                        <ul
+                            ref={listRef}
+                            className="mt-12 bg-white p-3 rounded max-h-[40vw] overflow-y-auto"
+                        >
                             {searchResults.map((book, index) => (
                                 <li
                                     key={index}
