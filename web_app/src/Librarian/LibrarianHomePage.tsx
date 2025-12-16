@@ -81,13 +81,11 @@ const LibrarianHomePage: React.FC = () => {
 
     const navigate = useNavigate();
 
-    // Lazy Loading for the book list display
+    // Lazy Loading
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const isFetchingRef = useRef(false);
-
-    // NEW: Ref for the scrollable list container
     const listRef = useRef<HTMLUListElement>(null);
 
     useEffect(() => {
@@ -95,13 +93,12 @@ const LibrarianHomePage: React.FC = () => {
         fetchDropdownData();
     }, []);
 
-    // Logic to reset list when library toggle changes
     useEffect(() => {
         if (assignedLibrary !== null) {
-            setBookSearchResults([]); // Clear existing results
+            setBookSearchResults([]);
             setPage(0);
             setHasMore(true);
-            // We use a timeout to allow state to settle before fetching
+
             const timeoutId = setTimeout(() => {
                 fetchBooks(isUserLibraryChecked, 0);
             }, 0);
@@ -143,12 +140,11 @@ const LibrarianHomePage: React.FC = () => {
         }
     }, [deleteBooksMessage]);
 
-    // UPDATED: Lazy Loading attached to the list element instead of window
+    // Lazy Loading
     useEffect(() => {
         const handleScroll = () => {
             if (listRef.current) {
                 const { scrollTop, scrollHeight, clientHeight } = listRef.current;
-                // Check if scrolled near bottom
                 if (scrollTop + clientHeight >= scrollHeight - 50) {
                     if (!isLoading && hasMore) {
                         fetchBooks(isUserLibraryChecked, page);
@@ -265,20 +261,17 @@ const LibrarianHomePage: React.FC = () => {
 
     const fetchBooks = async (filterByLibrary: boolean, pageToFetch: number = 0) => {
         const token = localStorage.getItem('access_token');
-        // Prevent fetching if we are already loading or if there is no more data (unless it's page 0)
-        if (!token || isFetchingRef.current || (isLoading && pageToFetch !== 0) || (!hasMore && pageToFetch !== 0)) return;
+        if (!token || isFetchingRef.current || (isLoading && pageToFetch !== 0) || (!hasMore && pageToFetch !== 0))
+            return;
 
         isFetchingRef.current = true;
         setIsLoading(true);
 
         const queryParams = new URLSearchParams();
 
-        // --- API UPDATE START ---
-        // Changed from 'libraryId' to 'library' (string name) based on new requirements
         if (filterByLibrary && assignedLibrary?.name) {
             queryParams.append("library", assignedLibrary.name);
         }
-        // --- API UPDATE END ---
 
         if (bookSearchInput) queryParams.append("title", bookSearchInput);
         if (categoryInput) queryParams.append("category", categoryInput);
@@ -290,7 +283,7 @@ const LibrarianHomePage: React.FC = () => {
         if (releaseYearTo) queryParams.append("releaseYearTo", releaseYearTo.toString());
 
         queryParams.append("page", pageToFetch.toString());
-        queryParams.append("size", "10"); // Adjusted size for better scrolling experience
+        queryParams.append("size", "10");
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/books/search?${queryParams.toString()}`, {
@@ -309,7 +302,6 @@ const LibrarianHomePage: React.FC = () => {
             setBookSearchResults(prev => pageToFetch === 0 ? newBooks : [...prev, ...newBooks]);
             setPage(pageToFetch + 1);
 
-            // Updated check based on new JSON response which has totalPages
             setHasMore(data.currentPage < data.totalPages - 1);
 
         } catch (error) {
