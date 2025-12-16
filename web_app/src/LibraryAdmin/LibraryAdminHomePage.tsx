@@ -160,7 +160,7 @@ const LibraryAdminHomePage: React.FC = () => {
                                         placeholder="Nazwa użytkownika"
                                         value={usernameSearch}
                                         onChange={(e) => setUsernameSearch(e.target.value)}
-                                        className="border border-gray-300 rounded p-2 w-full pr-10"
+                                        className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
                                     />
                                     {usernameSearch && (
                                         <button

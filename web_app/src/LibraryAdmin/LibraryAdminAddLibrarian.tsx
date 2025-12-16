@@ -85,21 +85,21 @@ const LibraryAdminHomePage: React.FC = () => {
                                         placeholder="Nazwa użytkownika"
                                         value={newLibrarian.username}
                                         onChange={(e) => setNewLibrarian({...newLibrarian, username: e.target.value})}
-                                        className="border border-gray-300 rounded p-2"
+                                        className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
                                     />
                                     <input
                                         type="text"
                                         placeholder="Imię"
                                         value={newLibrarian.firstName}
                                         onChange={(e) => setNewLibrarian({...newLibrarian, firstName: e.target.value})}
-                                        className="border border-gray-300 rounded p-2"
+                                        className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
                                     />
                                     <input
                                         type="text"
                                         placeholder="Nazwisko"
                                         value={newLibrarian.lastName}
                                         onChange={(e) => setNewLibrarian({...newLibrarian, lastName: e.target.value})}
-                                        className="border border-gray-300 rounded p-2"
+                                        className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
                                     />
                                 </div>
                                 <div className="relative flex justify-center items-center">
