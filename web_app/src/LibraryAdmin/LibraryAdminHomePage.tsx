@@ -108,6 +108,10 @@ const LibraryAdminHomePage: React.FC = () => {
     };
 
     const deleteLibrarian = async (username: string) => {
+        if (!window.confirm(`Czy na pewno chcesz konto użytkownika "${username}"? Tej operacji nie można cofnąć.`)) {
+            return;
+        }
+
         const token = localStorage.getItem('access_token');
         try {
             const res = await fetch(`${API_BASE_URL}/api/library-admins/librarians/${username}`, {
@@ -118,7 +122,7 @@ const LibraryAdminHomePage: React.FC = () => {
             });
             if (res.ok) {
                 setLibrarians(librarians.filter(lib => lib.username !== username));
-                setMessage('Usunięto bibliotekarza.');
+                setMessage('Usunięto bibliotekarza o nazwie użytkownika ' + username + '.');
             } else {
                 setMessage('Nie udało się usunąć bibliotekarza.');
             }

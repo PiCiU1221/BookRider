@@ -21,7 +21,7 @@ const LibraryAdminHomePage: React.FC = () => {
                 body: JSON.stringify(newLibrarian),
             });
             if (res.ok) {
-                setMessage('Dodano bibliotekarza.');
+                setMessage('Dodano bibliotekarza o nazwie użytkownika ' + newLibrarian.username + '.' );
                 setNewLibrarian({ username: '', firstName: '', lastName: '' });
             } else {
                 setMessage('Nie udało się dodać bibliotekarza.');
