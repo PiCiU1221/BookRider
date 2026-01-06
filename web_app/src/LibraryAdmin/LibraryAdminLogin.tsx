@@ -80,7 +80,7 @@ const LibraryAdminLogin: React.FC = () => {
                             navigate('/add-library');
                         }
                     } else {
-                        navigate('/'); // Landing page
+                        navigate('/'); // landing page
                     }
 
                 } else {
@@ -188,7 +188,7 @@ const LibraryAdminLogin: React.FC = () => {
                                     value={email}
                                     onChange={handleInputChange}
                                     required
-                                    maxLength={25}
+                                    maxLength={50}
                                     className={`peer p-2 border rounded-md w-full ${!emailValid ? 'border-red-600' : 'border-gray-300'}`}
                                 />
                             </div>
@@ -203,7 +203,7 @@ const LibraryAdminLogin: React.FC = () => {
                                     value={password}
                                     onChange={handleInputChange}
                                     required
-                                    maxLength={25}
+                                    maxLength={50}
                                     className="peer p-2 border rounded-md w-full"
                                 />
                             </div>

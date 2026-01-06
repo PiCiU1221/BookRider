@@ -210,12 +210,9 @@ public class RentalReturnService {
             Integer rentalId = requestDTO.getRentalId();
             Rental rental = rentalService.getRentalById(rentalId);
 
-            boolean isAlreadyReturned = rentalReturnItemService.isAlreadyReturned(rental);
-            if (isAlreadyReturned) {
+            if (rental.getStatus() == RentalStatus.RETURNED) {
                 throw new RentalAlreadyReturnedException("Rental " + rental.getId() + " has already been returned.");
             }
-
-            rentalService.updateRentalStatus(rentalId, RentalStatus.RETURN_IN_PROGRESS);
         }
     }
 
@@ -229,7 +226,7 @@ public class RentalReturnService {
         RentalReturn savedRentalReturn = rentalReturnRepository.save(rentalReturn);
 
         List<RentalReturnItem> rentalReturnItems = rentalReturnItemService.createRentalReturnItems(savedRentalReturn, rentals);
-        savedRentalReturn.setRentalReturnItems(rentalReturnItems);
+        savedRentalReturn.getRentalReturnItems().addAll(rentalReturnItems);
 
         return rentalReturnRepository.save(rentalReturn);
     }
@@ -262,7 +259,7 @@ public class RentalReturnService {
             RentalReturn savedRentalReturn = rentalReturnRepository.save(rentalReturn);
 
             List<RentalReturnItem> rentalReturnItems = rentalReturnItemService.createRentalReturnItems(savedRentalReturn, rentalsForLibrary);
-            savedRentalReturn.setRentalReturnItems(rentalReturnItems);
+            savedRentalReturn.getRentalReturnItems().addAll(rentalReturnItems);
 
             BigDecimal totalLateFees = BigDecimal.ZERO;
             for (RentalWithQuantityDTO rentalWithQuantityDTO : rentalsForLibrary) {

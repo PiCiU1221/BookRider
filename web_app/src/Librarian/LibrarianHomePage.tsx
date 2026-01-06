@@ -1,5 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
+import {useWebSocketNotification} from '../Utils/useWebSocketNotification.tsx';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -37,9 +40,19 @@ const LibrarianHomePage: React.FC = () => {
         name: string;
     }
 
+    // UPDATED: Matches your new JSON structure
+    interface LibraryAddress {
+        street: string;
+        city: string;
+        postalCode: string;
+    }
+
     interface Library {
         id: number;
         name: string;
+        phoneNumber: string;
+        email: string;
+        address: LibraryAddress;
     }
 
     // Books
@@ -68,6 +81,13 @@ const LibrarianHomePage: React.FC = () => {
 
     const navigate = useNavigate();
 
+    // Lazy Loading
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const isFetchingRef = useRef(false);
+    const listRef = useRef<HTMLUListElement>(null);
+
     useEffect(() => {
         fetchAssignedLibrary();
         fetchDropdownData();
@@ -75,7 +95,14 @@ const LibrarianHomePage: React.FC = () => {
 
     useEffect(() => {
         if (assignedLibrary !== null) {
-            fetchBooks(isUserLibraryChecked);
+            setBookSearchResults([]);
+            setPage(0);
+            setHasMore(true);
+
+            const timeoutId = setTimeout(() => {
+                fetchBooks(isUserLibraryChecked, 0);
+            }, 0);
+            return () => clearTimeout(timeoutId);
         }
     }, [isUserLibraryChecked, assignedLibrary]);
 
@@ -112,6 +139,37 @@ const LibrarianHomePage: React.FC = () => {
             };
         }
     }, [deleteBooksMessage]);
+
+    // Lazy Loading
+    useEffect(() => {
+        const handleScroll = () => {
+            if (listRef.current) {
+                const { scrollTop, scrollHeight, clientHeight } = listRef.current;
+                if (scrollTop + clientHeight >= scrollHeight - 50) {
+                    if (!isLoading && hasMore) {
+                        fetchBooks(isUserLibraryChecked, page);
+                    }
+                }
+            }
+        };
+
+        const listElement = listRef.current;
+        if (listElement) {
+            listElement.addEventListener('scroll', handleScroll);
+        }
+        return () => {
+            if (listElement) {
+                listElement.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, [isLoading, hasMore, page, isUserLibraryChecked]);
+
+    useWebSocketNotification('librarian/orders/pending', () => {
+        toast.info("Otrzymano nowe zamówienie!", {
+            position: "bottom-right",
+        });
+        console.log("New order received!");
+    });
 
     const fetchDropdownData = async () => {
         const token = localStorage.getItem('access_token');
@@ -201,9 +259,13 @@ const LibrarianHomePage: React.FC = () => {
         }
     };
 
-    const fetchBooks = async (filterByLibrary: boolean) => {
+    const fetchBooks = async (filterByLibrary: boolean, pageToFetch: number = 0) => {
         const token = localStorage.getItem('access_token');
-        if (!token) return;
+        if (!token || isFetchingRef.current || (isLoading && pageToFetch !== 0) || (!hasMore && pageToFetch !== 0))
+            return;
+
+        isFetchingRef.current = true;
+        setIsLoading(true);
 
         const queryParams = new URLSearchParams();
 
@@ -220,8 +282,8 @@ const LibrarianHomePage: React.FC = () => {
         if (releaseYearFrom) queryParams.append("releaseYearFrom", releaseYearFrom.toString());
         if (releaseYearTo) queryParams.append("releaseYearTo", releaseYearTo.toString());
 
-        queryParams.append("page", "0");
-        queryParams.append("size", "20");
+        queryParams.append("page", pageToFetch.toString());
+        queryParams.append("size", "10");
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/books/search?${queryParams.toString()}`, {
@@ -232,22 +294,33 @@ const LibrarianHomePage: React.FC = () => {
                 },
             });
 
-            if (!response.ok) {
-                throw new Error(`Error: ${response.statusText}`);
-            }
+            if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
             const data = await response.json();
-            setBookSearchResults(data.content);
+            const newBooks = data.content;
+
+            setBookSearchResults(prev => pageToFetch === 0 ? newBooks : [...prev, ...newBooks]);
+            setPage(pageToFetch + 1);
+
+            setHasMore(data.currentPage < data.totalPages - 1);
+
         } catch (error) {
             console.error("Error: ", error);
+        } finally {
+            setIsLoading(false);
+            isFetchingRef.current = false;
         }
     };
 
     const handleSearch = (reset: boolean = false) => {
         if (reset) {
             setBookSearchResults([]);
+            setPage(0);
+            setHasMore(true);
+            fetchBooks(isUserLibraryChecked, 0);
+        } else {
+            fetchBooks(isUserLibraryChecked, 0);
         }
-        fetchBooks(isUserLibraryChecked);
     };
 
     const handleRedirectToAddBook = () => {
@@ -596,7 +669,10 @@ const LibrarianHomePage: React.FC = () => {
                     </div>
 
                     {searchResults.length > 0 ? (
-                        <ul className="mt-12 bg-white p-3 rounded max-h-[40vw] overflow-y-auto">
+                        <ul
+                            ref={listRef}
+                            className="mt-12 bg-white p-3 rounded max-h-[40vw] overflow-y-auto"
+                        >
                             {searchResults.map((book, index) => (
                                 <li
                                     key={index}

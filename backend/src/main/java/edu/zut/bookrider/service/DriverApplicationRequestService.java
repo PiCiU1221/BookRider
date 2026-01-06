@@ -23,7 +23,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -95,15 +94,11 @@ public class DriverApplicationRequestService {
         List<CreateDriverDocumentResponseDTO> createdDocuments = new ArrayList<>();
 
         for (CreateDriverDocumentDTO documentDTO : documents) {
-            try {
-                CreateDriverDocumentResponseDTO createdDocument = driverDocumentService.saveDriverDocument(
-                        documentDTO,
-                        savedRequest
-                );
-                createdDocuments.add(createdDocument);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            CreateDriverDocumentResponseDTO createdDocument = driverDocumentService.saveDriverDocument(
+                    documentDTO,
+                    savedRequest
+            );
+            createdDocuments.add(createdDocument);
         }
 
         List<User> administrators = userService.getAllAdministrators();

@@ -142,7 +142,7 @@ const LibrarianLogin: React.FC = () => {
                         </Link>
                     </div>
                     <div
-                        className="absolute top-[22%] left-1/2 transform -translate-x-1/2 bg-white p-10 rounded-xl shadow-2xl w-[clamp(280px,30vw,400px)] h-[clamp(505px,55vh,90vh)]">
+                        className="absolute top-[22%] left-1/2 transform -translate-x-1/2 bg-white p-10 rounded-xl shadow-2xl w-[clamp(280px,400px,400px)] h-[clamp(550px,55px,90px)]">
                         <h2 className="text-center mb-6 text-3xl font-semibold text-[#2c3e50]">
                             Logowanie bibliotekarza
                         </h2>
@@ -159,7 +159,7 @@ const LibrarianLogin: React.FC = () => {
                                     value={username}
                                     onChange={handleInputChange}
                                     required
-                                    maxLength={25}
+                                    maxLength={50}
                                     className="p-2 border rounded-md w-full"
                                 />
                             </div>
@@ -191,7 +191,7 @@ const LibrarianLogin: React.FC = () => {
                                     value={password}
                                     onChange={handleInputChange}
                                     required
-                                    maxLength={25}
+                                    maxLength={50}
                                     className="p-2 border rounded-md w-full"
                                 />
                             </div>

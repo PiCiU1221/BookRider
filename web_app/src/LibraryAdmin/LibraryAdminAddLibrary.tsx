@@ -24,6 +24,8 @@ const LibraryAdminAddLibrary: React.FC = () => {
         emailAddress: '',
     });
 
+    const [errorMessage, setErrorMessage] = useState<string>('');
+
     const handleLogout = () => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('role');
@@ -38,6 +40,7 @@ const LibraryAdminAddLibrary: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setErrorMessage('');
 
         const requestBody = {
             street: formData.addressLine,
@@ -64,14 +67,12 @@ const LibraryAdminAddLibrary: React.FC = () => {
                 navigate('/processing-info');
             } else {
                 console.error('Error submitting request', response.statusText);
+                setErrorMessage('Wystąpił błąd podczas wysyłania formularza.');
             }
         } catch (error) {
             console.error('Error:', error);
+            setErrorMessage('Nie udało się połączyć z serwerem. Sprawdź swoje połączenie internetowe.');
         }
-    };
-
-    const handleSettings = () => {
-        alert('Ustawienia');
     };
 
     return (
@@ -85,12 +86,6 @@ const LibraryAdminAddLibrary: React.FC = () => {
                         src="/book-rider-high-resolution-logo.png"
                     />
                 </div>
-            <button
-                onClick={handleSettings}
-                className="relative mr-3 px-6 py-3 right-[1%] w-[8%] bg-[#314757] rounded-md text-sm transition-all duration-300 hover:bg-[#4b6477] flex items-center justify-center"
-            >
-                Ustawienia
-            </button>
             <button
                 onClick={handleLogout}
                 className="relative py-3 right-[1%] w-[13%] bg-[#314757] rounded-md text-sm transition-all duration-300 hover:bg-[#4b6477]"
@@ -139,6 +134,11 @@ const LibraryAdminAddLibrary: React.FC = () => {
                                 Złóż podanie
                             </button>
                         </div>
+                        {errorMessage && (
+                            <p className="mt-6 text-left text-red-600 font-semibold">
+                                {errorMessage}
+                            </p>
+                        )}
                     </form>
                 </section>
             </main>

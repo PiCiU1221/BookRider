@@ -22,10 +22,6 @@ public class RentalReturnItem extends BaseEntity<Integer> {
     @JoinColumn(name = "rental_id", nullable = false)
     private Rental rental;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
-    private Book book;
-
     @Column(nullable = false)
     private int returnedQuantity;
 }

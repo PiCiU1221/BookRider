@@ -150,7 +150,7 @@ const RegistrationForm: React.FC = () => {
                             name="firstName"
                             value={formData.firstName}
                             onChange={handleInputChange}
-                            maxLength={25}
+                            maxLength={50}
                             required
                             className="bg-gray-100 w-full p-3 rounded-md text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
                         />
@@ -163,7 +163,7 @@ const RegistrationForm: React.FC = () => {
                             name="lastName"
                             value={formData.lastName}
                             onChange={handleInputChange}
-                            maxLength={25}
+                            maxLength={50}
                             required
                             className="bg-gray-100 w-full p-3 rounded-md text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
                         />
@@ -176,7 +176,7 @@ const RegistrationForm: React.FC = () => {
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
-                            maxLength={25}
+                            maxLength={50}
                             required
                             className="bg-gray-100 w-full p-3 rounded-md text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
                         />
@@ -189,7 +189,7 @@ const RegistrationForm: React.FC = () => {
                             name="password"
                             value={formData.password}
                             onChange={handleInputChange}
-                            maxLength={25}
+                            maxLength={50}
                             required
                             className="bg-gray-100 w-full p-3 rounded-md text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
                         />
@@ -202,7 +202,7 @@ const RegistrationForm: React.FC = () => {
                             name="confirm_password"
                             value={formData.confirm_password}
                             onChange={handleInputChange}
-                            maxLength={25}
+                            maxLength={50}
                             required
                             className="bg-gray-100 w-full p-3 rounded-md text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
                         />

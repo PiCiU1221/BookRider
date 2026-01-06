@@ -1,5 +1,8 @@
 import React, { useState, useEffect  } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {useWebSocketNotification} from '../Utils/useWebSocketNotification.tsx';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -83,16 +86,20 @@ const LibrarianAddBook: React.FC = () => {
         fetchDropdownData();
     }, []);
 
+    useWebSocketNotification('librarian/orders/pending', () => {
+        toast.info("Otrzymano nowe zamówienie!", {
+            position: "bottom-right",
+        });
+        console.log("New order received!");
+    });
+
     const handleAuthorSelect = async (author: string) => {
         if (!authors.includes(author)) {
             setAuthors([...authors, author]);
             if (!authorOptions.includes(author)) {
                 try {
                     const token = localStorage.getItem('access_token');
-                    if (!token) {
-                        setError('Brak tokena autoryzacyjnego.');
-                        return;
-                    }
+                    if (!token) return;
 
                     const response = await fetch(`${API_BASE_URL}/api/authors`, {
                         method: 'POST',
@@ -104,16 +111,26 @@ const LibrarianAddBook: React.FC = () => {
                     });
 
                     if (!response.ok) {
+                        if (response.status === 409) {
+                            throw new Error("Ten autor już istnieje.");
+                        }
+
                         const errorText = await response.text();
-                        throw new Error(`Błąd ${response.status}: ${errorText}`);
+                        const finalMessage = errorText || response.statusText;
+                        throw new Error(`Błąd ${response.status}: ${finalMessage}`);
                     }
 
                     await fetchAuthors('');
                     await fetchPublishers('');
+                    toast.success(`Dodano nowego autora: ${author}`);
 
                 } catch (err) {
                     console.error("Error adding author:", err);
-                    setError('Wystąpił błąd podczas dodawania autora.');
+                    const msg = (err as Error).message || "Błąd dodawania autora";
+                    setError(msg);
+                    toast.error(msg);
+
+                    setAuthors(prev => prev.filter(a => a !== author));
                 }
             }
         }
@@ -122,8 +139,10 @@ const LibrarianAddBook: React.FC = () => {
     };
 
     const handleAuthorInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const input = e.target.value;
         setAuthorInput(e.target.value);
         setShowDropdown(true);
+        fetchAuthors(input);
     };
 
     const handleRemoveAuthor = (authorToRemove: string) => {
@@ -155,14 +174,26 @@ const LibrarianAddBook: React.FC = () => {
                     body: JSON.stringify({ name: publisherName }),
                 });
 
-                if (!response.ok) throw new Error(await response.text());
+                if (!response.ok) {
+                    if (response.status === 409) {
+                        throw new Error("To wydawnictwo już istnieje.");
+                    }
+
+                    const errorText = await response.text();
+                    const finalMessage = errorText || response.statusText;
+                    throw new Error(`Błąd ${response.status}: ${finalMessage}`);
+                }
 
                 await fetchPublishers('');
+                toast.success(`Dodano nowe wydawnictwo: ${publisherName}`);
             } catch (err) {
                 console.error("Error adding publisher:", err);
+                const msg = (err as Error).message || "Błąd dodawania wydawnictwa";
+
+                toast.error(msg);
+                setPublisher('');
             }
         }
-        //setPublisherInput('');
         setShowPublisherDropdown(false);
     };
 
@@ -176,7 +207,7 @@ const LibrarianAddBook: React.FC = () => {
     };
 
     const handleAddBook = async () => {
-        if (!title.trim() || !categoryName.trim() || authors.length === 0 || !publisher.trim() || !isbn.trim() || !language.trim() || releaseYear === null) {
+        if (!title.trim() || !categoryName.trim() || authors.length === 0 || !publisher.trim() || !isbn.trim() || !language.trim() || releaseYear === '') {
             setError('Wszystkie pola są wymagane.');
             return;
         }
@@ -217,13 +248,34 @@ const LibrarianAddBook: React.FC = () => {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`Błąd ${response.status}: ${errorText}`);
+
+                if (response.status === 409) {
+                    throw new Error("Książka o podanym numerze ISBN już istnieje.");
+                }
+
+                if (response.status === 400) {
+                    throw new Error(errorText || "Nieprawidłowe dane formularza.");
+                }
+
+                if (response.status === 401) {
+                    throw new Error("Sesja wygasła. Proszę zalogować się ponownie.");
+                }
+
+                if (response.status === 413) {
+                    throw new Error("Wybrane zdjęcie jest zbyt duże.");
+                }
+
+                // Code 500 and other unknown
+                const finalMessage = errorText || response.statusText || 'Unknown Server Error';
+                throw new Error(`Błąd ${response.status}: ${finalMessage}`);
             }
 
-            // alert('Książka dodana');
+            toast.success("Książka została dodana!");
             navigate('/librarian-dashboard');
         } catch (error) {
-            setError((error as Error).message || 'Wystąpił błąd podczas dodawania książki.');
+            const msg = (error as Error).message || 'Wystąpił błąd.';
+            setError(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }

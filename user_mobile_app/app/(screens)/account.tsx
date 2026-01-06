@@ -247,7 +247,7 @@ const [loading, setLoading] = useState(true);
                                         </View>
                                     ))
                                 ) : (
-                                    <Text className="text-gray-300">No library cards found.</Text>
+                                    <Text className="text-gray-300">Brak podpiętej karty bibliotecznej.</Text>
                                 )}
 
                                 <TouchableOpacity
@@ -260,7 +260,7 @@ const [loading, setLoading] = useState(true);
                         </View>
                     ) : (
                         <Text className="text-white text-lg text-center">
-                            Unable to load profile information.
+                            Nie można załadować informacji o profilu.
                         </Text>
                     )}
                 </ScrollView>

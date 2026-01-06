@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,14 +22,26 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     @Query("SELECT o FROM Order o " +
             "JOIN o.library l " +
             "JOIN l.address a " +
-            "WHERE (o.status = 'ACCEPTED' AND o.isReturn = false) " +
-            "OR (o.status = 'PENDING' AND o.isReturn = true) " +
+            "WHERE " +
+            "((o.status = 'ACCEPTED' AND o.isReturn = false) " +
+            "OR (o.status = 'PENDING' AND o.isReturn = true)) " +
             "AND (ST_DistanceSphere(ST_MakePoint(a.latitude, a.longitude), " +
-            "ST_MakePoint(:driverLatitude, :driverLongitude)) <= :maxDistanceInMeters)")
+            "ST_MakePoint(:driverLatitude, :driverLongitude)) <= :maxDistanceInMeters) " +
+
+            "ORDER BY " +
+            "CASE WHEN (" +
+            "   (o.status = 'ACCEPTED' AND o.isReturn = false AND o.acceptedAt < :olderThanDate) " +
+            "   OR " +
+            "   (o.status = 'PENDING' AND o.isReturn = true AND o.createdAt < :olderThanDate) " +
+            ") THEN 0 ELSE 1 END ASC, " +
+
+            "ST_DistanceSphere(ST_MakePoint(a.latitude, a.longitude), " +
+            "ST_MakePoint(:driverLatitude, :driverLongitude)) ASC")
     Page<Order> findOrdersForDriverWithDistance(
             @Param("driverLatitude") BigDecimal driverLatitude,
             @Param("driverLongitude") BigDecimal driverLongitude,
             @Param("maxDistanceInMeters") double maxDistanceInMeters,
+            @Param("olderThanDate") LocalDateTime olderThanDate,
             Pageable pageable);
 
     Page<Order> findByDriverIdAndStatusIn(String driverId, List<OrderStatus> status, Pageable pageable);

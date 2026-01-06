@@ -32,6 +32,7 @@ public class RentalService {
 
     private final RentalRepository rentalRepository;
     private final RentalMapper rentalMapper;
+    private final RentalReturnItemService rentalReturnItemService;
 
     @Transactional
     public void createRental(OrderItem orderItem) {
@@ -100,10 +101,17 @@ public class RentalService {
         User user = userService.getUser();
         Page<Rental> rentals = rentalRepository.findAllByUser(user, pageable);
 
-        List<RentalDTO> rentalDTOs = rentals.getContent()
-                .stream()
-                .map(rentalMapper::map)
-                .toList();
+        List<RentalDTO> rentalDTOs = new ArrayList<>();
+        for (Rental rental : rentals.getContent()) {
+            int totalReturned = rentalReturnItemService.sumReturnedQuantityByRentalId(rental.getId());
+            int remaining = rental.getQuantity() - totalReturned;
+
+            if (remaining > 0) {
+                RentalDTO dto = rentalMapper.map(rental);
+                dto.setQuantity(remaining);
+                rentalDTOs.add(dto);
+            }
+        }
 
         return new PageResponseDTO<>(
                 rentalDTOs,
@@ -112,12 +120,5 @@ public class RentalService {
                 rentals.getTotalElements(),
                 rentals.getTotalPages()
         );
-    }
-
-    public Rental updateRentalStatus(Integer rentalId, RentalStatus status) {
-        Rental rental =  getRentalById(rentalId);
-        rental.setStatus(status);
-
-        return rentalRepository.save(rental);
     }
 }

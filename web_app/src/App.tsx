@@ -9,12 +9,15 @@ import SysAdminLogin from "./SystemAdmin/SystemAdminLogin.tsx";
 import SystemAdminDashboard from './SystemAdmin/SystemAdminHomePage';
 import SubmissionDetailsLibrary from './SystemAdmin/SubmissionDetailsLibrary.tsx';
 import SubmissionDetailsDriver from './SystemAdmin/SubmissionDetailsDriver.tsx';
+import SystemAdminSettings from './SystemAdmin/SystemAdminSettings.tsx';
 
 // Library Administrator
 import RegistrationForm from './LibraryAdmin/LibraryAdminRegisterForm.tsx';
 import LibraryAdminLogin from './LibraryAdmin/LibraryAdminLogin.tsx';
 import LibraryAdminHomePage from './LibraryAdmin/LibraryAdminHomePage.tsx';
-import LibraryAdminAddLibrary from './LibraryAdmin/LibraryAdminAddLibrary';
+import LibraryAdminAddLibrary from './LibraryAdmin/LibraryAdminAddLibrary.tsx';
+import LibraryAdminAddLibrarian from './LibraryAdmin/LibraryAdminAddLibrarian.tsx';
+import LibraryAdminSettings from './LibraryAdmin/LibraryAdminSettings.tsx';
 
 // Librarian
 import LibrarianLogin from './Librarian/LibrarianLogin.tsx';
@@ -34,8 +37,12 @@ import LegalInfoPage from './Utils/LegalInfoPage.tsx';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 
+import {ToastContainer} from 'react-toastify';
+
 const App: React.FC = () => {
     return (
+        <>
+            <ToastContainer />
         <Router>
             <Routes>
                 <Route path="/" element={<LandingPage />} />
@@ -58,6 +65,9 @@ const App: React.FC = () => {
                 <Route path="/returns" element={<LibrarianReturns />} />
                 <Route path="/readers" element={<LibrarianReaders />} />
                 <Route path="/librarian-settings" element={<LibrarianSettings />} />
+                <Route path="/library-admin-add-librarian" element={<LibraryAdminAddLibrarian />} />
+                <Route path="/library-admin-settings" element={<LibraryAdminSettings />} />
+                <Route path="/system-admin-settings" element={<SystemAdminSettings />} />
                 <Route
                     path="/api-docs"
                     element={
@@ -80,6 +90,7 @@ const App: React.FC = () => {
                 />
             </Routes>
         </Router>
+        </>
     );
 };
 

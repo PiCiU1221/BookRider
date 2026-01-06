@@ -327,18 +327,14 @@ UPDATE orders
 SET payment_status = 'COMPLETED'
 WHERE id = 2;
 
-UPDATE rentals
-SET status = 'RETURN_IN_PROGRESS'
-WHERE id = 1;
-
 -- Rental table for tracking rentals (because they can be partial)
 INSERT INTO rental_returns (return_order_id, returned_at, status)
 VALUES
     (1,NULL, 'IN_PROGRESS');
 
-INSERT INTO rental_return_items (rental_return_id, rental_id, book_id, returned_quantity)
+INSERT INTO rental_return_items (rental_return_id, rental_id, returned_quantity)
 VALUES
-    (1, 1, 2, 2);
+    (1, 1, 2);
 
 -- Driver accept the return order
 UPDATE orders

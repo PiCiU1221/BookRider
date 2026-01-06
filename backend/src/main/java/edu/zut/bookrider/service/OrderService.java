@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -31,6 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static edu.zut.bookrider.config.SystemConstants.SERVICE_FEE_PERCENTAGE;
+import static edu.zut.bookrider.config.SystemConstants.URGENT_ORDER_THRESHOLD_MINUTES;
 import static java.util.Objects.isNull;
 
 @RequiredArgsConstructor
@@ -165,12 +165,12 @@ public class OrderService {
     }
 
     public PageResponseDTO<OrderResponseDTO> getLibraryInRealizationOrders(int page, int size) {
-        return getLibraryOrdersByStatus(List.of(OrderStatus.ACCEPTED), page, size);
+        return getLibraryOrdersByStatus(List.of(OrderStatus.ACCEPTED, OrderStatus.DRIVER_ACCEPTED), page, size);
     }
 
     public PageResponseDTO<OrderResponseDTO> getLibraryCompletedOrders(int page, int size) {
         return getLibraryOrdersByStatus(
-                List.of(OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED, OrderStatus.DRIVER_ACCEPTED, OrderStatus.DECLINED),
+                List.of(OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED, OrderStatus.DECLINED),
                 page, size);
     }
 
@@ -273,10 +273,14 @@ public class OrderService {
             @Valid CoordinateDTO location, double maxDistanceInMeters, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        LocalDateTime olderThanDate = LocalDateTime.now().minusMinutes(URGENT_ORDER_THRESHOLD_MINUTES);
         Page<Order> pendingOrders = orderRepository.findOrdersForDriverWithDistance(
                 BigDecimal.valueOf(location.getLatitude()),
                 BigDecimal.valueOf(location.getLongitude()),
-                maxDistanceInMeters, pageable);
+                maxDistanceInMeters,
+                olderThanDate,
+                pageable
+        );
 
         List<OrderResponseDTO> pendingOrderDtos = pendingOrders.getContent().stream().map(order -> {
             OrderResponseDTO dto = orderMapper.map(order);
@@ -402,13 +406,7 @@ public class OrderService {
 
         byte[] imageBase64 = Base64.getDecoder().decode(requestDTO.getPhotoBase64());
         MultipartFile multipartFile = new BASE64DecodedMultipartFile(imageBase64);
-        String deliveryPhotoUrl;
-
-        try {
-            deliveryPhotoUrl = imageUploadService.uploadImage(multipartFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String deliveryPhotoUrl = imageUploadService.uploadImage(multipartFile);
 
         order.setDeliveryPhotoUrl(deliveryPhotoUrl);
         order.setDeliveredAt(LocalDateTime.now());
@@ -431,8 +429,8 @@ public class OrderService {
 
             User user = order.getUser();
             webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/delivered");
-            webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/pending");
-            webSocketHandler.sendRefreshSignal(user.getEmail(), "driver/order-history");
+            webSocketHandler.sendRefreshSignal(user.getEmail(), "user/orders/in-realization");
+            webSocketHandler.sendRefreshSignal(driver.getEmail(), "driver/in-realization");
 
             return new DeliverOrderResponseDTO(true);
         }

@@ -3,7 +3,7 @@ import {Link} from "react-router-dom";
 
 export const ContactInfoPage: React.FC = () => {
     return (
-        <div className="min-h-screen bg-[#314757] flex items-center justify-center text-white">
+        <div className="min-h-screen bg-[#3b576c] flex items-center justify-center text-white">
             <div className="text-center space-y-10 px-4">
                 {/* Big Book Logo Image */}
                 <img

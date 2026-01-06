@@ -10,4 +10,5 @@ public class SystemConstants {
     public static final BigDecimal ADDITIONAL_ITEM_COST = BigDecimal.valueOf(1.00);
     public static final BigDecimal DAILY_LATE_FEE = BigDecimal.valueOf(1.00);
     public static final int RETURN_DEADLINE_DAYS = 30;
+    public static final long URGENT_ORDER_THRESHOLD_MINUTES = 15;
 }
