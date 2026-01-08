@@ -344,36 +344,47 @@ const LibrarianHomePage: React.FC = () => {
             return;
         }
 
-        try {
-            const addRequests = selectedBooks.map(id =>
-                fetch(`${API_BASE_URL}/api/books/add-existing/${id}?libraryId=${assignedLibrary.id}`, {
+        let successCount = 0;
+        let failCount = 0;
+        const successfulIds: number[] = [];
+
+        // preventing race conditions on the server by ensuring that the requests are sent sequentially (one by one)
+        for (const id of selectedBooks) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/books/add-existing/${id}?libraryId=${assignedLibrary.id}`, {
                     method: "POST",
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
-                })
-            );
-
-            const responses = await Promise.all(addRequests);
-
-            const allSuccessful = responses.every(response => response.ok);
-
-            if (allSuccessful) {
-                setAddBooksMessage({
-                    text: "Pomyślnie dodano książki do biblioteki.",
-                    type: "success"
                 });
-            } else {
-                setAddBooksMessage({
-                    text: "Niektóre z książek już wcześniej zostały przypisane do Twojej biblioteki.",
-                    type: "error"
-                });
+
+                if (response.ok) {
+                    successCount++;
+                    successfulIds.push(id);
+                } else {
+                    failCount++;
+                }
+            } catch (error) {
+                console.error(`Error adding book ${id}:`, error);
+                failCount++;
             }
+        }
 
-            setSelectedBooks([]);
-        } catch {
+        setSelectedBooks((prev) => prev.filter((id) => !successfulIds.includes(id)));
+
+        if (successCount > 0 && failCount === 0) {
             setAddBooksMessage({
-                text: "Wystąpił błąd podczas dodawania książek.",
+                text: "Pomyślnie dodano wszystkie wybrane książki do biblioteki.",
+                type: "success"
+            });
+        } else if (successCount > 0 && failCount > 0) {
+            setAddBooksMessage({
+                text: `Dodano ${successCount} książek. ${failCount} nie udało się dodać (mogą już istnieć w bibliotece).`,
+                type: "error"
+            });
+        } else {
+            setAddBooksMessage({
+                text: "Nie udało się dodać wybranych książek (mogą już być w bibliotece).",
                 type: "error"
             });
         }
@@ -383,37 +394,49 @@ const LibrarianHomePage: React.FC = () => {
         const token = localStorage.getItem('access_token');
         if (!token) return;
 
-        try {
-            const deleteRequests = selectedBooks.map(id =>
-                fetch(`${API_BASE_URL}/api/books/my-library/${id}`, {
+        let successCount = 0;
+        let failCount = 0;
+        const successfulIds: number[] = [];
+
+        // preventing race conditions on the server by ensuring that the requests are sent sequentially (one by one)
+        for (const id of selectedBooks) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/books/my-library/${id}`, {
                     method: "DELETE",
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
-                })
-            );
-
-            const responses = await Promise.all(deleteRequests);
-
-            const allSuccessful = responses.every(response => response.ok);
-
-            if (allSuccessful) {
-                setBookSearchResults(prev => prev.filter(book => !selectedBooks.includes(book.id)));
-
-                setSelectedBooks([]);
-                setDeleteBooksMessage({
-                    text: "Wybrane książki zostały usunięte z biblioteki.",
-                    type: "success"
                 });
-            } else {
-                setDeleteBooksMessage({
-                    text: "Niektórych książek nie udało się usunąć.",
-                    type: "error"
-                });
+
+                if (response.ok) {
+                    successCount++;
+                    successfulIds.push(id);
+                } else {
+                    failCount++;
+                }
+            } catch (error) {
+                console.error(`Error deleting book ${id}:`, error);
+                failCount++;
             }
-        } catch {
+        }
+
+        setBookSearchResults(prev => prev.filter(book => !successfulIds.includes(book.id)));
+
+        setSelectedBooks((prev) => prev.filter((id) => !successfulIds.includes(id)));
+
+        if (successCount > 0 && failCount === 0) {
             setDeleteBooksMessage({
-                text: "Wystąpił błąd podczas usuwania książek.",
+                text: "Wybrane książki zostały usunięte z biblioteki.",
+                type: "success"
+            });
+        } else if (successCount > 0 && failCount > 0) {
+            setDeleteBooksMessage({
+                text: `Usunięto ${successCount} książek. ${failCount} nie udało się usunąć.`,
+                type: "error"
+            });
+        } else {
+            setDeleteBooksMessage({
+                text: "Nie udało się usunąć wybranych książek.",
                 type: "error"
             });
         }
