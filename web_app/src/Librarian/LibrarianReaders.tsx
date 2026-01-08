@@ -12,7 +12,7 @@ const LibrarianReaders: React.FC = () => {
     const [cardId, setCardId] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [expirationDate, setExpirationDate] = useState('2025-01-01');
+    const [expirationDate, setExpirationDate] = useState(new Date().toLocaleDateString('en-CA'));
     const [libraryCardSearchId, setLibraryCardSearchId] = useState('');
 
     // User
@@ -65,7 +65,7 @@ const LibrarianReaders: React.FC = () => {
                 setCardId('');
                 setFirstName('');
                 setLastName('');
-                setExpirationDate('2025-01-01');
+                setExpirationDate(new Date().toLocaleDateString('en-CA'));
             } else {
                 throw new Error('Error creating library card');
             }
