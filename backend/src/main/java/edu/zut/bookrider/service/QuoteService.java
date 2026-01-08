@@ -57,7 +57,7 @@ public class QuoteService {
         List<QuoteOption> options = new ArrayList<>();
 
         for (Library library : libraries) {
-            boolean isLibraryInCart = isLibraryInCart(library, cart, bookId);
+            boolean isLibraryInCart = isLibraryInCart(library, cart);
 
             QuoteOption option = quoteOptionService.createQuoteOption(
                     library,
@@ -88,9 +88,10 @@ public class QuoteService {
         return quoteMapper.map(savedQuote);
     }
 
-    private boolean isLibraryInCart(Library library, ShoppingCart cart, Integer bookId) {
+    private boolean isLibraryInCart(Library library, ShoppingCart cart) {
         return cart.getItems().stream()
-                .anyMatch(item -> item.getLibrary().getId().equals(library.getId()) &&
-                        item.getBooks().stream().anyMatch(subItem -> subItem.getBook().getId().equals(bookId)));
+                .anyMatch(item -> item.getLibrary() != null
+                        && item.getLibrary().getId() != null
+                        && item.getLibrary().getId().equals(library.getId()));
     }
 }
