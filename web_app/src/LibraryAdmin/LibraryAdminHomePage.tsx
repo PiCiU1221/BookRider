@@ -10,6 +10,14 @@ interface Librarian {
     lastName: string;
 }
 
+interface PasswordResetResponse {
+    id: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    tempPassword: string;
+}
+
 const LibraryAdminHomePage: React.FC = () => {
     const [usernameSearch, setUsernameSearch] = useState('');
     const [librarians, setLibrarians] = useState<Librarian[]>([]);
@@ -72,6 +80,10 @@ const LibraryAdminHomePage: React.FC = () => {
     };
 
     const resetPassword = async (username: string) => {
+        if (!window.confirm(`Czy na pewno chcesz zresetować hasło dla użytkownika "${username}"?`)) {
+            return;
+        }
+
         const token = localStorage.getItem('access_token');
         try {
             const res = await fetch(`${API_BASE_URL}/api/library-admins/librarians/reset-password/${username}`, {
@@ -80,7 +92,15 @@ const LibraryAdminHomePage: React.FC = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setMessage(res.ok ? 'Hasło bibliotekarza zresetowano pomyślnie.' : 'Nie udało się zresetować hasła bibliotekarza.');
+
+            if (res.ok) {
+                const data: PasswordResetResponse = await res.json();
+                const newPassword = data.tempPassword;
+
+                setMessage(`Hasło zresetowane dla ${username}. Nowe hasło: ${newPassword}`);
+            } else {
+                setMessage('Nie udało się zresetować hasła bibliotekarza.');
+            }
         } catch (err) {
             console.error(err);
             setMessage('Error resetting password');
@@ -88,6 +108,10 @@ const LibraryAdminHomePage: React.FC = () => {
     };
 
     const deleteLibrarian = async (username: string) => {
+        if (!window.confirm(`Czy na pewno chcesz konto użytkownika "${username}"? Tej operacji nie można cofnąć.`)) {
+            return;
+        }
+
         const token = localStorage.getItem('access_token');
         try {
             const res = await fetch(`${API_BASE_URL}/api/library-admins/librarians/${username}`, {
@@ -98,7 +122,7 @@ const LibraryAdminHomePage: React.FC = () => {
             });
             if (res.ok) {
                 setLibrarians(librarians.filter(lib => lib.username !== username));
-                setMessage('Usunięto bibliotekarza.');
+                setMessage('Usunięto bibliotekarza o nazwie użytkownika ' + username + '.');
             } else {
                 setMessage('Nie udało się usunąć bibliotekarza.');
             }
@@ -160,7 +184,7 @@ const LibraryAdminHomePage: React.FC = () => {
                                         placeholder="Nazwa użytkownika"
                                         value={usernameSearch}
                                         onChange={(e) => setUsernameSearch(e.target.value)}
-                                        className="border border-gray-300 rounded p-2 w-full pr-10"
+                                        className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
                                     />
                                     {usernameSearch && (
                                         <button
@@ -210,7 +234,7 @@ const LibraryAdminHomePage: React.FC = () => {
                                 </div>
                             )}
 
-                            {message && <p className="text-sm text-gray-700 mt-4">{message}</p>}
+                            {message && <p className="mt-4 p-4 rounded-md bg-green-100 text-[#3B576C]">{message}</p>}
                         </div>
                     </div>
                 </section>
