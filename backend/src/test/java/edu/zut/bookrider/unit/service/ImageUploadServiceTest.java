@@ -37,7 +37,7 @@ public class ImageUploadServiceTest {
 
     @Test
     void whenValidImage_thenReturnUploadedImageUrl() throws IOException {
-        byte[] imageBytes = Files.readAllBytes(Paths.get("src/test/resources/imageUploadServiceTest/example_image.jpg"));
+        byte[] imageBytes = Files.readAllBytes(Paths.get("src/test/resources/test_image.jpg"));
 
         MultipartFile multipartFile = new MockMultipartFile(
                 "imageFile",

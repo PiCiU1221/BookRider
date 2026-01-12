@@ -98,8 +98,8 @@ public class DriverApplicationControllerIT {
     @Test
     @WithMockUser(username = "driver@dacit.com", roles = {"driver"})
     void whenValidInput_returnDTO() throws Exception {
-        File driverLicense = new ClassPathResource("driverApplicationServiceTest/driverLicence.jpg").getFile();
-        File identityCard = new ClassPathResource("driverApplicationServiceTest/identityCard.jpg").getFile();
+        File driverLicense = new ClassPathResource("test_image.jpg").getFile();
+        File identityCard = new ClassPathResource("test_image.jpg").getFile();
 
         String driverLicenseString = Base64.getEncoder().encodeToString(java.nio.file.Files.readAllBytes(driverLicense.toPath()));
         String identityCardString = Base64.getEncoder().encodeToString(java.nio.file.Files.readAllBytes(identityCard.toPath()));
