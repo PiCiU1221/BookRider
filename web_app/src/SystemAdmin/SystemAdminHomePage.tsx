@@ -97,7 +97,13 @@ const SystemAdminDashboard: React.FC = () => {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/driver-applications?statuses=PENDING,UNDER_REVIEW&page=${page}&size=1`, {
+            const params = new URLSearchParams();
+            params.append('statuses', 'PENDING');
+            params.append('statuses', 'UNDER_REVIEW');
+            params.append('page', page.toString());
+            params.append('size', '5');
+
+            const response = await fetch(`${API_BASE_URL}/api/driver-applications?${params.toString()}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -128,7 +134,13 @@ const SystemAdminDashboard: React.FC = () => {
         if (!token) return;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/library-requests?statuses=PENDING,UNDER_REVIEW&page=${page}&size=1`, {
+            const params = new URLSearchParams();
+            params.append('statuses', 'PENDING');
+            params.append('statuses', 'UNDER_REVIEW');
+            params.append('page', page.toString());
+            params.append('size', '5');
+
+            const response = await fetch(`${API_BASE_URL}/api/library-requests?${params.toString()}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -142,7 +154,7 @@ const SystemAdminDashboard: React.FC = () => {
 
             if (data.length > 0) {
                 setLibraryRequests((prev) => [...prev, ...data]);
-                setLibraryPage(page + 5);
+                setLibraryPage(page + 2);
             } else {
                 setLibraryHasMore(false);
             }
