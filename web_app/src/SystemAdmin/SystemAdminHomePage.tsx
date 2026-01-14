@@ -113,7 +113,7 @@ const SystemAdminDashboard: React.FC = () => {
 
             if (data.length > 0) {
                 setDriverApplications((prev) => [...prev, ...data]);
-                setDriverPage(page + 1);
+                setDriverPage(page + 5);
             } else {
                 setDriverHasMore(false);
             }
@@ -142,7 +142,7 @@ const SystemAdminDashboard: React.FC = () => {
 
             if (data.length > 0) {
                 setLibraryRequests((prev) => [...prev, ...data]);
-                setLibraryPage(page + 1);
+                setLibraryPage(page + 5);
             } else {
                 setLibraryHasMore(false);
             }
