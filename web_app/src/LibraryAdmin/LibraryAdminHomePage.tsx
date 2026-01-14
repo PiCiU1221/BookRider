@@ -112,13 +112,48 @@ const LibraryAdminHomePage: React.FC = () => {
                 const data: PasswordResetResponse = await res.json();
                 const newPassword = data.tempPassword;
 
-                setMessage(`Hasło zresetowane dla ${username}. Nowe hasło: ${newPassword}`);
+                const reset = await Swal.fire({
+                    title: 'Hasło zostało zresetowane',
+                    text: `Hasło zresetowane dla ${username}. Nowe hasło: ${newPassword}`,
+                    icon: 'info',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3B576C',
+                    confirmButtonText: 'OK',
+                });
+
+                if (!reset.isConfirmed) {
+                    return;
+                }
+
             } else {
-                setMessage('Nie udało się zresetować hasła bibliotekarza.');
+                const reset = await Swal.fire({
+                    title: 'Nie udało się zresetować hasła',
+                    text: `Spróbuj ponownie później.`,
+                    icon: 'warning',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3B576C',
+                    confirmButtonText: 'OK',
+                });
+
+                if (!reset.isConfirmed) {
+                    return;
+                }
             }
         } catch (err) {
             console.error(err);
-            setMessage('Error resetting password');
+
+            const reset = await Swal.fire({
+                title: 'Nie udało się zresetować hasła',
+                text: `Spróbuj ponownie później.`,
+                icon: 'warning',
+                showCancelButton: false,
+                confirmButtonColor: '#3B576C',
+                confirmButtonText: 'OK',
+            });
+
+            if (!reset.isConfirmed) {
+                return;
+            }
         }
     };
 
