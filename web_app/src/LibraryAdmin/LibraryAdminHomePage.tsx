@@ -20,8 +20,10 @@ interface PasswordResetResponse {
 
 const LibraryAdminHomePage: React.FC = () => {
     const [usernameSearch, setUsernameSearch] = useState('');
-    const [librarians, setLibrarians] = useState<Librarian[]>([]);
+    const [librarians, setLibrarians] = useState<Librarian[]>([]); // displayed list ("fake")
+    const [allLibrarians, setAllLibrarians] = useState<Librarian[]>([]); // master list ("real")
     const [message, setMessage] = useState('');
+    const [notif, setNotif] = useState('');
 
     const navigate = useNavigate();
 
@@ -31,12 +33,11 @@ const LibraryAdminHomePage: React.FC = () => {
             try {
                 const response = await fetch(`${API_BASE_URL}/api/library-admins/librarians`, {
                     method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                 });
                 if (response.ok) {
                     const data = await response.json();
+                    setAllLibrarians(data);
                     setLibrarians(data);
                     setMessage('');
                 } else {
@@ -47,37 +48,37 @@ const LibraryAdminHomePage: React.FC = () => {
                 setMessage('Error fetching librarian list');
             }
         };
+        fetchAll();
+    }, []);
 
-        if (usernameSearch.trim() === '') {
-            fetchAll();
+    const handleSearch = () => {
+        const term = usernameSearch.trim().toLowerCase();
+
+        if (!term) {
+            setLibrarians(allLibrarians);
+            setMessage('');
+            return;
         }
-    }, [usernameSearch]);
 
-    const fetchLibrarian = async () => {
-        const token = localStorage.getItem('access_token');
-        if (!usernameSearch.trim()) return;
+        const filtered = allLibrarians.filter(lib =>
+            lib.username.toLowerCase().includes(term)
+        );
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/library-admins/librarians?username=${usernameSearch}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+        setLibrarians(filtered);
 
-            if (response.ok) {
-                const data = await response.json();
-                setLibrarians(Array.isArray(data) ? data : [data]);
-                setMessage('');
-            } else {
-                setLibrarians([]);
-                setMessage('Nie znaleziono bibliotekarza.');
-            }
-        } catch (err) {
-            console.error(err);
-            setMessage('Error fetching librarian');
+        if (filtered.length === 0) {
+            setNotif('Bibliotekarz o podanej nazwie użytkownika nie istnieje.');
+        } else {
+            setNotif('');
         }
     };
+
+    useEffect(() => {
+        if (usernameSearch === '') {
+            setLibrarians(allLibrarians);
+            setMessage('');
+        }
+    }, [usernameSearch, allLibrarians]);
 
     const resetPassword = async (username: string) => {
         if (!window.confirm(`Czy na pewno chcesz zresetować hasło dla użytkownika "${username}"?`)) {
@@ -121,14 +122,14 @@ const LibraryAdminHomePage: React.FC = () => {
                 },
             });
             if (res.ok) {
-                setLibrarians(librarians.filter(lib => lib.username !== username));
+                setAllLibrarians(prev => prev.filter(lib => lib.username !== username));
+                setLibrarians(prev => prev.filter(lib => lib.username !== username));
+
                 setMessage('Usunięto bibliotekarza o nazwie użytkownika ' + username + '.');
-            } else {
-                setMessage('Nie udało się usunąć bibliotekarza.');
             }
         } catch (err) {
             console.error(err);
-            setMessage('Error deleting librarian');
+            setMessage('Usuwanie biblkiotekarza nie powiodło się.');
         }
     };
 
@@ -184,20 +185,23 @@ const LibraryAdminHomePage: React.FC = () => {
                                         placeholder="Nazwa użytkownika"
                                         value={usernameSearch}
                                         onChange={(e) => setUsernameSearch(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                         className="w-full p-2 rounded-lg border-2 outline-none bg-white text-[#3b4248] focus:outline-none focus:ring-2 focus:ring-[#3B576C]"
                                     />
                                     {usernameSearch && (
                                         <button
-                                            onClick={() => setUsernameSearch('')}
-                                            className="absolute right-28 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 px-2"
+                                            onClick={() => {
+                                                setUsernameSearch('');
+                                                setLibrarians(allLibrarians);
+                                            }}
+                                            className="absolute right-24 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 px-2"
                                         >
                                             ✕
                                         </button>
                                     )}
                                     <button
-                                        onClick={fetchLibrarian}
-                                        className="bg-[#3B576C] text-white px-4 py-2 rounded-md whitespace-nowrap"
-                                    >
+                                        onClick={handleSearch}
+                                        className="bg-[#3B576C] text-white px-4 py-2 rounded-md whitespace-nowrap">
                                         Szukaj
                                     </button>
                                 </div>
@@ -217,14 +221,12 @@ const LibraryAdminHomePage: React.FC = () => {
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => resetPassword(lib.username)}
-                                                        className="bg-[#5B7F9A] text-white px-9 py-2 rounded-md"
-                                                    >
+                                                        className="bg-[#5B7F9A] text-white px-9 py-2 rounded-md">
                                                         Zresetuj hasło
                                                     </button>
                                                     <button
                                                         onClick={() => deleteLibrarian(lib.username)}
-                                                        className="bg-red-600 text-white px-8 py-2 rounded-md"
-                                                    >
+                                                        className="bg-red-600 text-white px-8 py-2 rounded-md">
                                                         Usuń
                                                     </button>
                                                 </div>
@@ -235,6 +237,7 @@ const LibraryAdminHomePage: React.FC = () => {
                             )}
 
                             {message && <p className="mt-4 p-4 rounded-md bg-green-100 text-[#3B576C]">{message}</p>}
+                            {notif && <p className="mt-4 text-lg p-4 rounded-md bg-gray-100 text-[#3B576C]">{notif}</p>}
                         </div>
                     </div>
                 </section>
