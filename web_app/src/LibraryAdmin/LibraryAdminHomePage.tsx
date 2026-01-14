@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {Link, useNavigate} from "react-router-dom";
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -20,8 +22,8 @@ interface PasswordResetResponse {
 
 const LibraryAdminHomePage: React.FC = () => {
     const [usernameSearch, setUsernameSearch] = useState('');
-    const [librarians, setLibrarians] = useState<Librarian[]>([]); // displayed list ("fake")
-    const [allLibrarians, setAllLibrarians] = useState<Librarian[]>([]); // master list ("real")
+    const [librarians, setLibrarians] = useState<Librarian[]>([]); // displayed list (filtered)
+    const [allLibrarians, setAllLibrarians] = useState<Librarian[]>([]); // master list (real)
     const [message, setMessage] = useState('');
     const [notif, setNotif] = useState('');
 
@@ -81,7 +83,19 @@ const LibraryAdminHomePage: React.FC = () => {
     }, [usernameSearch, allLibrarians]);
 
     const resetPassword = async (username: string) => {
-        if (!window.confirm(`Czy na pewno chcesz zresetować hasło dla użytkownika "${username}"?`)) {
+        const result = await Swal.fire({
+            title: 'Na pewno?',
+            text: `Czy na pewno chcesz zresetować hasło dla użytkownika "${username}"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3B576C',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Tak, zresetuj',
+            cancelButtonText: 'Anuluj'
+        });
+
+        // if cancelled
+        if (!result.isConfirmed) {
             return;
         }
 
@@ -109,7 +123,19 @@ const LibraryAdminHomePage: React.FC = () => {
     };
 
     const deleteLibrarian = async (username: string) => {
-        if (!window.confirm(`Czy na pewno chcesz konto użytkownika "${username}"? Tej operacji nie można cofnąć.`)) {
+        const result = await Swal.fire({
+            title: 'Na pewno?',
+            text: `Czy na pewno chcesz usunąć konto użytkownika "${username}"? Tej operacji nie można cofnąć.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3B576C',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Tak, usuń',
+            cancelButtonText: 'Anuluj'
+        });
+
+        // if cancelled
+        if (!result.isConfirmed) {
             return;
         }
 
