@@ -108,15 +108,15 @@ const LibrarianReturns: React.FC = () => {
 
             if (response.ok) {
                 //setReturnStatus('COMPLETED');
-                setMessage('Return completed successfully.');
+                //setMessage('Return completed successfully.');
                 setMessageType('success');
             } else {
-                setMessage('Failed to complete the return.');
+                //setMessage('Failed to complete the return.');
                 setMessageType('error');
             }
         } catch (error) {
             console.error('Error:', error);
-            setMessage('Error completing the return.');
+            setMessage('Podczas realizacji zwrotu nastąpił błąd.');
             setMessageType('error');
         }
     };

@@ -12,7 +12,7 @@ const LibrarianReaders: React.FC = () => {
     const [cardId, setCardId] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [expirationDate, setExpirationDate] = useState('2025-01-01');
+    const [expirationDate, setExpirationDate] = useState(new Date().toLocaleDateString('en-CA'));
     const [libraryCardSearchId, setLibraryCardSearchId] = useState('');
 
     // User
@@ -27,6 +27,10 @@ const LibrarianReaders: React.FC = () => {
     const [libraryCardDetails, setLibraryCardDetails] = useState<LibraryCardDetails | null>(null);
 
     const navigate = useNavigate();
+
+    const [message, setMessage] = useState<string | null>(null);
+    const [messageSearch, setMessageSearch] = useState<string | null>(null);
+    const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
 
     useWebSocketNotification('librarian/orders/pending', () => {
         toast.info("Otrzymano nowe zamówienie!", {
@@ -60,17 +64,20 @@ const LibrarianReaders: React.FC = () => {
             });
 
             if (response.ok) {
-                alert('Library card created successfully');
+                setMessage('Konto czytelnika zostało pomyślnie dodane.');
+                setMessageType('success');
                 setUserId('');
                 setCardId('');
                 setFirstName('');
                 setLastName('');
-                setExpirationDate('2025-01-01');
+                setExpirationDate(new Date().toLocaleDateString('en-CA'));
             } else {
                 throw new Error('Error creating library card');
             }
         } catch (error) {
             console.error('Error creating library card: ', error);
+            setMessage('Nastąpił błąd podczas dodawania czytelnika.');
+            setMessageType('error');
         }
     };
 
@@ -99,6 +106,8 @@ const LibrarianReaders: React.FC = () => {
         } catch (error) {
             console.error('Error searching for library card: ', error);
             setLibraryCardDetails(null);
+            setMessageSearch('Nie znaleziono czytelnika o podanym numerze ID.');
+            setMessageType('error');
         }
     };
 
@@ -221,6 +230,17 @@ const LibrarianReaders: React.FC = () => {
                                     </button>
                                 </div>
                             </div>
+                            {message && (
+                                <div
+                                    className={`mt-4 p-4 rounded-md ${
+                                        messageType === 'success'
+                                            ? 'bg-green-100 text-[#3B576C]'
+                                            : 'bg-red-100 text-red-800'
+                                    }`}
+                                >
+                                    {message}
+                                </div>
+                            )}
                         </div>
 
 
@@ -252,6 +272,17 @@ const LibrarianReaders: React.FC = () => {
                                     </button>
                                 </div>
                             </div>
+                            {messageSearch && (
+                                <div
+                                    className={`mt-8 p-4 rounded-md ${
+                                        messageType === 'success'
+                                            ? 'bg-green-100 text-[#3B576C]'
+                                            : 'bg-red-100 text-red-800'
+                                    }`}
+                                >
+                                    {messageSearch}
+                                </div>
+                            )}
                         </div>
 
                         {libraryCardDetails && (
@@ -268,13 +299,6 @@ const LibrarianReaders: React.FC = () => {
                             </div>
                         )}
                     </div>
-
-                {/*{activeSection === 'settings' && (*/}
-                {/*    <section className="p-5 rounded-md mb-[400px] h-[80%] max-h-[90%] w-[65%]">*/}
-                {/*        <h2 className="text-center text-white">Ustawienia</h2>*/}
-                {/*    </section>*/}
-                {/*)}*/}
-
             </main>
         </div>
     );
