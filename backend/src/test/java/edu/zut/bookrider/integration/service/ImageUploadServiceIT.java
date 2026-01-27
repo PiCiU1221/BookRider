@@ -22,7 +22,7 @@ public class ImageUploadServiceIT {
 
     @Test
     void whenValidImage_thenDontThrowException() throws IOException {
-        byte[] imageBytes = Files.readAllBytes(Paths.get("src/test/resources/imageUploadServiceTest/example_image.jpg"));
+        byte[] imageBytes = Files.readAllBytes(Paths.get("src/test/resources/test_image.jpg"));
 
         // We have to mock it, since it's an interface populated by
         // Spring during an HTTP multipart request in a real application

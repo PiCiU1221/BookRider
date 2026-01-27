@@ -879,7 +879,7 @@ public class OrderControllerIT {
 
         CoordinateDTO location = new CoordinateDTO(53.423, 14.553);
 
-        String imagePath = "src/test/resources/orderControllerTest/example_delivery_photo.png";
+        String imagePath = "src/test/resources/test_image.jpg";
         byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
         String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
@@ -922,7 +922,7 @@ public class OrderControllerIT {
 
         CoordinateDTO location = new CoordinateDTO(10.0, 10.0);
 
-        String imagePath = "src/test/resources/orderControllerTest/example_delivery_photo.png";
+        String imagePath = "src/test/resources/test_image.jpg";
         byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
         String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
@@ -963,7 +963,7 @@ public class OrderControllerIT {
 
         CoordinateDTO location = new CoordinateDTO(10.0, 10.0);
 
-        String imagePath = "src/test/resources/orderControllerTest/example_delivery_photo.png";
+        String imagePath = "src/test/resources/test_image.jpg";
         byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
         String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
@@ -996,7 +996,7 @@ public class OrderControllerIT {
 
         CoordinateDTO location = new CoordinateDTO(15.0, 15.0);
 
-        String imagePath = "src/test/resources/orderControllerTest/example_delivery_photo.png";
+        String imagePath = "src/test/resources/test_image.jpg";
         byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
         String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
@@ -1226,7 +1226,7 @@ public class OrderControllerIT {
 
         CoordinateDTO location = new CoordinateDTO(53.423, 14.553);
 
-        String imagePath = "src/test/resources/orderControllerTest/example_delivery_photo.png";
+        String imagePath = "src/test/resources/test_image.jpg";
         byte[] imageBytes = Files.readAllBytes(Paths.get(imagePath));
         String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 

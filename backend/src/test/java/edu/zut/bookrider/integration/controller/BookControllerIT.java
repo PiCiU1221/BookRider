@@ -180,7 +180,7 @@ public class BookControllerIT {
     @Test
     @WithMockUser(username = "librarian67:1", roles = {"librarian"})
     void whenValidInput_returnDTO() throws Exception {
-        File exampleImage = new ClassPathResource("bookControllerTest/cat-2605502_1280.jpg").getFile();
+        File exampleImage = new ClassPathResource("test_image.jpg").getFile();
         String bookCoverString = Base64.getEncoder().encodeToString(java.nio.file.Files.readAllBytes(exampleImage.toPath()));
 
         List<String> authors = new ArrayList<>(List.of("bcit_author1", "bcit_author2"));

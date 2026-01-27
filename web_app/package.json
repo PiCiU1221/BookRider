@@ -17,7 +17,8 @@
     "react-router-dom": "^7.0.2",
     "react-toastify": "^11.0.5",
     "swagger-ui": "^5.18.2",
-    "swagger-ui-react": "^5.18.2"
+    "swagger-ui-react": "^5.18.2",
+    "sweetalert2": "^11.26.17"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
