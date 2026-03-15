@@ -30,10 +30,18 @@ jobs:
           java-version: "17"
           cache: "maven"
 
+      - name: Create .env file for testing
+        working-directory: backend
+        run: |
+          echo "DB_URL=${{ secrets.DB_URL }}" > .env
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "OPENROUTESERVICE_API_KEY=${{ secrets.OPENROUTESERVICE_API_KEY }}" >> .env
+          echo "JWT_SERVICE_KEY=${{ secrets.JWT_SERVICE_KEY }}" >> .env
+          echo "JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}" >> .env
+
       - name: Execute Maven build
         working-directory: backend
-        env:
-          OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICE_API_KEY }}
         run: mvn clean verify -Duser.timezone=Europe/Warsaw
 
       - name: Upload build artifacts
