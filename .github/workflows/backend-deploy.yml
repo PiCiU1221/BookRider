@@ -32,6 +32,8 @@ jobs:
 
       - name: Execute Maven build
         working-directory: backend
+        env:
+          OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICE_API_KEY }}
         run: mvn clean verify -Duser.timezone=Europe/Warsaw
 
       - name: Upload build artifacts
