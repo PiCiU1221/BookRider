@@ -1,9 +1,4 @@
-FROM maven:3.9.4-eclipse-temurin-17 AS builder
-WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
-
-FROM eclipse-temurin:17-jdk-jammy
+FROM eclipse-temurin:17-jre-jammy
 
 ENV TZ=Europe/Warsaw
 RUN apt-get update && \
@@ -14,6 +9,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY --from=builder /app/target/*.jar app.jar
+
+COPY target/*.jar app.jar
+
 EXPOSE 8080
+
 ENTRYPOINT ["java", "-Duser.timezone=Europe/Warsaw", "-jar", "app.jar"]

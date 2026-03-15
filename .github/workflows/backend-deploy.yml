@@ -1,0 +1,102 @@
+name: Deploy Backend
+
+on:
+  pull_request:
+    branches:
+      - dev
+    types:
+      - closed
+    paths:
+      - "backend/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Provision JDK environment
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: "maven"
+
+      - name: Execute Maven build
+        working-directory: backend
+        run: mvn clean verify -Duser.timezone=Europe/Warsaw
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: |
+            backend/target/*.jar
+            backend/Dockerfile
+          retention-days: 1
+
+  deploy:
+    name: Deploy to EC2
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist
+          path: backend-dist
+
+      - name: Transfer artifacts to target environment
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          source: "backend-dist/*"
+          target: "/tmp/backend-deploy"
+          strip_components: 1
+
+      - name: Orchestrate container deployment
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICE_API_KEY }}
+          JWT_SERVICE_KEY: ${{ secrets.JWT_SERVICE_KEY }}
+          JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          envs: DB_URL,DB_USERNAME,DB_PASSWORD,OPENROUTESERVICE_API_KEY,JWT_SERVICE_KEY,JWT_EXPIRATION
+          script: |
+            mkdir -p ~/BookRider/backend
+            mv /tmp/backend-deploy/* ~/BookRider/backend/
+            cd ~/BookRider/backend
+
+            echo "DB_URL=$DB_URL" > .env
+            echo "DB_USERNAME=$DB_USERNAME" >> .env
+            echo "DB_PASSWORD=$DB_PASSWORD" >> .env
+            echo "OPENROUTESERVICE_API_KEY=$OPENROUTESERVICE_API_KEY" >> .env
+            echo "JWT_SERVICE_KEY=$JWT_SERVICE_KEY" >> .env
+            echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> .env
+
+            docker stop backend-container || true
+            docker rm backend-container || true
+            docker rmi backend-image || true
+            docker system prune -af --volumes
+
+            docker build -t backend-image .
+            docker run -d --restart unless-stopped -p 8080:8080 --env-file .env --name backend-container backend-image
+
+            rm -rf /tmp/backend-deploy
